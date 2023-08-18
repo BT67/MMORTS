@@ -1,0 +1,16 @@
+{
+  "name": "webrpg",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "minimist": "*",
+    "extend": "*",
+    "binary-parser": "*",
+    "performance-now": "*",
+    "mysql": "*",
+    "q": "*",
+    "underscore": "*"
+  },
+  "author": "Jean-Luc Gallo",
+  "license": "ISC"
+}
