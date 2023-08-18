@@ -6,9 +6,6 @@ module.exports = function () {
     //Below objects are added to client by the server at runtime:
     //this.socket = {}
     //this.user = {}
-
-
-
     this.initiate = function () {
         var client = this;
         //send the connection handshake packet to the client
@@ -17,6 +14,8 @@ module.exports = function () {
     };
 
     this.data = function (data) {
+        var client = this;
+        var clientid = client.id;
         console.log(data);
         console.log(timeNow() + "Client Data: " + data.toString());
         packet.parse(client, data);
@@ -24,6 +23,8 @@ module.exports = function () {
 
     //Log the user out if client is unexpectedly closed or crashes:
     this.error = function (err) {
+        var client = this;
+        var clientid = client.id;
         console.log(timeNow() + "Client Error: " + err.toString());
         console.log(timeNow() + "Client Connection Closed");
         const connection = mysql.createConnection({
@@ -31,7 +32,6 @@ module.exports = function () {
             user: 'root',
             password: 'root',
         });
-        var clientid = client.id;
         function getLastRecord(clientid, next) {
             var query_str = "SELECT username, current_room FROM webrpg.users WHERE current_client = ? LIMIT 1";
             var query_var = [clientid];
