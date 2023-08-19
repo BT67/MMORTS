@@ -9,7 +9,6 @@ const connection = new Client({
     database: 'postgres'
 });
 var zeroBuffer = Buffer.from("00", "hex");
-
 module.exports = packet = {
     //params is an array of javascript objects to be turned into buffers to send data to gamemaker
     build: function (params) {
@@ -69,15 +68,15 @@ module.exports = packet = {
                 connection.query(query, values, function (error, result) {
                     if (error || (result.length < 1)) {
                         client.socket.write(packet.build(["LOGIN", "FALSE"]));
-                        console.log(timeNow() + conf.err_msg_login);
+                        console.log(timeNow() + config.err_msg_login);
                     } else {
                         next(null, rows);
                     }
                 });
             }
-            getLastRecord(username, function (err, data) {
-                if (err) {
-                    throw err;
+            getLastRecord(username, function (error, data) {
+                if (error) {
+                    throw error;
                 } else {
                     console.log(data);
                     client.username = username;
@@ -96,13 +95,7 @@ module.exports = packet = {
                 console.log(timeNow() + config.msg_login_success);
             });
             client.socket.write(packet.build([
-                "LOGIN",
-                "TRUE",
-                username,
-                current_room,
-                pos_x,
-                pos_y,
-                1
+                "LOGIN", "TRUE", username, current_room, pos_x, pos_y,  1
             ]));
             maps[current_room].clients.push(client);
             //Send spawn player packet to other clients in the room who are online
@@ -117,80 +110,81 @@ module.exports = packet = {
             }
         }
         function register(username, password) {
+            //Check username and password format:
+            if(username.length > config.username_length || username.length === 0){
+                client.socket.write(packet.build(["REGISTER", "FALSE", "USERNAME"]));
+                console.log(timeNow() + config.err_msg_register_invalid_username);
+                return;
+            }
+            if(password.length > config.password_length || password.length === 0){
+                client.socket.write(packet.build(["REGISTER", "FALSE", "PASSWORD"]));
+                console.log(timeNow() + config.err_msg_register_invalid_password);
+                return;
+            }
             connection.connect((error) => {
                 if (error) {
-                    client.socket.write(packet.build(["REGISTER", "FALSE"]));
-                    console.log(error);
-
+                    client.socket.write(packet.build(["REGISTER", "FALSE", "TAKEN"]));
+                    console.log(timeNow() + config.err_msg_register);
+                    throw error;
                 }
             });
             query = "SELECT * FROM public.users WHERE username = ? ";
             values = [username];
             connection.query(query, values, function (error, result) {
                 if (result.length > 0) {
-                    console.log(timeNow() + result);
-                    client.socket.write(packet.build(["REGISTER", "FALSE"]));
+                    console.log(timeNow() + config.err_msg_register_user_exists);
+                    client.socket.write(packet.build(["REGISTER", "TAKEN"]));
+                    throw error;
                 } else {
                     //If username is not taken, register the user:
                     query = "INSERT INTO public.users (username, password, current_room, pos_x, pos_y) VALUES (?,?,?,?,?)";
                     values = [username, password, config.start_room, config.start_x, config.start_y];
-                    connection.query(query, values, function (error, result) {
+                    connection.query(query, values, function (error) {
                         if (error) {
-                            //console.log('Error: Failed to register new user, error adding user to database');
-                            client.socket.write(packet.build(["REGISTER", "FALSE"]));
-                            //console.log("Failed register packet sent");
-                            console.log(timeNow() + error);
+                            client.socket.write(packet.build(["REGISTER", "FALSE", "DATABASE"]));
+                            console.log(timeNow() + config.err_msg_register_database);
+                            throw error;
                         } else {
                             client.socket.write(packet.build(["REGISTER", "TRUE"]));
+                            console.log(timeNow() + config.msg_register_success);
                         }
                     });
                 }
             });
-            function entity(name, target_x, target_y, health) {
+            function entity(entity_name, entity_type, target_x, target_y, health, sprite) {
                 maps.forEach(function (map) {
                     map.clients.forEach(function (otherClient) {
                             otherClient.socket.write(packet.build([
-                                "ENTITY",
-                                name,
-                                target_x.toString(),
-                                target_y.toString(),
-                                health
+                                "ENTITY", name, target_x.toString(), target_y.toString(), health, sprite
                             ]));
                     });
                 });
             }
             //Send entity attacks to other clients
-            function attack(enemy, attack, current_x, current_y, target_x, target_y) {
-                 maps["zone1"].clients.forEach(function (OtherClient) {
-                    OtherClient.socket.write(packet.build(["ENATK", enemy, attack, current_x, current_y, target_x, target_y]));
+            function attack(attack_name, attack_type, target_entity, origin_entity, damage, sprite) {
+                 maps[current_room].clients.forEach(function (OtherClient) {
+                    OtherClient.socket.write(packet.build([
+                        "ATTACK", attack_name, attack_type, target_entity, origin_entity, damage, sprite
+                    ]));
                 });
             }
-            //Send logout packet to other clients
+            //TODO console log for login/logout should show username and clientId
             function logout(username) {
-                console.log("logout event: " + username);
-                for (var i = 0; i < users.length; i++) {
-                    if (users[i][0] === username) {
-                        users[i][3] = null;
-                        break;
-                    }
-                }
-                maps["zone1"].clients.forEach(function (OtherClient) {
-                    if (OtherClient.user.toString() !== username.toString()) {
-                        OtherClient.socket.write(packet.build(["NETLOGOUT", username]));
-                    }
-                });
-
                 query = "UPDATE public.users SET online_status = 0, current_client = null WHERE username = ? AND online_status = 1 LIMIT 1";
                 values = [username];
                 connection.query(query, values, function (error) {
                     if(error) {
-                        console.log(time)
+                        console.log(timeNow() + config.err_msg_logout)
                         throw error;
                     }
-                    client.loggedin = 1;
+                    console.log(timeNow() + config.msg_logout_success);
                 });
+                // maps[current_room].clients.forEach(function (OtherClient) {
+                //     if (OtherClient.user.toString() !== username.toString()) {
+                //         OtherClient.socket.write(packet.build(["DESTROY", username]));
+                //     }
+                // });
             }
-
             var data;
             //Interpret commands for client
             switch (header.command.toUpperCase()) {
@@ -203,24 +197,23 @@ module.exports = packet = {
                     register(data.username, data.password);
                     break;
                 case "ENTITY":
-                    data = PacketModels.pos.parse(datapacket);
-                    entity(data.username, data.target_x, data.target_y);
+                    data = PacketModels.entity.parse(datapacket);
+                    entity(data.entity_name, data.entity_type, data.target_x, data.target_y, data.health, data.sprite);
                     break;
                 case "ATTACK":
-                    data = PacketModels.platk.parse(datapacket);
-                    attack(data.username, data.attack, data.current_x, data.current_y, data.target_x, data.target_y);
+                    data = PacketModels.attack.parse(datapacket);
+                    attack(data.attack_name, data.attack_type, data.target_entity, data.origin_entity, data.damage, data.sprite);
                     break;
                 case "LOGOUT":
                     data = PacketModels.logout.parse(datapacket);
                     logout(data.username);
                     break;
-                case "DEATH":
+                case "DESTROY":
                     data = PacketModels.endeath.parse(datapacket);
                     break;
             }
         }
-        //TODO store mob and player positions IN MEMORY, only save to database on logout
-        //Store in jsons, not arrays
+        //TODO store mob and player positions IN MEMORY in jsons, only save to database on logout/server downtime
         function timeNow() {
             var timeStamp = new Date().toISOString();
             return "[" + timeStamp + "] ";
