@@ -44,7 +44,16 @@ map_files.forEach(function (mapFile) {
 
 
 //Initialise the database:
-var query_str = "CREATE TABLE IF NOT EXISTS users(username VARCHAR(30), password VARCHAR(30), email VARCHAR(100), current_room VARCHAR(100), pos_x INTEGER, pos_y INTEGER, sprite VARCHAR(100), online_status boolean)";
+var query_str = "CREATE TABLE IF NOT EXISTS users(" +
+    "username VARCHAR(30), " +
+    "password VARCHAR(30), " +
+    "email VARCHAR(100), " +
+    "current_room VARCHAR(100), " +
+    "current_client VARCHAR(30), " +
+    "pos_x INTEGER, " +
+    "pos_y INTEGER, " +
+    "sprite VARCHAR(100), " +
+    "online_status boolean)";
 const connection = new Client({
     host: '127.0.0.1',
     port: '5432',

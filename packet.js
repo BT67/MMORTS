@@ -51,172 +51,186 @@ module.exports = packet = {
         var query;
         var values;
         var header = PacketModels.header.parse(datapacket);
+
         function login(username, password) {
-            connection.connect((err) => {
-                if (err) {
-                    client.socket.write(packet.build(["DB", "FALSE"]));
-                    console.log(timeNow() + conf.err_msg_db);
-                    throw err;
+            connection.connect((error) => {
+                if (error) {
+                    client.socket.write(packet.build(["LOGIN", "FALSE", config.err_msg_db]));
+                    console.log(timeNow() + config.err_msg_db);
+                    throw error;
                 }
+            });
+            query = "UPDATE public.users SET online_status = 1, current_client = ? WHERE username = ? AND password = ? AND online_status = 0 AND current_client is null LIMIT 1";
+            values = [client.id, username, password];
+            connection.query(query, values, function (error) {
+                if (error) {
+                    console.log(timeNow() + config.err_msg_login_auth);
+                    throw error;
+                }
+                console.log(timeNow() + config.msg_login_success);
             });
             var current_room;
             var pos_x;
             var pos_y;
+            var health;
+            var sprite;
+
             function getLastRecord(username, next) {
                 query = "SELECT * FROM public.users WHERE username = ? AND password = ? AND online_status = 0 LIMIT 1";
                 values = [username, password];
                 connection.query(query, values, function (error, result) {
                     if (error || (result.length < 1)) {
-                        client.socket.write(packet.build(["LOGIN", "FALSE"]));
-                        console.log(timeNow() + config.err_msg_login);
+                        client.socket.write(packet.build(["LOGIN", "FALSE", config.err_msg_login_auth]));
+                        console.log(timeNow() + config.err_msg_login_auth);
                     } else {
                         next(null, rows);
                     }
                 });
             }
+
             getLastRecord(username, function (error, data) {
                 if (error) {
                     throw error;
                 } else {
-                    console.log(data);
+                    console.log(timeNow() + data);
                     client.username = username;
                     current_room = data[0].current_room;
                     pos_x = parseInt(data[0].pos_x);
                     pos_y = parseInt(data[0].pos_y);
+                    health = parseInt(data[0].health);
+                    sprite = data[0].sprite;
                 }
-            });
-            query = "UPDATE public.users SET online_status = 1, current_client = ? WHERE username = ? AND password = ? AND online_status = 0 LIMIT 1";
-            values = [client.id, username, password];
-            connection.query(query, values, function (error, result) {
-                if (error) {
-                    console.log(timeNow() + config.err_msg_login);
-                    throw error;
-                }
-                console.log(timeNow() + config.msg_login_success);
             });
             client.socket.write(packet.build([
-                "LOGIN", "TRUE", username, current_room, pos_x, pos_y,  1
+                "LOGIN", "TRUE", username, current_room, pos_x, pos_y
             ]));
-            maps[current_room].clients.push(client);
             //Send spawn player packet to other clients in the room who are online
+            maps[current_room].clients.push(client);
             maps[current_room].clients.forEach(function (otherClient) {
                 if (otherClient.id !== client.id) {
-                    otherClient.socket.write(packet.build(["SPAWN", username, pos_x, pos_y]));
+                    otherClient.socket.write(packet.build([
+                        "SPAWN", username, "player", pos_x, pos_y, health, sprite
+                    ]));
                 }
             });
             //Get list of current entities in the room with their positions, and send to player:
-            for (let i = 0; i < maps[current_room].entities.length; i++) {
-                //client.socket.write(packet.build(["SPAWN", username, pos_x, pos_y]));
-            }
-        }
-        function register(username, password) {
-            //Check username and password format:
-            if(username.length > config.username_length || username.length === 0){
-                client.socket.write(packet.build(["REGISTER", "FALSE", "USERNAME"]));
-                console.log(timeNow() + config.err_msg_register_invalid_username);
-                return;
-            }
-            if(password.length > config.password_length || password.length === 0){
-                client.socket.write(packet.build(["REGISTER", "FALSE", "PASSWORD"]));
-                console.log(timeNow() + config.err_msg_register_invalid_password);
-                return;
-            }
-            connection.connect((error) => {
-                if (error) {
-                    client.socket.write(packet.build(["REGISTER", "FALSE", "TAKEN"]));
-                    console.log(timeNow() + config.err_msg_register);
-                    throw error;
+            maps[current_room].entities.forEach(function (entity) {
+                if (entity.name !== username) {
+                    client.socket.write(packet.build([
+                        "SPAWN", entity.name, entity.type, entity.pos_x, entity.pos_y, entity.health, entity.sprite
+                    ]));
                 }
             });
-            query = "SELECT * FROM public.users WHERE username = ? ";
-            values = [username];
-            connection.query(query, values, function (error, result) {
-                if (result.length > 0) {
-                    console.log(timeNow() + config.err_msg_register_user_exists);
-                    client.socket.write(packet.build(["REGISTER", "TAKEN"]));
-                    throw error;
-                } else {
-                    //If username is not taken, register the user:
-                    query = "INSERT INTO public.users (username, password, current_room, pos_x, pos_y) VALUES (?,?,?,?,?)";
-                    values = [username, password, config.start_room, config.start_x, config.start_y];
-                    connection.query(query, values, function (error) {
-                        if (error) {
-                            client.socket.write(packet.build(["REGISTER", "FALSE", "DATABASE"]));
-                            console.log(timeNow() + config.err_msg_register_database);
-                            throw error;
-                        } else {
-                            client.socket.write(packet.build(["REGISTER", "TRUE"]));
-                            console.log(timeNow() + config.msg_register_success);
-                        }
-                    });
+
+            function register(username, password) {
+                //Check username and password format:
+                if (username.length > config.username_length || username.length === 0) {
+                    client.socket.write(packet.build([
+                        "REGISTER", "FALSE", config.err_msg_register_invalid_username
+                    ]));
+                    console.log(timeNow() + config.err_msg_register_invalid_username);
+                    return;
                 }
-            });
-            function entity(entity_name, entity_type, target_x, target_y, health, sprite) {
-                maps.forEach(function (map) {
-                    map.clients.forEach(function (otherClient) {
+                if (password.length > config.password_length || password.length === 0) {
+                    client.socket.write(packet.build([
+                        "REGISTER", "FALSE", config.err_msg_register_invalid_password
+                    ]));
+                    console.log(timeNow() + config.err_msg_register_invalid_password);
+                    return;
+                }
+                connection.connect((error) => {
+                    if (error) {
+                        client.socket.write(packet.build([
+                            "REGISTER", "FALSE", config.err_msg_register_database
+                        ]));
+                        console.log(timeNow() + config.err_msg_register_database);
+                        throw error;
+                    }
+                });
+                //If username is not taken, register the user:
+                query = "INSERT INTO public.users (username, password, current_room, pos_x, pos_y) VALUES (?,?,?,?,?)";
+                values = [username, password, config.start_room, config.start_x, config.start_y];
+                connection.query(query, values, function (error) {
+                    if (error) {
+                        client.socket.write(packet.build([
+                            "REGISTER", "FALSE", config.err_msg_register_user_exists
+                        ]));
+                        console.log(timeNow() + config.err_msg_register_user_exists);
+                        throw error;
+                    } else {
+                        client.socket.write(packet.build([
+                            "REGISTER", "TRUE", config.msg_register_success
+                        ]));
+                        console.log(timeNow() + config.msg_register_success);
+                    }
+                });
+
+                function entity(entity_name, entity_type, target_x, target_y, health, sprite) {
+                    maps.forEach(function (map) {
+                        map.clients.forEach(function (otherClient) {
                             otherClient.socket.write(packet.build([
                                 "ENTITY", name, target_x.toString(), target_y.toString(), health, sprite
                             ]));
+                        });
                     });
-                });
+                }
+
+                //Send entity attacks to other clients
+                function attack(attack_name, attack_type, target_entity, origin_entity, damage, sprite) {
+                    maps[current_room].clients.forEach(function (OtherClient) {
+                        OtherClient.socket.write(packet.build([
+                            "ATTACK", attack_name, attack_type, target_entity, origin_entity, damage, sprite
+                        ]));
+                    });
+                }
+
+                //TODO console log for login/logout should show username and clientId
+                function logout(username) {
+                    query = "UPDATE public.users SET online_status = 0, current_client = null WHERE username = ? AND online_status = 1 LIMIT 1";
+                    values = [username];
+                    connection.query(query, values, function (error) {
+                        if (error) {
+                            console.log(timeNow() + config.err_msg_logout)
+                            throw error;
+                        }
+                        console.log(timeNow() + config.msg_logout_success);
+                    });
+                    // maps[current_room].clients.forEach(function (OtherClient) {
+                    //     if (OtherClient.user.toString() !== username.toString()) {
+                    //         OtherClient.socket.write(packet.build(["DESTROY", username]));
+                    //     }
+                    // });
+                }
+                var data;
+                //Interpret commands for client
+                switch (header.command.toUpperCase()) {
+                    case "LOGIN":
+                        data = PacketModels.login.parse(datapacket);
+                        login(data.username, data.password);
+                        break;
+                    case "REGISTER":
+                        data = PacketModels.register.parse(datapacket);
+                        register(data.username, data.password);
+                        break;
+                    case "ENTITY":
+                        data = PacketModels.entity.parse(datapacket);
+                        entity(data.entity_name, data.entity_type, data.target_x, data.target_y, data.health, data.sprite);
+                        break;
+                    case "ATTACK":
+                        data = PacketModels.attack.parse(datapacket);
+                        attack(data.attack_name, data.attack_type, data.target_entity, data.origin_entity, data.damage, data.sprite);
+                        break;
+                    case "LOGOUT":
+                        data = PacketModels.logout.parse(datapacket);
+                        logout(data.username);
+                        break;
+                }
             }
-            //Send entity attacks to other clients
-            function attack(attack_name, attack_type, target_entity, origin_entity, damage, sprite) {
-                 maps[current_room].clients.forEach(function (OtherClient) {
-                    OtherClient.socket.write(packet.build([
-                        "ATTACK", attack_name, attack_type, target_entity, origin_entity, damage, sprite
-                    ]));
-                });
+            //TODO store mob and player positions IN MEMORY in jsons, only save to database on logout/server downtime
+            function timeNow() {
+                var timeStamp = new Date().toISOString();
+                return "[" + timeStamp + "] ";
             }
-            //TODO console log for login/logout should show username and clientId
-            function logout(username) {
-                query = "UPDATE public.users SET online_status = 0, current_client = null WHERE username = ? AND online_status = 1 LIMIT 1";
-                values = [username];
-                connection.query(query, values, function (error) {
-                    if(error) {
-                        console.log(timeNow() + config.err_msg_logout)
-                        throw error;
-                    }
-                    console.log(timeNow() + config.msg_logout_success);
-                });
-                // maps[current_room].clients.forEach(function (OtherClient) {
-                //     if (OtherClient.user.toString() !== username.toString()) {
-                //         OtherClient.socket.write(packet.build(["DESTROY", username]));
-                //     }
-                // });
-            }
-            var data;
-            //Interpret commands for client
-            switch (header.command.toUpperCase()) {
-                case "LOGIN":
-                    data = PacketModels.login.parse(datapacket);
-                    login(data.username, data.password);
-                    break;
-                case "REGISTER":
-                    data = PacketModels.register.parse(datapacket);
-                    register(data.username, data.password);
-                    break;
-                case "ENTITY":
-                    data = PacketModels.entity.parse(datapacket);
-                    entity(data.entity_name, data.entity_type, data.target_x, data.target_y, data.health, data.sprite);
-                    break;
-                case "ATTACK":
-                    data = PacketModels.attack.parse(datapacket);
-                    attack(data.attack_name, data.attack_type, data.target_entity, data.origin_entity, data.damage, data.sprite);
-                    break;
-                case "LOGOUT":
-                    data = PacketModels.logout.parse(datapacket);
-                    logout(data.username);
-                    break;
-                case "DESTROY":
-                    data = PacketModels.endeath.parse(datapacket);
-                    break;
-            }
-        }
-        //TODO store mob and player positions IN MEMORY in jsons, only save to database on logout/server downtime
-        function timeNow() {
-            var timeStamp = new Date().toISOString();
-            return "[" + timeStamp + "] ";
         }
     }
 }

@@ -24,36 +24,36 @@ module.exports = function () {
         packet.parse(client, data);
     };
     //Log the user out if client is unexpectedly closed or crashes:
-    this.error = function (username) {
-        query = "UPDATE public.users SET online_status = 0 , current_client = null WHERE username = ? AND online_status = 1 LIMIT 1";
-        values = [username];
-        if (username === undefined || username.length === 0) {
-            console.log(timeNow() + config.msg_client_disconnect + clientId);
-        } else {
-            connection.query(query, values, function (error) {
-                if (error) {
-                    console.log(timeNow() + "Error: Failed to logout user=" + user + " from clientid=" + client.id);
-                    throw error;
-                } else {
-                    console.log(timeNow() + "logout successful, clientid=" + client.id + " logged out as user=" + user);
-                }
-            });
-        }
-        function getLastRecord(clientid, current_room, next) {
-            var query_str = "SELECT current_client FROM public.users WHERE current_room = ? AND current_client != ? ";
-            var query_var = [current_room, clientid];
-            connection.query(query_str, query_var, function (error, rows) {
-                if (err) {
-                    console.log(err);
-                    next(err);
-                } else {
-                    next(null, rows);
-                }
-            });
-            connection.end();
-        }
+    this.error = function () {
+        console.log(timeNow() + config.err_msg_client_error + clientId);
+        query = "UPDATE public.users SET online_status = 0 , current_client = null WHERE current_client = ? LIMIT 1";
+        values = [clientId];
+        connection.query(query, values, function (error) {
+            if (error) {
+                console.log(timeNow() + config.err_msg_logout_database);
+                throw error;
+            } else {
+                console.log(timeNow() + config.msg_logout_success);
+            }
+        });
     }
-};
+
+    function getLastRecord(clientid, current_room, next) {
+        var query_str = "SELECT current_client FROM public.users WHERE current_room = ? AND current_client != ? ";
+        var query_var = [current_room, clientid];
+        connection.query(query_str, query_var, function (error, rows) {
+            if (error) {
+                console.log(error);
+                next(error);
+            } else {
+                next(null, rows);
+            }
+        });
+        connection.end();
+        //TODO add connection.end() for all sql queries
+    }
+}
+
 this.end = function () {
 }
 

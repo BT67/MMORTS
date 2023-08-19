@@ -6,6 +6,7 @@ var StringOptions = {
 };
 
 //Password should be encrypted by the client before being transmitted to the server
+//Packet models sent from the client to the server
 module.exports = PacketModels = {
     header: new Parser().skip(1).string("command", StringOptions),
     login: new Parser().skip(1).string("command", StringOptions)
@@ -15,15 +16,12 @@ module.exports = PacketModels = {
         .string("username", StringOptions)
         .string("password", StringOptions),
     logout: new Parser().skip(1).string("command", StringOptions)
-        .string("username", StringOptions)
-
-    ,
-
+        .string("username", StringOptions),
     spawn: new Parser().skip(1).string("command", StringOptions)
         .string("entity_name", StringOptions)
         .string("entity_type", StringOptions)
-        .string("target_x", StringOptions)
-        .string("target_y", StringOptions)
+        .string("pos_x", StringOptions)
+        .string("pos_y", StringOptions)
         .string("health", StringOptions)
         .string("sprite", StringOptions),
     entity: new Parser().skip(1).string("command", StringOptions)

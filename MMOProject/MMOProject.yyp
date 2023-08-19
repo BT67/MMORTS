@@ -30,6 +30,8 @@
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"UI Framework","folderPath":"folders/Sprites/UI Framework.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Tile Sets","folderPath":"folders/Tile Sets.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Timelines","folderPath":"folders/Timelines.yy",},
+    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Maps","folderPath":"folders/Rooms/Maps.yy",},
+    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Menus","folderPath":"folders/Rooms/Menus.yy",},
   ],
   "IncludedFiles": [],
   "isEcma": false,
@@ -46,6 +48,7 @@
     {"id":{"name":"network_write","path":"scripts/network_write/network_write.yy",},},
     {"id":{"name":"btn_register","path":"objects/btn_register/btn_register.yy",},},
     {"id":{"name":"spr_ui_base","path":"sprites/spr_ui_base/spr_ui_base.yy",},},
+    {"id":{"name":"zone1","path":"rooms/zone1/zone1.yy",},},
     {"id":{"name":"handle_packet","path":"scripts/handle_packet/handle_packet.yy",},},
     {"id":{"name":"txt_username","path":"objects/txt_username/txt_username.yy",},},
     {"id":{"name":"ui_textbox_base","path":"objects/ui_textbox_base/ui_textbox_base.yy",},},
@@ -56,6 +59,7 @@
   "RoomOrderNodes": [
     {"roomId":{"name":"rm_init","path":"rooms/rm_init/rm_init.yy",},},
     {"roomId":{"name":"rm_login","path":"rooms/rm_login/rm_login.yy",},},
+    {"roomId":{"name":"zone1","path":"rooms/zone1/zone1.yy",},},
   ],
   "TextureGroups": [
     {"resourceType":"GMTextureGroup","resourceVersion":"1.3","name":"Default","autocrop":true,"border":2,"compressFormat":"bz2","directory":"","groupParent":null,"isScaled":true,"loadType":"default","mipsToGenerate":0,"targets":-1,},

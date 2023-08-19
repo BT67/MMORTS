@@ -3,7 +3,7 @@
   <database-model serializer="dbm" dbms="POSTGRES" family-id="POSTGRES" format-version="4.49">
     <root id="1">
       <DateStyle>mdy</DateStyle>
-      <IntrospectionStateNumber>738</IntrospectionStateNumber>
+      <IntrospectionStateNumber>748</IntrospectionStateNumber>
       <ServerVersion>15.4</ServerVersion>
       <StartupTime>1692410966</StartupTime>
       <TimeZones>true ACDT
@@ -802,18 +802,18 @@ false Zulu
 13183||10|C|G
 13183||-9223372036854775808|U|G
 13183||10|U|G</Grants>
-      <IntrospectionStateNumber>738</IntrospectionStateNumber>
+      <IntrospectionStateNumber>748</IntrospectionStateNumber>
       <ObjectId>5</ObjectId>
       <OwnerName>postgres</OwnerName>
     </database>
-    <role id="3" parent="1" name="pg_database_owner">
+    <role id="3" parent="1" name="pg_checkpoint">
+      <ObjectId>4544</ObjectId>
+    </role>
+    <role id="4" parent="1" name="pg_database_owner">
       <ObjectId>6171</ObjectId>
     </role>
-    <role id="4" parent="1" name="pg_read_all_data">
-      <ObjectId>6181</ObjectId>
-    </role>
-    <role id="5" parent="1" name="pg_write_all_data">
-      <ObjectId>6182</ObjectId>
+    <role id="5" parent="1" name="pg_execute_server_program">
+      <ObjectId>4571</ObjectId>
     </role>
     <role id="6" parent="1" name="pg_monitor">
       <ObjectId>3373</ObjectId>
@@ -821,29 +821,29 @@ false Zulu
 3375
 3377</RoleGrants>
     </role>
-    <role id="7" parent="1" name="pg_read_all_settings">
+    <role id="7" parent="1" name="pg_read_all_data">
+      <ObjectId>6181</ObjectId>
+    </role>
+    <role id="8" parent="1" name="pg_read_all_settings">
       <ObjectId>3374</ObjectId>
     </role>
-    <role id="8" parent="1" name="pg_read_all_stats">
+    <role id="9" parent="1" name="pg_read_all_stats">
       <ObjectId>3375</ObjectId>
-    </role>
-    <role id="9" parent="1" name="pg_stat_scan_tables">
-      <ObjectId>3377</ObjectId>
     </role>
     <role id="10" parent="1" name="pg_read_server_files">
       <ObjectId>4569</ObjectId>
     </role>
-    <role id="11" parent="1" name="pg_write_server_files">
-      <ObjectId>4570</ObjectId>
-    </role>
-    <role id="12" parent="1" name="pg_execute_server_program">
-      <ObjectId>4571</ObjectId>
-    </role>
-    <role id="13" parent="1" name="pg_signal_backend">
+    <role id="11" parent="1" name="pg_signal_backend">
       <ObjectId>4200</ObjectId>
     </role>
-    <role id="14" parent="1" name="pg_checkpoint">
-      <ObjectId>4544</ObjectId>
+    <role id="12" parent="1" name="pg_stat_scan_tables">
+      <ObjectId>3377</ObjectId>
+    </role>
+    <role id="13" parent="1" name="pg_write_all_data">
+      <ObjectId>6182</ObjectId>
+    </role>
+    <role id="14" parent="1" name="pg_write_server_files">
+      <ObjectId>4570</ObjectId>
     </role>
     <role id="15" parent="1" name="postgres">
       <BypassRls>1</BypassRls>
@@ -4229,12 +4229,73 @@ false Zulu
     <schema id="262" parent="2" name="public">
       <Comment>standard public schema</Comment>
       <Current>1</Current>
-      <IntrospectionStateNumber>738</IntrospectionStateNumber>
-      <IntrospectionTimestamp>2023-08-19.11:21:12.629</IntrospectionTimestamp>
-      <LocalIntrospectionTimestamp>2023-08-19.02:21:14</LocalIntrospectionTimestamp>
+      <IntrospectionStateNumber>748</IntrospectionStateNumber>
+      <IntrospectionTimestamp>2023-08-19.20:53:09.986</IntrospectionTimestamp>
+      <LocalIntrospectionTimestamp>2023-08-19.11:53:11</LocalIntrospectionTimestamp>
       <ObjectId>2200</ObjectId>
       <StateNumber>518</StateNumber>
       <OwnerName>pg_database_owner</OwnerName>
     </schema>
+    <table id="263" parent="262" name="users">
+      <ObjectId>16401</ObjectId>
+      <StateNumber>747</StateNumber>
+      <AccessMethodId>2</AccessMethodId>
+      <OwnerName>postgres</OwnerName>
+    </table>
+    <column id="264" parent="263" name="username">
+      <DasType>varchar(30)|0s</DasType>
+      <Position>1</Position>
+      <StateNumber>741</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="265" parent="263" name="password">
+      <DasType>varchar(30)|0s</DasType>
+      <Position>2</Position>
+      <StateNumber>741</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="266" parent="263" name="email">
+      <DasType>varchar(100)|0s</DasType>
+      <Position>3</Position>
+      <StateNumber>741</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="267" parent="263" name="current_room">
+      <DasType>varchar(100)|0s</DasType>
+      <Position>4</Position>
+      <StateNumber>741</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="268" parent="263" name="pos_x">
+      <DasType>integer|0s</DasType>
+      <Position>5</Position>
+      <StateNumber>741</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="269" parent="263" name="pos_y">
+      <DasType>integer|0s</DasType>
+      <Position>6</Position>
+      <StateNumber>741</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="270" parent="263" name="sprite">
+      <DasType>varchar(100)|0s</DasType>
+      <Position>7</Position>
+      <StateNumber>741</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="271" parent="263" name="online_status">
+      <DasType>boolean|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>8</Position>
+      <StateNumber>744</StateNumber>
+      <TypeId>16</TypeId>
+    </column>
+    <column id="272" parent="263" name="current_client">
+      <DasType>varchar(30)|0s</DasType>
+      <Position>9</Position>
+      <StateNumber>747</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
   </database-model>
 </dataSource>

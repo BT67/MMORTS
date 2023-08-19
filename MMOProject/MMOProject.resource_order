@@ -19,6 +19,8 @@
     {"name":"UI Framework","order":1,"path":"folders/Sprites/UI Framework.yy",},
     {"name":"Tile Sets","order":2,"path":"folders/Tile Sets.yy",},
     {"name":"Timelines","order":8,"path":"folders/Timelines.yy",},
+    {"name":"Maps","order":2,"path":"folders/Rooms/Maps.yy",},
+    {"name":"Menus","order":3,"path":"folders/Rooms/Menus.yy",},
   ],
   "ResourceOrderSettings": [
     {"name":"ui_button_base","order":3,"path":"objects/ui_button_base/ui_button_base.yy",},
