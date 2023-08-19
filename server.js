@@ -3,13 +3,15 @@ var fs = require("fs");
 var net = require("net");
 require("./packet.js");
 require((__dirname + '/Resources/config.js'));
-const mysql = require("mysql");
+const pg = require("pg");
+const {Client} = require("pg");
 
 /*
 1. Load the init files
 2. Load game models
 3. Load game map data
-4. Init server and listen to the internet
+4. Init database
+5. Init server and listen to the internet
  */
 
 var timeStamp = new Date();
@@ -38,6 +40,28 @@ map_files.forEach(function (mapFile) {
     console.log(timeNow() + "Loading map file: " + mapFile);
     var map = require(config.data_paths.maps + mapFile);
     maps[map.room] = map;
+});
+
+
+//Initialise the database:
+var query_str = "CREATE TABLE IF NOT EXISTS users(username VARCHAR(30), password VARCHAR(30), email VARCHAR(100), current_room VARCHAR(100), pos_x INTEGER, pos_y INTEGER, sprite VARCHAR(100))";
+const connection = new Client({
+    host: '127.0.0.1',
+    port: '5432',
+    user: 'postgres',
+    password: 'root',
+    database: 'postgres'
+});
+
+console.log(timeNow() + "Initialising database...");
+connection.connect();
+connection.query(query_str, function (err) {
+    if (err) {
+        console.log(timeNow() + err);
+    } else {
+        console.log(timeNow() + "Users table created in database");
+    }
+    connection.end();
 });
 
 //Initialise the server

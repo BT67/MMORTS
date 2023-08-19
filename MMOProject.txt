@@ -1,3 +1,8 @@
 MMO Project
 
-Lets Build a MMORPG vid 7
+Lets Build a MMORPG vid 9
+
+
+PGadmin:
+postgres
+root

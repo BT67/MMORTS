@@ -7,7 +7,7 @@
     "extend": "*",
     "binary-parser": "*",
     "performance-now": "*",
-    "mysql": "*",
+    "pg": "*",
     "q": "*",
     "underscore": "*"
   },

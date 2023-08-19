@@ -1,5 +1,5 @@
 const {data} = require("./client");
-const mysql = require("mysql");
+const pg = require("pg");
 const q = require('q');
 
 //const {toString} = require("underscore/modules/_setup");
@@ -65,7 +65,7 @@ module.exports = packet = {
     //Interpret commands from individual data packets
     interpret: function (client, datapacket) {
         var header = PacketModels.header.parse(datapacket);
-        const connection = mysql.createConnection({
+        const connection = pg.createConnection({
             host: 'localhost',
             user: 'root',
             password: 'root',

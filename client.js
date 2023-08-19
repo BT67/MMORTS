@@ -1,6 +1,6 @@
 var now = require("performance-now");
 var _ = require("underscore");
-const mysql = require("mysql");
+const pg = require("pg");
 
 module.exports = function () {
     //Below objects are added to client by the server at runtime:
@@ -27,7 +27,7 @@ module.exports = function () {
         var clientid = client.id;
         console.log(timeNow() + "Client Error: " + err.toString());
         console.log(timeNow() + "Client Connection Closed");
-        const connection = mysql.createConnection({
+        const connection = pg.createConnection({
             host: '127.0.0.1',
             user: 'root',
             password: 'root',

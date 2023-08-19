@@ -29,13 +29,13 @@ var conf = {
     production: {
         ip: args.ip || "127.0.0.1",
         port: args.port || 8081,
-        database: "jdbc:mysql://localhost:3306/prod"
+        database: "jdbc:postgresql://127.0.0.1:5432/postgres"
     },
 
     test: {
         ip: args.ip || "127.0.0.1",
         port: args.port || 8082,
-        database: "jdbc:mysql://localhost:3306/test"
+        database: "jdbc:postgresql://127.0.0.1:5432/postgres"
     },
 }
 
