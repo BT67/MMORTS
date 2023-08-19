@@ -11,11 +11,26 @@ function handle_packet(data_buffer){
 			status = buffer_read(data_buffer, buffer_string);
 			msg = buffer_read(data_buffer, buffer_string);
 			show_debug_message(date_datetime_string(date_current_datetime()) + msg);
+			if(status == "TRUE"){
+				username = buffer_read(data_buffer, buffer_string);
+				target_room = buffer_read(data_buffer, buffer_string);
+				pos_x = buffer_read(data_buffer, buffer_string);
+				pos_y = buffer_read(data_buffer, buffer_string);
+				player_health = buffer_read(data_buffer, buffer_string);
+				player_sprite = buffer_read(data_buffer, buffer_string);
+				room_goto(asset_get_index(target_room));
+			}
 			break;
 		case "REGISTER":
 			status = buffer_read(data_buffer, buffer_string);
 			msg = buffer_read(data_buffer, buffer_string);
 			show_debug_message(date_datetime_string(date_current_datetime()) + msg);
+			if(status == "TRUE"){
+				
+				
+			} else if(status == "FALSE") {
+				
+			}
 			break;
 		case "SPAWN":
 			break;

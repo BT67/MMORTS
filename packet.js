@@ -74,7 +74,6 @@ module.exports = packet = {
             var pos_y;
             var health;
             var sprite;
-
             function getLastRecord(username, next) {
                 query = "SELECT * FROM public.users WHERE username = ? AND password = ? AND online_status = 0 LIMIT 1";
                 values = [username, password];
@@ -87,7 +86,6 @@ module.exports = packet = {
                     }
                 });
             }
-
             getLastRecord(username, function (error, data) {
                 if (error) {
                     throw error;
@@ -102,7 +100,7 @@ module.exports = packet = {
                 }
             });
             client.socket.write(packet.build([
-                "LOGIN", "TRUE", username, current_room, pos_x, pos_y
+                "LOGIN", "TRUE", username, current_room, pos_x, pos_y, health, sprite
             ]));
             //Send spawn player packet to other clients in the room who are online
             maps[current_room].clients.push(client);
@@ -121,7 +119,6 @@ module.exports = packet = {
                     ]));
                 }
             });
-
             function register(username, password) {
                 //Check username and password format:
                 if (username.length > config.username_length || username.length === 0) {

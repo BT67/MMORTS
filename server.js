@@ -32,6 +32,7 @@ model_files.forEach(function (modelFile) {
 });
 
 var clientIdNo = 0;
+var clients = {};
 
 //Load game map data
 maps = {};
@@ -41,7 +42,6 @@ map_files.forEach(function (mapFile) {
     var map = require(config.data_paths.maps + mapFile);
     maps[map.room] = map;
 });
-
 
 //Initialise the database:
 var query_str = "CREATE TABLE IF NOT EXISTS users(" +
@@ -75,22 +75,21 @@ connection.query(query_str, function (err) {
 
 //Initialise the server
 net.createServer(function (socket) {
-    console.log(timeNow() + "Socket Connected");
     var c_inst = new require("./client.js");
     var thisClient = new c_inst();
     thisClient.socket = socket;
     thisClient.id = clientIdNo;
     thisClient.loggedin = 0;
     clientIdNo += 1;
+    //TODO create clientId allocation system
     thisClient.initiate();
     socket.on("error", thisClient.error);
     socket.on("end", thisClient.end);
     socket.on("data", thisClient.data);
 }).listen(config.port);
 
-console.log(timeNow() + "Server initialisation completed, server running on " + config.ip + ":" + config.port + " on environment=" + config.environment)
-
-console.log(timeNow() + "Server using database=" + config.database);
+console.log(timeNow() + config.msg_server_init + config.ip + ":" + config.port + "/" + config.environment)
+console.log(timeNow() + config.msg_server_db + config.database);
 
 function timeNow() {
     var timeStamp = new Date().toISOString();

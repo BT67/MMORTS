@@ -24,6 +24,7 @@ var common_conf = {
     start_x: 0,
     start_y: 0,
     err_msg_client_error: "Error: Unexpected client error, clientId=",
+
     err_msg_db: "Error: Database connection lost",
     err_msg_login: "Error: Unable to login",
     err_msg_register: "Error: Unable to register new user",
@@ -34,6 +35,10 @@ var common_conf = {
     err_msg_register_database: "Error: Unable to register new user - database connection lost",
     msg_client_disconnect: "Client disconnected, clientId=",
     msg_logout_success: "Successfully logged out",
+    msg_client_connected: "Client connected, clientId=",
+    msg_server_init: "Server initialisation completed, server host=",
+    msg_server_db: "Server database=",
+    msg_client_data: "Data from ClientId=",
     err_msg_logout_database: "Error: Unable to logout - database connection lost",
     msg_login_success: "Successfully logged in",
     msg_register_success: "Successfully registered new user",
