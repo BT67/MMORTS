@@ -24,6 +24,7 @@
     {"name":"ui_button_base","order":3,"path":"objects/ui_button_base/ui_button_base.yy",},
     {"name":"ui_focus_base","order":1,"path":"objects/ui_focus_base/ui_focus_base.yy",},
     {"name":"btn_login","order":2,"path":"objects/btn_login/btn_login.yy",},
+    {"name":"network_write","order":1,"path":"scripts/network_write/network_write.yy",},
     {"name":"btn_register","order":3,"path":"objects/btn_register/btn_register.yy",},
     {"name":"ui_textbox_base","order":2,"path":"objects/ui_textbox_base/ui_textbox_base.yy",},
     {"name":"txt_password","order":1,"path":"objects/txt_password/txt_password.yy",},

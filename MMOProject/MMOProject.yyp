@@ -43,6 +43,7 @@
     {"id":{"name":"ui_button_base","path":"objects/ui_button_base/ui_button_base.yy",},},
     {"id":{"name":"ui_focus_base","path":"objects/ui_focus_base/ui_focus_base.yy",},},
     {"id":{"name":"btn_login","path":"objects/btn_login/btn_login.yy",},},
+    {"id":{"name":"network_write","path":"scripts/network_write/network_write.yy",},},
     {"id":{"name":"btn_register","path":"objects/btn_register/btn_register.yy",},},
     {"id":{"name":"spr_ui_base","path":"sprites/spr_ui_base/spr_ui_base.yy",},},
     {"id":{"name":"handle_packet","path":"scripts/handle_packet/handle_packet.yy",},},

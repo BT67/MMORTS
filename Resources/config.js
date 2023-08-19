@@ -21,7 +21,12 @@ var common_conf = {
         items: __dirname + "\\Game Data\\" + "Items\\",
         maps: __dirname + "\\Game Data\\" + "Maps\\",
     },
-    starting_zone: "zone1"
+    start_room: "zone1",
+    start_x: 0,
+    start_y: 0,
+    err_msg_db: "Error: Database connection lost",
+    err_msg_login: "Error: Unable to Login",
+    msg_login_success: "Successfully Logged in"
 };
 
 //Environment Specific Config

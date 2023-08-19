@@ -1,27 +1,13 @@
 const {data} = require("./client");
-const pg = require("pg");
 const q = require('q');
-
-//const {toString} = require("underscore/modules/_setup");
-
-var movement = [
-    //test_enemy_1:
-    // [150, 150], [100, 150], [120, 150], [120, 180], [200, 130], [180, 150]
-]
-var enemies = [
-    //mob_name, x,y,alive, type, targetx, target y,  respawn time, spawn_x, spawn_y
-    // ["0", 100, 100, 1, "obj_enemy_test", 100, 100, 500, 100, 100],
-    // ["1", 150, 150, 1, "obj_enemy_test", 150, 150, 500, 150, 150],
-    // ["2", 100, 170, 1, "obj_enemy_test", 100, 170, 500, 100, 170]
-]
-
-var users = [
-    //user, x, y, client, health
-    // ["pok", 150, 150, 0, 100],
-    // ["lok", 150, 150, 0, 100]
-]
-var pospackets = [];
-var tick = 0;
+const {Client} = require("pg");
+const connection = new Client({
+    host: '127.0.0.1',
+    port: '5432',
+    user: 'postgres',
+    password: 'root',
+    database: 'postgres'
+});
 var zeroBuffer = Buffer.from("00", "hex");
 
 module.exports = packet = {
@@ -46,8 +32,7 @@ module.exports = packet = {
         var dataBuffer = Buffer.concat(packetParts, packetSize);
         var size = Buffer.alloc(1);
         size.writeUInt8(dataBuffer.length + 1, 0);
-        var finalPacket = Buffer.concat([size, dataBuffer], size.length + dataBuffer.length);
-        return finalPacket;
+        return Buffer.concat([size, dataBuffer], size.length + dataBuffer.length);
     },
     //Read and separate size, header and data of a packet to be handled for a client by the server
     parse: function (client, data) {
@@ -64,373 +49,181 @@ module.exports = packet = {
     },
     //Interpret commands from individual data packets
     interpret: function (client, datapacket) {
+        var query;
+        var values;
         var header = PacketModels.header.parse(datapacket);
-        const connection = pg.createConnection({
-            host: 'localhost',
-            user: 'root',
-            password: 'root',
-        });
         function login(username, password) {
-            connection.connect((error) => {
-                if (error) {
-                    client.socket.write(packet.build(["LOGIN", "FALSE"]));
-                    console.log(error);
-                } else {
-                    var query = "SELECT * FROM webrpg.users WHERE username = ? AND password = ? AND online_status = 0 LIMIT 1";
-                    var values = [username, password];
-                    connection.query(query, values, function (error, result) {
-                        if (error || (result.length < 1)) {
-                            client.socket.write(packet.build(["LOGIN", "FALSE"]));
-                            console.log(error);
-                        } else {
-                            //Obtain other user info from database (room, room pos, inventory, etc)
-                            function getLastRecord(username, next) {
-                                var query_str = "SELECT current_room, pos_x, pos_y FROM webrpg.users WHERE username = ? LIMIT 1";
-                                var query_var = [username];
-                                connection.query(query_str, query_var, function (err, rows, fields) {
-                                    if (err) {
-                                        console.log(err);
-                                        next(err);
-                                    } else {
-                                        next(null, rows);
-                                    }
-                                });
-                            }
-
-                            getLastRecord(username, function (err, data) {
-                                if (err) {
-                                } else {
-                                    var current_room = data[0].current_room;
-                                    var pos_x = data[0].pos_x;
-                                    var pos_y = data[0].pos_y;
-                                    for (let i = 0; i < users.length; i++) {
-                                        if (users[i][0] == username) {
-                                            users[i][1] = parseInt(pos_x);
-                                            users[i][2] = parseInt(pos_y);
-                                            break;
-                                        }
-                                    }
-                                    var online_status = 1;
-                                    client.socket.write(packet.build(["LOGIN", "TRUE", username, current_room, pos_x, pos_y, online_status]));
-                                    maps[current_room].clients.push(client);
-                                    //Send network login packet to other clients in the room who are online
-                                    maps[current_room].clients.forEach(function (otherClient) {
-                                        if (otherClient.id !== client.id) {
-                                            otherClient.socket.write(packet.build(["NETLOGIN", username, pos_x, pos_y]));
-                                        }
-                                    });
-
-                                    //Get list of current enemies in the room, with their positions:
-                                    for (let i = 0; i < enemies.length; i++) {
-                                        if (enemies[i][3] == 1) {
-                                            client.socket.write(packet.build(["POPENEMY", enemies[i][0], enemies[i][4], enemies[i][1].toString(), enemies[i][2].toString(), enemies[i][5].toString(), enemies[i][6].toString()]));
-                                        }
-                                    }
-                                }
-                            });
-                            var query = "UPDATE webrpg.users SET online_status = 1, current_client = ? WHERE username = ? AND password = ? AND online_status = 0 LIMIT 1";
-                            var values = [client.id, username, password];
-                            connection.query(query, values, function (error, result) {
-                                client.loggedin = 1;
-                            });
-                            client.user = username;
-                            for (let i = 0; i < users.length; i++) {
-                                if (users[i][0] == username) {
-                                    users[i][3] = client.id;
-                                    break;
-                                }
-                            }
-                        }
-                    });
+            connection.connect((err) => {
+                if (err) {
+                    client.socket.write(packet.build(["DB", "FALSE"]));
+                    console.log(timeNow() + conf.err_msg_db);
+                    throw err;
                 }
             });
+            var current_room;
+            var pos_x;
+            var pos_y;
+            function getLastRecord(username, next) {
+                query = "SELECT * FROM public.users WHERE username = ? AND password = ? AND online_status = 0 LIMIT 1";
+                values = [username, password];
+                connection.query(query, values, function (error, result) {
+                    if (error || (result.length < 1)) {
+                        client.socket.write(packet.build(["LOGIN", "FALSE"]));
+                        console.log(timeNow() + conf.err_msg_login);
+                    } else {
+                        next(null, rows);
+                    }
+                });
+            }
+            getLastRecord(username, function (err, data) {
+                if (err) {
+                    throw err;
+                } else {
+                    console.log(data);
+                    client.username = username;
+                    current_room = data[0].current_room;
+                    pos_x = parseInt(data[0].pos_x);
+                    pos_y = parseInt(data[0].pos_y);
+                }
+            });
+            query = "UPDATE public.users SET online_status = 1, current_client = ? WHERE username = ? AND password = ? AND online_status = 0 LIMIT 1";
+            values = [client.id, username, password];
+            connection.query(query, values, function (error, result) {
+                if (error) {
+                    console.log(timeNow() + config.err_msg_login);
+                    throw error;
+                }
+                console.log(timeNow() + config.msg_login_success);
+            });
+            client.socket.write(packet.build([
+                "LOGIN",
+                "TRUE",
+                username,
+                current_room,
+                pos_x,
+                pos_y,
+                1
+            ]));
+            maps[current_room].clients.push(client);
+            //Send spawn player packet to other clients in the room who are online
+            maps[current_room].clients.forEach(function (otherClient) {
+                if (otherClient.id !== client.id) {
+                    otherClient.socket.write(packet.build(["SPAWN", username, pos_x, pos_y]));
+                }
+            });
+            //Get list of current entities in the room with their positions, and send to player:
+            for (let i = 0; i < maps[current_room].entities.length; i++) {
+                //client.socket.write(packet.build(["SPAWN", username, pos_x, pos_y]));
+            }
         }
-
         function register(username, password) {
             connection.connect((error) => {
                 if (error) {
                     client.socket.write(packet.build(["REGISTER", "FALSE"]));
                     console.log(error);
+
+                }
+            });
+            query = "SELECT * FROM public.users WHERE username = ? ";
+            values = [username];
+            connection.query(query, values, function (error, result) {
+                if (result.length > 0) {
+                    console.log(timeNow() + result);
+                    client.socket.write(packet.build(["REGISTER", "FALSE"]));
                 } else {
-                    //check if username is already taken:
-                    var query = "SELECT * FROM webrpg.users WHERE username = ? ";
-                    var values = [username];
+                    //If username is not taken, register the user:
+                    query = "INSERT INTO public.users (username, password, current_room, pos_x, pos_y) VALUES (?,?,?,?,?)";
+                    values = [username, password, config.start_room, config.start_x, config.start_y];
                     connection.query(query, values, function (error, result) {
-                        if (result.length > 1) {
+                        if (error) {
+                            //console.log('Error: Failed to register new user, error adding user to database');
                             client.socket.write(packet.build(["REGISTER", "FALSE"]));
+                            //console.log("Failed register packet sent");
+                            console.log(timeNow() + error);
                         } else {
-                            //If username is not taken, register the user:
-                            var query = "INSERT INTO webrpg.users (username, password, current_room, pos_x, pos_y) VALUES (?,?,0,0,0)";
-                            var values = [username, password];
-                            connection.query(query, values, function (error, result) {
-                                if (error) {
-                                    //console.log('Error: Failed to register new user, error adding user to database');
-                                    client.socket.write(packet.build(["REGISTER", "FALSE"]));
-                                    //console.log("Failed register packet sent");
-                                    console.log(error);
-                                } else {
-                                    client.socket.write(packet.build(["REGISTER", "TRUE"]));
-                                }
-                            });
+                            client.socket.write(packet.build(["REGISTER", "TRUE"]));
                         }
                     });
                 }
             });
-        }
-
-        //receive pos packet from a client and send info to other clients in the same room:
-        //collect packets from all clients, then periodically update all clients at set intervals
-        function pos(client_username, target_x, target_y) {
-            //get id of origin client:
-            var origin_client_id;
-            console.log(users);
-            console.log(client_username);
-            for (let i = 0; i < users.length; i++) {
-                if (users[i][0] == client_username) {
-                    origin_client_id = users[i][3];
-                    users[i][1] = target_x;
-                    users[i][2] = target_y;
-                    break;
-                }
+            function entity(name, target_x, target_y, health) {
+                maps.forEach(function (map) {
+                    map.clients.forEach(function (otherClient) {
+                            otherClient.socket.write(packet.build([
+                                "ENTITY",
+                                name,
+                                target_x.toString(),
+                                target_y.toString(),
+                                health
+                            ]));
+                    });
+                });
             }
-            maps["zone1"].clients.forEach(function (otherClient) {
-                if (otherClient.id != origin_client_id) {
-                    otherClient.socket.write(packet.build(["POS", client_username, target_x.toString(), target_y.toString()]));
-                }
-            });
-        }
-
-        //receive pop packet from net_user after client_user logs in to populate room, forward packet to client_user:
-        function pop(client_username, net_username, current_room, target_x, target_y) {
-            connection.connect((error) => {
-                if (error) {
-                } else {
-                    console.log("function, client_user=" + client_username + ", " +
-                        "net_user=" + net_username + ", " +
-                        "current_room=" + current_room + ", " +
-                        "target_x=" + target_x + ", " +
-                        "target_y=" + target_y + ", ");
-
-                    //get client id of client_user:
-                    function getLastRecord(client_username, current_room, next) {
-                        var query_str = "SELECT current_client FROM webrpg.users WHERE username = ? AND current_room = ? LIMIT 1";
-                        var query_var = [client_username, current_room];
-                        connection.query(query_str, query_var, function (err, rows, fields) {
-                            if (err) {
-                                console.log(err);
-                                next(err);
-                            } else {
-                                next(null, rows);
-                            }
-                        });
-                        connection.end();
-                    }
-
-                    var user = client_username;
-                    var net_user = net_username;
-                    var room = current_room;
-                    var originclient = null;
-                    var x = target_x;
-                    var y = target_y;
-                    getLastRecord(user, room, function (err, data) {
-                        if (err) {
-                        } else {
-                            var result = []
-                            data.forEach(function (rowPacket) {
-                                result.push(rowPacket.current_client);
-                            });
-                            originclient = maps[current_room].clients[maps[current_room].clients.length - 1];
-                            console.log("sending pop packet from user=" + user + " to clientid=" + originclient.id + "(user=" + originclient.user + ") for room=" + current_room);
-                            console.log("Sent packet: " + packet.build(["POP", net_user, x, y]).toString());
-                            originclient.socket.write(packet.build(["POP", net_user, x, y]));
-                        }
-                    });
-                }
-            });
-        }
-
-        //With move packets, send target x,y
-        function movenemy() {
-            for (let i = 0; i < enemies.length; i++) {
-                var target_x = users[0][1].toString();
-                var target_y = users[0][2].toString();
-                if (enemies[i][3] == 1) {
-                    maps["zone1"].clients.forEach(function (client) {
-                        client.socket.write(packet.build(["MOVENEMY", enemies[i][0], target_x, target_y]));
-                    });
-                    enemies[i][5] = users[0][1];
-                    enemies[i][6] = users[0][2];
-                } else if (enemies[i][3] == 0) {
-                    //Update respawn timers for dead enemies
-                    enemies[i][7] = enemies[i][7] - 1;
-                    console.log("Respawn timer: " + enemies[i][7]);
-                    //If respawn timer reaches 0, respawn enemy and reset timer
-                    if (enemies[i][7] <= 0) {
-                        enemies[i][3] = 1;
-                        enemies[i][1] = enemies[i][8];
-                        enemies[i][2] = enemies[i][9];
-                        enemies[i][5] = users[0][1];
-                        enemies[i][6] = users[0][2];
-                        maps["zone1"].clients.forEach(function (client) {
-                            client.socket.write(packet.build(["POPENEMY", enemies[i][0], enemies[i][4], enemies[i][1].toString(), enemies[i][2].toString(), enemies[i][5].toString(), enemies[i][6].toString()]));
-                        });
-                        enemies[i][7] = 500;
+            //Send entity attacks to other clients
+            function attack(enemy, attack, current_x, current_y, target_x, target_y) {
+                 maps["zone1"].clients.forEach(function (OtherClient) {
+                    OtherClient.socket.write(packet.build(["ENATK", enemy, attack, current_x, current_y, target_x, target_y]));
+                });
+            }
+            //Send logout packet to other clients
+            function logout(username) {
+                console.log("logout event: " + username);
+                for (var i = 0; i < users.length; i++) {
+                    if (users[i][0] === username) {
+                        users[i][3] = null;
+                        break;
                     }
                 }
+                maps["zone1"].clients.forEach(function (OtherClient) {
+                    if (OtherClient.user.toString() !== username.toString()) {
+                        OtherClient.socket.write(packet.build(["NETLOGOUT", username]));
+                    }
+                });
+
+                query = "UPDATE public.users SET online_status = 0, current_client = null WHERE username = ? AND online_status = 1 LIMIT 1";
+                values = [username];
+                connection.query(query, values, function (error) {
+                    if(error) {
+                        console.log(time)
+                        throw error;
+                    }
+                    client.loggedin = 1;
+                });
             }
-        }
 
-        //Update enemy current x,y
-        function updenemy(enemy_name, current_x, current_y) {
-            enemies[enemy_name][5] = current_x;
-            enemies[enemy_name][6] = current_y;
-            //console.log(enemies);
-        }
-
-        //With send player attacks to other clients
-        function platk(username, attack, current_x, current_y, target_x, target_y) {
-            console.log("platk event");
-            console.log(username + "," + attack + "," + current_x + "," + current_y + "," + target_x + "," + target_y)
-            maps["zone1"].clients.forEach(function (OtherClient) {
-                if (OtherClient.user.toString() != username.toString()) {
-                    OtherClient.socket.write(packet.build(["PLATK", username, attack, current_x, current_y, target_x, target_y]));
-                }
-            });
-        }
-
-        //With send enemy attacks to other clients
-        function enatk(enemy, attack, current_x, current_y, target_x, target_y) {
-            console.log("enatk event");
-            console.log(enemy + "," + attack + "," + current_x + "," + current_y + "," + target_x + "," + target_y);
-            maps["zone1"].clients.forEach(function (OtherClient) {
-                OtherClient.socket.write(packet.build(["ENATK", enemy, attack, current_x, current_y, target_x, target_y]));
-            });
-        }
-
-        //With send enemy health to other clients
-        function enhealth(enemy, health) {
-            console.log("enhealth event");
-            console.log(enemy + "," + health);
-            maps["zone1"].clients.forEach(function (OtherClient) {
-                OtherClient.socket.write(packet.build(["ENHEALTH", enemy, health]));
-            });
-        }
-
-        //With send player health to other clients
-        function plhealth(username, health) {
-            console.log("plhealth event");
-            console.log(username + "," + health);
-            for (var i = 0; i < users.length; i++) {
-                if (users[i][0] == username) {
-                    users[i][4] = health;
+            var data;
+            //Interpret commands for client
+            switch (header.command.toUpperCase()) {
+                case "LOGIN":
+                    data = PacketModels.login.parse(datapacket);
+                    login(data.username, data.password);
                     break;
-                }
-            }
-            console.log(users);
-            maps["zone1"].clients.forEach(function (OtherClient) {
-                if (OtherClient.user.toString() != username.toString()) {
-                    OtherClient.socket.write(packet.build(["PLHEALTH", username, health]));
-                }
-            });
-        }
-
-        //With send logout packet to other clients
-        function logout(username) {
-            console.log("logout event: " + username);
-            for (var i = 0; i < users.length; i++) {
-                if (users[i][0] == username) {
-                    users[i][3] = null;
+                case "REGISTER":
+                    data = PacketModels.register.parse(datapacket);
+                    register(data.username, data.password);
                     break;
-                }
-            }
-            maps["zone1"].clients.forEach(function (OtherClient) {
-                if (OtherClient.user.toString() != username.toString()) {
-                    OtherClient.socket.write(packet.build(["NETLOGOUT", username]));
-                }
-            });
-
-            var query = "UPDATE webrpg.users SET online_status = 0, current_client = null WHERE username = ? AND online_status = 1 LIMIT 1";
-            var values = [username];
-            connection.query(query, values, function (error, result) {
-                client.loggedin = 1;
-            });
-        }
-
-        //With send logout packet to other clients
-        function endeath(enemy) {
-            console.log("endeath event: " + enemy);
-            for (var i = 0; i < enemies.length; i++) {
-                if (enemies[i][0] == enemy) {
-                    enemies[i][3] = 0;
+                case "ENTITY":
+                    data = PacketModels.pos.parse(datapacket);
+                    entity(data.username, data.target_x, data.target_y);
                     break;
-                }
+                case "ATTACK":
+                    data = PacketModels.platk.parse(datapacket);
+                    attack(data.username, data.attack, data.current_x, data.current_y, data.target_x, data.target_y);
+                    break;
+                case "LOGOUT":
+                    data = PacketModels.logout.parse(datapacket);
+                    logout(data.username);
+                    break;
+                case "DEATH":
+                    data = PacketModels.endeath.parse(datapacket);
+                    break;
             }
-            maps["zone1"].clients.forEach(function (OtherClient) {
-                OtherClient.socket.write(packet.build(["ENDEATH", enemy]));
-            });
-
-            var query = "UPDATE webrpg.zone1 SET alive_status = 0 WHERE enemy_id = ? AND alive_status = 1 LIMIT 1";
-            var values = [enemy];
-            connection.query(query, values, function (error, result) {
-            });
         }
-
-//Interpret commands for client
-        switch (header.command.toUpperCase()) {
-            case "LOGIN":
-                var data = PacketModels.login.parse(datapacket);
-                login(data.username, data.password);
-                break;
-            case "REGISTER":
-                var data = PacketModels.register.parse(datapacket);
-                register(data.username, data.password);
-                break;
-            case "POS":
-                var data = PacketModels.pos.parse(datapacket);
-                pos(data.username, data.target_x, data.target_y);
-                break;
-            case "POP":
-                var data = PacketModels.pop.parse(datapacket);
-                pop(data.username, data.net_user, data.current_room, data.target_x, data.target_y);
-                break;
-            case "MOVENEMY":
-                movenemy();
-                break;
-            case "UPDENEMY":
-                var data = PacketModels.updenemy.parse(datapacket);
-                updenemy(data.enemy_name, data.current_x, data.current_y);
-                break;
-            case "PLATK":
-                var data = PacketModels.platk.parse(datapacket);
-                platk(data.username, data.attack, data.current_x, data.current_y, data.target_x, data.target_y);
-                break;
-            case "ENATK":
-                var data = PacketModels.enatk.parse(datapacket);
-                enatk(data.enemy, data.attack, data.current_x, data.current_y, data.target_x, data.target_y);
-                break;
-            case "ENHEALTH":
-                var data = PacketModels.enhealth.parse(datapacket);
-                enhealth(data.enemy, data.health);
-                break;
-            case "PLHEALTH":
-                var data = PacketModels.plhealth.parse(datapacket);
-                plhealth(data.username, data.health);
-                break;
-            case "LOGOUT":
-                var data = PacketModels.logout.parse(datapacket);
-                logout(data.username);
-                break;
-            case "ENDEATH":
-                var data = PacketModels.endeath.parse(datapacket);
-                endeath(data.enemy);
-                break;
+        //TODO store mob and player positions IN MEMORY, only save to database on logout
+        //Store in jsons, not arrays
+        function timeNow() {
+            var timeStamp = new Date().toISOString();
+            return "[" + timeStamp + "] ";
         }
     }
-}
-
-//TODO store mob and player positions IN MEMORY, only save to database on logout
-
-function timeNow() {
-    var timeStamp = new Date().toISOString();
-    return "[" + timeStamp + "] ";
 }
