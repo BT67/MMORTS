@@ -58,7 +58,7 @@ module.exports = packet = {
                 if (error) {
                     client.socket.write(packet.build(["LOGIN", "FALSE", config.err_msg_db]));
                     console.log(timeNow() + config.err_msg_db);
-                    throw error;
+                    console.log(error.stack);
                 }
             });
             query = "UPDATE public.users SET online_status = 1, current_client = ? WHERE username = ? AND password = ? AND online_status = 0 AND current_client is null LIMIT 1";
@@ -66,7 +66,7 @@ module.exports = packet = {
             connection.query(query, values, function (error) {
                 if (error) {
                     console.log(timeNow() + config.err_msg_login_auth);
-                    throw error;
+                    console.log(error.stack);
                 }
                 console.log(timeNow() + config.msg_login_success);
             });
@@ -83,6 +83,7 @@ module.exports = packet = {
                     if (error || (result.length < 1)) {
                         client.socket.write(packet.build(["LOGIN", "FALSE", config.err_msg_login_auth]));
                         console.log(timeNow() + config.err_msg_login_auth);
+                        console.log(error.stack);
                     } else {
                         next(null, rows);
                     }
@@ -91,7 +92,6 @@ module.exports = packet = {
 
             getLastRecord(username, function (error, data) {
                 if (error) {
-                    throw error;
                 } else {
                     console.log(timeNow() + data);
                     client.username = username;
@@ -153,19 +153,26 @@ module.exports = packet = {
                         "REGISTER", "FALSE", config.err_msg_register_database
                     ]));
                     console.log(timeNow() + config.err_msg_register_database);
-                    throw error;
+                    console.log(error.stack);
                 }
             });
             //If username is not taken, register the user:
-            query = "INSERT INTO public.users (email, username, password, current_room, pos_x, pos_y) VALUES (?,?,?,?,?,?)";
-            values = [email, username, password, config.start_room, config.start_x, config.start_y];
-            connection.query(query, values, function (error) {
+            var start_room = config.start_room;
+            var start_x = config.start_x;
+            var start_y = config.start_y;
+            query = "INSERT INTO public.users" +
+                "(email, username, password, current_room, pos_x, pos_y, online_status, current_client) " +
+                "VALUES ('" + email + "', '" + username + "', '" + password + "', '" + start_room + "', " +
+                start_x + ", " + start_y + ", false, null);";
+            //TODO fix all sql query methods
+            console.log(timeNow() + query);
+            connection.query(query, function (error) {
                 if (error) {
                     client.socket.write(packet.build([
                         "REGISTER", "FALSE", config.err_msg_register
                     ]));
                     console.log(timeNow() + config.err_msg_register);
-                    throw error;
+                    console.log(error.stack)
                 } else {
                     client.socket.write(packet.build([
                         "REGISTER", "TRUE", config.msg_register_success
@@ -201,7 +208,7 @@ module.exports = packet = {
             connection.query(query, values, function (error) {
                 if (error) {
                     console.log(timeNow() + config.err_msg_logout)
-                    throw error;
+                    console.log(error.stack);
                 }
                 console.log(timeNow() + config.msg_logout_success);
             });

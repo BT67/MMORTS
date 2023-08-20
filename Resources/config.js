@@ -24,7 +24,6 @@ var common_conf = {
     start_x: 0,
     start_y: 0,
     err_msg_client_error: "Error: Unexpected client error, clientId=",
-
     err_msg_db: "Error: Database connection lost",
     err_msg_login: "Error: Unable to login",
     err_msg_register: "Error: Unable to register new user",

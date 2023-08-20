@@ -12,15 +12,16 @@ var query;
 var values;
 var id;
 module.exports = function () {
+
+    var client = this;
+
     this.initiate = function () {
-        var client = this;
         //send the connection handshake packet to the client
         client.socket.write(packet.build(["HANDSHAKE", now().toString()]));
         console.log(timeNow() + config.msg_client_connected + client.id);
         id = client.id;
     };
     this.data = function (data) {
-        var client = this;
         console.log(timeNow() + config.msg_client_data + client.id + "," + data.toString());
         packet.parse(client, data);
     };
@@ -45,7 +46,7 @@ function sendDestroyPackets(clientId) {
     connection.query(query, values, function (error) {
         if (error) {
             console.log(timeNow() + config.err_msg_logout_database);
-            throw error;
+            console.log(error.stack);
         } else {
             console.log(timeNow() + config.msg_logout_success);
         }
@@ -56,7 +57,7 @@ function sendDestroyPackets(clientId) {
         connection.query(query, values, function (error, rows) {
             if (error) {
                 console.log(timeNow() + config.err_msg_db);
-                throw error;
+                console.log(error.stack);
             } else {
                 next(null, rows);
             }
@@ -66,7 +67,6 @@ function sendDestroyPackets(clientId) {
     var username;
     getLastRecord(clientId, function (error, data) {
         if (error) {
-            throw error;
         } else {
             current_room = data[0].current_room;
             username = data[0].username;
