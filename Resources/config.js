@@ -30,9 +30,12 @@ var common_conf = {
     err_msg_register: "Error: Unable to register new user",
     err_msg_login_auth: "Error: Unable to login - username or password is invalid",
     err_msg_register_user_exists: "Error: Unable to register new user - username is already taken",
+    err_msg_register_invalid_email: "Error: Unable to register new user - email address is invalid",
     err_msg_register_invalid_username: "Error: Unable to register new user - username is invalid",
     err_msg_register_invalid_password: "Error: Unable to register new user - password is invalid",
     err_msg_register_database: "Error: Unable to register new user - database connection lost",
+    msg_packet_data: "Packet data=",
+    msg_packet_size: "Packet size=",
     msg_client_disconnect: "Client disconnected, clientId=",
     msg_logout_success: "Successfully logged out",
     msg_client_connected: "Client connected, clientId=",
@@ -42,6 +45,7 @@ var common_conf = {
     err_msg_logout_database: "Error: Unable to logout - database connection lost",
     msg_login_success: "Successfully logged in",
     msg_register_success: "Successfully registered new user",
+    email_length: 100,
     username_length: 30,
     password_length: 30
 };

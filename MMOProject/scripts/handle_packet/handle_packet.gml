@@ -4,7 +4,7 @@ function handle_packet(data_buffer){
 	switch(command){
 		case "HANDSHAKE":
 			server_time = buffer_read(data_buffer, buffer_string);
-			room_goto(rm_login);
+			room_goto(rm_init);
 			show_debug_message(date_datetime_string(date_current_datetime()) + " Connection with server established");
 			break;
 		case "LOGIN":
@@ -20,8 +20,8 @@ function handle_packet(data_buffer){
 				player_sprite = buffer_read(data_buffer, buffer_string);
 				room_goto(asset_get_index(target_room));
 			} else {
-				if(instance_exists(lbl_register)){
-				lbl_register.text = msg;
+				if(instance_exists(lbl_msg_login)){
+				lbl_msg_login.text = msg;
 				}
 			}
 			break;
@@ -29,8 +29,8 @@ function handle_packet(data_buffer){
 			status = buffer_read(data_buffer, buffer_string);
 			msg = buffer_read(data_buffer, buffer_string);
 			show_debug_message(date_datetime_string(date_current_datetime()) + msg);
-			if(instance_exists(lbl_register)){
-				lbl_register.text = msg;
+			if(instance_exists(lbl_msg_register)){
+				lbl_msg_register.text = msg;
 			}
 			break;
 		case "SPAWN":
