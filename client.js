@@ -10,12 +10,14 @@ const connection = new Client({
 });
 var query;
 var values;
+var id;
 module.exports = function () {
     this.initiate = function () {
         var client = this;
         //send the connection handshake packet to the client
         client.socket.write(packet.build(["HANDSHAKE", now().toString()]));
         console.log(timeNow() + config.msg_client_connected + client.id);
+        id = client.id;
     };
     this.data = function (data) {
         var client = this;
@@ -24,14 +26,11 @@ module.exports = function () {
     };
     //Log the user out if client is unexpectedly closed or crashes:
     this.error = function () {
-        var client = this;
-        console.log(timeNow() + config.err_msg_client_error + client.id);
-        client.socket.write(packet.build(["LOGOUT"]));
-        sendDestroyPackets(client.id);
+        console.log(timeNow() + config.err_msg_client_error + id);
+        sendDestroyPackets(id);
     }
     this.end = function () {
-        var client = this;
-        sendDestroyPackets(client.id);
+        sendDestroyPackets(id);
     }
 }
 

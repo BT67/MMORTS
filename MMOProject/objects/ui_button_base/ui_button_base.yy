@@ -15,8 +15,8 @@
     "path": "folders/Objects/UI Framework.yy",
   },
   "parentObjectId": {
-    "name": "ui_base",
-    "path": "objects/ui_base/ui_base.yy",
+    "name": "ui_focus_base",
+    "path": "objects/ui_focus_base/ui_focus_base.yy",
   },
   "persistent": false,
   "physicsAngularDamping": 0.1,
@@ -34,8 +34,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_ui_base_grey",
-    "path": "sprites/spr_ui_base_grey/spr_ui_base_grey.yy",
+    "name": "spr_ui_base_black",
+    "path": "sprites/spr_ui_base_black/spr_ui_base_black.yy",
   },
   "spriteMaskId": null,
   "visible": true,

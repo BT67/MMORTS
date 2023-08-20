@@ -32,8 +32,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_ui_base_grey",
-    "path": "sprites/spr_ui_base_grey/spr_ui_base_grey.yy",
+    "name": "spr_ui_base_black",
+    "path": "sprites/spr_ui_base_black/spr_ui_base_black.yy",
   },
   "spriteMaskId": null,
   "visible": true,
