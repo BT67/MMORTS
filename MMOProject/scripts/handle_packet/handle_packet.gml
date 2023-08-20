@@ -29,8 +29,13 @@ function handle_packet(data_buffer){
 			status = buffer_read(data_buffer, buffer_string);
 			msg = buffer_read(data_buffer, buffer_string);
 			show_debug_message(date_datetime_string(date_current_datetime()) + msg);
-			if(instance_exists(lbl_msg_register)){
-				lbl_msg_register.text = msg;
+			if(status == "TRUE") {
+				room_goto(rm_register_success);
+				network.server_text = msg;
+			} else {
+				if(instance_exists(lbl_msg_register)){
+					lbl_msg_register.text = msg;
+				}
 			}
 			break;
 		case "SPAWN":

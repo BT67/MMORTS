@@ -1,13 +1,6 @@
 const {data} = require("./client");
 const q = require('q');
 const {Client} = require("pg");
-const connection = new Client({
-    host: '127.0.0.1',
-    port: '5432',
-    user: 'postgres',
-    password: 'root',
-    database: 'postgres'
-});
 var zeroBuffer = Buffer.from("00", "hex");
 module.exports = packet = {
     //params is an array of javascript objects to be turned into buffers to send data to gamemaker
@@ -54,6 +47,13 @@ module.exports = packet = {
         var header = PacketModels.header.parse(datapacket);
 
         function login(username, password) {
+            const connection = new Client({
+                host: '127.0.0.1',
+                port: '5432',
+                user: 'postgres',
+                password: 'root',
+                database: 'postgres'
+            });
             connection.connect((error) => {
                 if (error) {
                     client.socket.write(packet.build(["LOGIN", "FALSE", config.err_msg_db]));
@@ -147,6 +147,13 @@ module.exports = packet = {
                 console.log(timeNow() + config.err_msg_register_invalid_password);
                 return;
             }
+            const connection = new Client({
+                host: '127.0.0.1',
+                port: '5432',
+                user: 'postgres',
+                password: 'root',
+                database: 'postgres'
+            });
             connection.connect((error) => {
                 if (error) {
                     client.socket.write(packet.build([
@@ -205,6 +212,22 @@ module.exports = packet = {
         function logout(username) {
             query = "UPDATE public.users SET online_status = 0, current_client = null WHERE username = ? AND online_status = 1 LIMIT 1";
             values = [username];
+            const connection = new Client({
+                host: '127.0.0.1',
+                port: '5432',
+                user: 'postgres',
+                password: 'root',
+                database: 'postgres'
+            });
+            connection.connect((error) => {
+                if (error) {
+                    client.socket.write(packet.build([
+                        "LOGOUT", "FALSE", config.err_msg_db
+                    ]));
+                    console.log(timeNow() + config.err_msg_db);
+                    console.log(error.stack);
+                }
+            });
             connection.query(query, values, function (error) {
                 if (error) {
                     console.log(timeNow() + config.err_msg_logout)
@@ -252,3 +275,5 @@ function timeNow() {
     var timeStamp = new Date().toISOString();
     return "[" + timeStamp + "] ";
 }
+
+//TODO add unique key to user table
