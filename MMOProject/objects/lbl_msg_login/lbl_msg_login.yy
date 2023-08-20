@@ -1,7 +1,7 @@
 {
   "resourceType": "GMObject",
   "resourceVersion": "1.0",
-  "name": "lbl_register",
+  "name": "lbl_msg_login",
   "eventList": [],
   "managed": true,
   "overriddenProperties": [],

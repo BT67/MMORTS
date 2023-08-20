@@ -1,9 +1,11 @@
 {
   "resourceType": "GMObject",
   "resourceVersion": "1.0",
-  "name": "btn_register",
+  "name": "txt_password_register",
   "eventList": [
     {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,},
+    {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":0,"eventType":8,"isDnD":false,},
+    {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":1,"eventType":9,"isDnD":false,},
     {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":7,"eventType":6,"isDnD":false,},
   ],
   "managed": true,
@@ -13,8 +15,8 @@
     "path": "folders/Objects/Register.yy",
   },
   "parentObjectId": {
-    "name": "ui_button_base",
-    "path": "objects/ui_button_base/ui_button_base.yy",
+    "name": "ui_textbox_base",
+    "path": "objects/ui_textbox_base/ui_textbox_base.yy",
   },
   "persistent": false,
   "physicsAngularDamping": 0.1,
