@@ -7,3 +7,5 @@ exports.start_y = 0;
 
 exports.clients = [];
 
+exports.entities = [];
+

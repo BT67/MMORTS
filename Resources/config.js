@@ -33,6 +33,7 @@ var common_conf = {
     err_msg_register_invalid_username: "Error: Unable to register new user - username is invalid",
     err_msg_register_invalid_password: "Error: Unable to register new user - password is invalid",
     err_msg_register_database: "Error: Unable to register new user - database connection lost",
+    msg_server_packet: "Sending packet to clientId=",
     msg_packet_data: "Packet data=",
     msg_packet_size: "Packet size=",
     msg_client_disconnect: "Client disconnected, clientId=",
@@ -44,6 +45,7 @@ var common_conf = {
     err_msg_logout_database: "Error: Unable to logout - database connection lost",
     msg_login_success: "Successfully logged in",
     msg_register_success: "Successfully registered new user",
+    err_msg_packet_data_unknown: "Error: Unknown data type encountered in packet builder=",
     email_length: 100,
     username_length: 30,
     password_length: 30

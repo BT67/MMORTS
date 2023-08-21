@@ -10,10 +10,11 @@ function handle_packet(data_buffer){
 		case "LOGIN":
 			status = buffer_read(data_buffer, buffer_string);
 			msg = buffer_read(data_buffer, buffer_string);
-			show_debug_message(date_datetime_string(date_current_datetime()) + msg);
+			show_debug_message(date_datetime_string(date_current_datetime()) + " " + msg);
 			if(status == "TRUE"){
 				username = buffer_read(data_buffer, buffer_string);
 				target_room = buffer_read(data_buffer, buffer_string);
+				show_debug_message(string(target_room));
 				pos_x = buffer_read(data_buffer, buffer_string);
 				pos_y = buffer_read(data_buffer, buffer_string);
 				player_health = buffer_read(data_buffer, buffer_string);

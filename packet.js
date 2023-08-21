@@ -1,6 +1,19 @@
 const {data} = require("./client");
 const q = require('q');
 const {Client} = require("pg");
+const connection = new Client({
+    host: '127.0.0.1',
+    port: '5432',
+    user: 'postgres',
+    password: 'root',
+    database: 'postgres'
+});
+connection.connect((error) => {
+    if (error) {
+        console.log(timeNow() + config.err_msg_db);
+        console.log(error.stack);
+    }
+});
 var zeroBuffer = Buffer.from("00", "hex");
 module.exports = packet = {
     //params is an array of javascript objects to be turned into buffers to send data to gamemaker
@@ -16,7 +29,7 @@ module.exports = packet = {
                 buffer = Buffer.alloc(2);
                 buffer.writeUInt16LE(param, 0);
             } else {
-                console.log(timeNow() + "*WARNING* Unknown data type encountered in packet builder: " + typeof (param) + " " + param);
+                console.log(timeNow() + config.err_msg_packet_data_unknown + typeof (param) + " " + param);
             }
             packetSize += buffer.length;
             packetParts.push(buffer);
@@ -24,6 +37,7 @@ module.exports = packet = {
         var dataBuffer = Buffer.concat(packetParts, packetSize);
         var size = Buffer.alloc(1);
         size.writeUInt8(dataBuffer.length + 1, 0);
+        console.log(timeNow() + config.msg_server_packet + "," + dataBuffer.toString());
         return Buffer.concat([size, dataBuffer], size.length + dataBuffer.length);
     },
     //Read and separate size, header and data of a packet to be handled for a client by the server
@@ -47,81 +61,93 @@ module.exports = packet = {
         var header = PacketModels.header.parse(datapacket);
 
         function login(username, password) {
-            const connection = new Client({
-                host: '127.0.0.1',
-                port: '5432',
-                user: 'postgres',
-                password: 'root',
-                database: 'postgres'
-            });
-            connection.connect((error) => {
-                if (error) {
-                    client.socket.write(packet.build(["LOGIN", "FALSE", config.err_msg_db]));
-                    console.log(timeNow() + config.err_msg_db);
+            function setLogin(username, password) {
+                query = "UPDATE public.users SET online_status = true, current_client = " + client.id +
+                " WHERE username = '" + username + "' AND password = '" + password + "' AND online_status = false" +
+                " AND current_client is null;";
+                console.log(timeNow() + query);
+                try {
+                    connection.query(query);
+                } catch (error) {
+                    console.log(timeNow() + config.err_msg_login);
                     console.log(error.stack);
                 }
-            });
-            query = "UPDATE public.users SET online_status = 1, current_client = ? WHERE username = ? AND password = ? AND online_status = 0 AND current_client is null LIMIT 1";
-            values = [client.id, username, password];
-            connection.query(query, values, function (error) {
-                if (error) {
-                    console.log(timeNow() + config.err_msg_login_auth);
-                    console.log(error.stack);
-                }
-                console.log(timeNow() + config.msg_login_success);
-            });
-            var current_room;
-            var pos_x;
-            var pos_y;
-            var health;
-            var sprite;
-
-            function getLastRecord(username, next) {
-                query = "SELECT * FROM public.users WHERE username = ? AND password = ? AND online_status = 0 LIMIT 1";
-                values = [username, password];
-                connection.query(query, values, function (error, result) {
-                    if (error || (result.length < 1)) {
-                        client.socket.write(packet.build(["LOGIN", "FALSE", config.err_msg_login_auth]));
-                        console.log(timeNow() + config.err_msg_login_auth);
-                        console.log(error.stack);
-                    } else {
-                        next(null, rows);
-                    }
-                });
             }
+            async function loginQuery(username, password) {
+                var data;
+                query = "SELECT * FROM public.users WHERE username = '" +
+                    username + "' AND password = '" + password + "' AND online_status = false LIMIT 1;";
+                    // "UPDATE public.users SET online_status = true, current_client = " + client.id +
+                    // " WHERE username = '" + username + "' AND password = '" + password + "' AND online_status = false" +
+                    // " AND current_client is null;";
+                console.log(timeNow() + query);
+                try {
+                    data = await connection.query(query);
+                } catch (error) {
+                    console.log(error.stack);
+                }
+                return data;
+            }
+            async function processLogin(username, password) {
+                data = await loginQuery(username, password);
+                var current_room, pos_x, pos_y, health, sprite;
+                if(data.length < 1){
+                    client.socket.write(packet.build(["LOGIN", "FALSE", config.err_msg_login_auth]));
+                    console.log(timeNow() + config.err_msg_login_auth);
+                    return;
+                }
+                client.username = username;
+                try {
+                    current_room = data.rows[0].current_room;
+                    pos_x = parseInt(data.rows[0].pos_x);
+                    pos_y = parseInt(data.rows[0].pos_y);
+                    health = parseInt(data.rows[0].health);
+                    sprite = data.rows[0].sprite;
+                } catch (error) {
+                    console.log(error.stack);
+                    return;
+                }
+                if(
+                    username     == null ||
+                    current_room == null ||
+                    pos_x        == null ||
+                    pos_y        == null ||
+                    health       == null ||
+                    sprite       == null
+                ){
+                    console.log(timeNow() + config.err_msg_db);
+                    return;
+                }
+                client.socket.write(packet.build([
+                    "LOGIN", "TRUE", config.msg_login_success, username, current_room, pos_x, pos_y, health, sprite
+                ]));
+                //Send spawn player packet to other clients in the room who are online
+                maps[current_room].clients.push(client);
+                //TODO add spawn packet to other clients in the same room
 
-            getLastRecord(username, function (error, data) {
-                if (error) {
-                } else {
-                    console.log(timeNow() + data);
-                    client.username = username;
-                    current_room = data[0].current_room;
-                    pos_x = parseInt(data[0].pos_x);
-                    pos_y = parseInt(data[0].pos_y);
-                    health = parseInt(data[0].health);
-                    sprite = data[0].sprite;
-                }
-            });
-            client.socket.write(packet.build([
-                "LOGIN", "TRUE", username, current_room, pos_x, pos_y, health, sprite
-            ]));
-            //Send spawn player packet to other clients in the room who are online
-            maps[current_room].clients.push(client);
-            maps[current_room].clients.forEach(function (otherClient) {
-                if (otherClient.id !== client.id) {
-                    otherClient.socket.write(packet.build([
-                        "SPAWN", username, "player", pos_x, pos_y, health, sprite
-                    ]));
-                }
-            });
-            //Get list of current entities in the room with their positions, and send to player:
-            maps[current_room].entities.forEach(function (entity) {
-                if (entity.name !== username) {
-                    client.socket.write(packet.build([
-                        "SPAWN", entity.name, entity.type, entity.pos_x, entity.pos_y, entity.health, entity.sprite
-                    ]));
-                }
-            });
+                // maps[current_room].clients.forEach(function (otherClient) {
+                //     if (otherClient.id !== client.id) {
+                //         otherClient.socket.write(packet.build([
+                //             "SPAWN", username, "player", pos_x, pos_y, health, sprite
+                //         ]));
+                //     }
+                // });
+                //Get list of current entities in the room with their positions, and send to player:
+                // maps[current_room].entities.forEach(function (entity) {
+                //     if (entity.name !== username) {
+                //         client.socket.write(packet.build([
+                //             "SPAWN", entity.name, entity.type, entity.pos_x, entity.pos_y, entity.health, entity.sprite
+                //         ]));
+                //     }
+                // });
+            }
+            //TODO fix all sql queries so that processing is included in the getLastRecord function
+            try {
+                processLogin(username, password);
+                setLogin(username, password);
+            } catch(error) {
+                console.log(error.stack);
+            }
         }
 
         function register(email, username, password) {
@@ -147,22 +173,6 @@ module.exports = packet = {
                 console.log(timeNow() + config.err_msg_register_invalid_password);
                 return;
             }
-            const connection = new Client({
-                host: '127.0.0.1',
-                port: '5432',
-                user: 'postgres',
-                password: 'root',
-                database: 'postgres'
-            });
-            connection.connect((error) => {
-                if (error) {
-                    client.socket.write(packet.build([
-                        "REGISTER", "FALSE", config.err_msg_register_database
-                    ]));
-                    console.log(timeNow() + config.err_msg_register_database);
-                    console.log(error.stack);
-                }
-            });
             //If username is not taken, register the user:
             var start_room = config.start_room;
             var start_x = config.start_x;
@@ -171,7 +181,6 @@ module.exports = packet = {
                 "(email, username, password, current_room, pos_x, pos_y, online_status, current_client) " +
                 "VALUES ('" + email + "', '" + username + "', '" + password + "', '" + start_room + "', " +
                 start_x + ", " + start_y + ", false, null);";
-            //TODO fix all sql query methods
             console.log(timeNow() + query);
             connection.query(query, function (error) {
                 if (error) {
@@ -210,24 +219,9 @@ module.exports = packet = {
 
         //TODO console log for login/logout should show username and clientId
         function logout(username) {
+            //TODO fix logout sql query
             query = "UPDATE public.users SET online_status = 0, current_client = null WHERE username = ? AND online_status = 1 LIMIT 1";
             values = [username];
-            const connection = new Client({
-                host: '127.0.0.1',
-                port: '5432',
-                user: 'postgres',
-                password: 'root',
-                database: 'postgres'
-            });
-            connection.connect((error) => {
-                if (error) {
-                    client.socket.write(packet.build([
-                        "LOGOUT", "FALSE", config.err_msg_db
-                    ]));
-                    console.log(timeNow() + config.err_msg_db);
-                    console.log(error.stack);
-                }
-            });
             connection.query(query, values, function (error) {
                 if (error) {
                     console.log(timeNow() + config.err_msg_logout)
