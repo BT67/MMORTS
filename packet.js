@@ -17,7 +17,10 @@ connection.connect((error) => {
 var zeroBuffer = Buffer.from("00", "hex");
 module.exports = packet = {
     //params is an array of javascript objects to be turned into buffers to send data to gamemaker
-    build: function (params) {
+    build: function (params, clientId) {
+        if(clientId == null) {
+            clientId = "unknown";
+        }
         var packetParts = [];
         var packetSize = 0;
         params.forEach(function (param) {
@@ -37,7 +40,7 @@ module.exports = packet = {
         var dataBuffer = Buffer.concat(packetParts, packetSize);
         var size = Buffer.alloc(1);
         size.writeUInt8(dataBuffer.length + 1, 0);
-        console.log(timeNow() + config.msg_server_packet + "," + dataBuffer.toString());
+        console.log(timeNow() + config.msg_server_packet + clientId.toString() + "," + dataBuffer.toString());
         return Buffer.concat([size, dataBuffer], size.length + dataBuffer.length);
     },
     //Read and separate size, header and data of a packet to be handled for a client by the server
@@ -120,7 +123,7 @@ module.exports = packet = {
                 }
                 client.socket.write(packet.build([
                     "LOGIN", "TRUE", config.msg_login_success, username, current_room, pos_x, pos_y, health, sprite
-                ]));
+                ], client.id));
                 //Send spawn player packet to other clients in the room who are online
                 maps[current_room].clients.push(client);
                 //TODO add spawn packet to other clients in the same room
@@ -155,21 +158,21 @@ module.exports = packet = {
             if (email.length > config.email_length || email.length === 0) {
                 client.socket.write(packet.build([
                     "REGISTER", "FALSE", config.err_msg_register_invalid_email
-                ]));
+                ], client.id));
                 console.log(timeNow() + config.err_msg_register_invalid_email);
                 return;
             }
             if (username.length > config.username_length || username.length === 0) {
                 client.socket.write(packet.build([
                     "REGISTER", "FALSE", config.err_msg_register_invalid_username
-                ]));
+                ], client.id));
                 console.log(timeNow() + config.err_msg_register_invalid_username);
                 return;
             }
             if (password.length > config.password_length || password.length === 0) {
                 client.socket.write(packet.build([
                     "REGISTER", "FALSE", config.err_msg_register_invalid_password
-                ]));
+                ], client.id));
                 console.log(timeNow() + config.err_msg_register_invalid_password);
                 return;
             }
@@ -186,13 +189,13 @@ module.exports = packet = {
                 if (error) {
                     client.socket.write(packet.build([
                         "REGISTER", "FALSE", config.err_msg_register
-                    ]));
+                    ], client.id));
                     console.log(timeNow() + config.err_msg_register);
                     console.log(error.stack)
                 } else {
                     client.socket.write(packet.build([
                         "REGISTER", "TRUE", config.msg_register_success
-                    ]));
+                    ], client.id));
                     console.log(timeNow() + config.msg_register_success);
                 }
             });
@@ -203,32 +206,32 @@ module.exports = packet = {
                 map.clients.forEach(function (otherClient) {
                     otherClient.socket.write(packet.build([
                         "ENTITY", name, target_x.toString(), target_y.toString(), health, sprite
-                    ]));
+                    ], otherClient.id));
                 });
             });
         }
 
         //Send entity attacks to other clients
         function attack(attack_name, attack_type, target_entity, origin_entity, damage, sprite) {
-            maps[current_room].clients.forEach(function (OtherClient) {
-                OtherClient.socket.write(packet.build([
-                    "ATTACK", attack_name, attack_type, target_entity, origin_entity, damage, sprite
-                ]));
-            });
+            // maps[origin_entity.current_room].clients.forEach(function (otherClient) {
+            //     otherClient.socket.write(packet.build([
+            //         "ATTACK", attack_name, attack_type, target_entity, origin_entity, damage, sprite
+            //     ], otherClient.id));
+            // });
         }
 
         //TODO console log for login/logout should show username and clientId
-        function logout(username) {
-            //TODO fix logout sql query
-            query = "UPDATE public.users SET online_status = 0, current_client = null WHERE username = ? AND online_status = 1 LIMIT 1";
-            values = [username];
-            connection.query(query, values, function (error) {
-                if (error) {
-                    console.log(timeNow() + config.err_msg_logout)
-                    console.log(error.stack);
-                }
+        function logout(clientId) {
+            query = "UPDATE public.users SET online_status = false, current_client = null " +
+                "WHERE current_client = '" + clientId.toString() + "' AND online_status = true";
+            console.log(timeNow() + query);
+            try {
+                connection.query(query);
                 console.log(timeNow() + config.msg_logout_success);
-            });
+            } catch (error) {
+                console.log(timeNow() + config.err_msg_logout_database)
+                console.log(error.stack);
+            }
             // maps[current_room].clients.forEach(function (OtherClient) {
             //     if (OtherClient.user.toString() !== username.toString()) {
             //         OtherClient.socket.write(packet.build(["DESTROY", username]));
@@ -257,7 +260,7 @@ module.exports = packet = {
                 break;
             case "LOGOUT":
                 data = PacketModels.logout.parse(datapacket);
-                logout(data.username);
+                logout(client.id);
                 break;
         }
 
