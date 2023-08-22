@@ -80,6 +80,8 @@ net.createServer(function (socket) {
     thisClient.socket = socket;
     thisClient.id = clientIdNo;
     thisClient.loggedin = 0;
+    thisClient.username = "";
+    thisClient.current_room = "";
     clientIdNo += 1;
     //TODO create clientId allocation system
     thisClient.initiate();

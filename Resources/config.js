@@ -38,6 +38,8 @@ var common_conf = {
     msg_packet_size: "Packet size=",
     msg_client_disconnect: "Client disconnected, clientId=",
     msg_logout_success: "Successfully logged out",
+    msg_enter_room: "Player entered room=",
+    msg_clients_in_room: "Clients in room=",
     msg_client_connected: "Client connected, clientId=",
     msg_server_init: "Server initialisation completed, server host=",
     msg_server_db: "Server database=",

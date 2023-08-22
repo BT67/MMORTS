@@ -128,6 +128,9 @@ module.exports = packet = {
                 ], client.id));
                 //Send spawn player packet to other clients in the room who are online
                 maps[current_room].clients.push(client);
+                client.current_room = current_room;
+                console.log(timeNow() + config.msg_enter_room + ", clientId=" + client.id);
+                console.log(timeNow() + config.msg_clients_in_room + current_room + ": " + maps[current_room].clients.toString());
                 //TODO add spawn packet to other clients in the same room
                 maps[current_room].clients.forEach(function (otherClient) {
                     if (otherClient.id !== client.id) {
@@ -145,10 +148,10 @@ module.exports = packet = {
                     }
                 });
             }
-
             try {
                 processLogin(username, password);
                 setLogin(username, password);
+                //TODO login success message appears in log even when client does not acknowledge login
                 console.log(timeNow() + config.msg_login_success + ", clientId=" + client.id);
             } catch (error) {
                 console.log(error.stack);
@@ -203,13 +206,11 @@ module.exports = packet = {
             });
         }
 
-        function entity(entity_name, entity_type, target_x, target_y, health, sprite) {
-            maps.forEach(function (map) {
-                map.clients.forEach(function (otherClient) {
-                    otherClient.socket.write(packet.build([
-                        "ENTITY", name, target_x.toString(), target_y.toString(), health, sprite
-                    ], otherClient.id));
-                });
+        function entity(target_x, target_y) {
+            maps[client.current_room].clients.forEach(function (client) {
+                client.socket.write(packet.build([
+                    "ENTITY", client.username, target_x.toString(), target_y.toString(), "", ""
+                ], client.id));
             });
         }
 
@@ -232,7 +233,8 @@ module.exports = packet = {
                     console.log(error.stack);
                 }
             }
-            async function sendMessage(message){
+
+            async function sendMessage(message) {
                 var current_room = await getClients();
                 maps[current_room].clients.forEach(function (client) {
                     client.socket.write(packet.build([
@@ -240,6 +242,7 @@ module.exports = packet = {
                     ], client.id));
                 });
             }
+
             sendMessage(message);
         }
 
@@ -254,7 +257,10 @@ module.exports = packet = {
             } catch (error) {
                 console.log(timeNow() + config.err_msg_logout_database + client.id)
                 console.log(error.stack);
+                return;
             }
+            delete maps[client.current_room].clients.client;
+            client.current_room = null;
             // maps[current_room].clients.forEach(function (OtherClient) {
             //     if (OtherClient.user.toString() !== username.toString()) {
             //         OtherClient.socket.write(packet.build(["DESTROY", username]));
@@ -275,7 +281,7 @@ module.exports = packet = {
                 break;
             case "ENTITY":
                 data = PacketModels.entity.parse(datapacket);
-                entity(data.entity_name, data.entity_type, data.target_x, data.target_y, data.health, data.sprite);
+                entity(data.target_x, data.target_y);
                 break;
             case "ATTACK":
                 data = PacketModels.attack.parse(datapacket);

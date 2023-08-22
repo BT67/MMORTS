@@ -31,12 +31,8 @@ module.exports = PacketModels = {
         .string("sprite", StringOptions),
     entity: new Parser().skip(1)
         .string("command", StringOptions)
-        .string("entity_name", StringOptions)
-        .string("entity_type", StringOptions)
         .string("target_x", StringOptions)
-        .string("target_y", StringOptions)
-        .string("health", StringOptions)
-        .string("sprite", StringOptions),
+        .string("target_y", StringOptions),
     attack: new Parser().skip(1)
         .string("command", StringOptions)
         .string("attack_name", StringOptions)
