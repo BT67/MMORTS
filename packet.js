@@ -127,7 +127,15 @@ module.exports = packet = {
                     "LOGIN", "TRUE", config.msg_login_success, username, current_room, pos_x.toString(), pos_y.toString(), health, sprite
                 ], client.id));
                 //Send spawn player packet to other clients in the room who are online
-                maps[current_room].clients.push(client);
+                maps[current_room].clients.push(client)
+                var entity_inst = require(__dirname + "/Models/entity.js");
+                var entity = new entity_inst();
+                entity.name = username;
+                entity.pos_x = pos_x;
+                entity.pos_y = pos_y;
+                client.pos_x = pos_x;
+                client.pos_y = pos_y;
+                maps[current_room].entities.push(entity);
                 client.current_room = current_room;
                 console.log(timeNow() + config.msg_enter_room + ", clientId=" + client.id);
                 console.log(timeNow() + config.msg_clients_in_room + current_room + ": " + maps[current_room].clients.toString());
@@ -207,6 +215,8 @@ module.exports = packet = {
         }
 
         function entity(target_x, target_y) {
+            client.pos_x = target_x;
+            client.pos_y = target_y;
             maps[client.current_room].clients.forEach(function (client) {
                 client.socket.write(packet.build([
                     "ENTITY", client.username, target_x.toString(), target_y.toString(), "", ""
@@ -246,10 +256,10 @@ module.exports = packet = {
             sendMessage(message);
         }
 
-        //TODO remove client from room.clients when client disconnects
         function logout(clientId) {
-            query = "UPDATE public.users SET online_status = false, current_client = null " +
-                "WHERE current_client = '" + clientId.toString() + "' AND online_status = true";
+            query = "UPDATE public.users SET online_status = false, current_client = null, " +
+                "pos_x = " + client.pos_x + ", pos_y = " + client.pos_y +
+                " WHERE current_client = '" + clientId.toString() + "' AND online_status = true";
             console.log(timeNow() + query);
             try {
                 connection.query(query);
@@ -260,12 +270,13 @@ module.exports = packet = {
                 return;
             }
             delete maps[client.current_room].clients.client;
+            delete maps[client.current_room].entities[client.username];
+            maps[client.current_room].clients.forEach(function (OtherClient) {
+                if (OtherClient.username !== client.username) {
+                    OtherClient.socket.write(packet.build(["DESTROY", client.username]));
+                }
+            });
             client.current_room = null;
-            // maps[current_room].clients.forEach(function (OtherClient) {
-            //     if (OtherClient.user.toString() !== username.toString()) {
-            //         OtherClient.socket.write(packet.build(["DESTROY", username]));
-            //     }
-            // });
         }
 
         var data;
@@ -304,3 +315,5 @@ function timeNow() {
     var timeStamp = new Date().toISOString();
     return "[" + timeStamp + "] ";
 }
+
+//TODO save player position on logout

@@ -82,6 +82,8 @@ net.createServer(function (socket) {
     thisClient.loggedin = 0;
     thisClient.username = "";
     thisClient.current_room = "";
+    thisClient.pos_x = 0;
+    thisClient.pos_y = 0;
     clientIdNo += 1;
     //TODO create clientId allocation system
     thisClient.initiate();
@@ -98,6 +100,7 @@ function timeNow() {
     return "[" + timeStamp + "] ";
 }
 
+//TODO add function that sets all users' online status to false on server startup
 
 
 
