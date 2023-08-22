@@ -26,6 +26,8 @@ module.exports = function () {
         packet.parse(client, data);
     };
     //Log the user out if client is unexpectedly closed or crashes:
+    //TODO update database to logout when client error causes disconnect
+    //TODO remove client from room.clients when client disconnects
     this.error = function () {
         console.log(timeNow() + config.err_msg_client_error + id);
         sendDestroyPackets(id);

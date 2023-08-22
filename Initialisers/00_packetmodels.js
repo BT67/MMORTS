@@ -47,6 +47,9 @@ module.exports = PacketModels = {
         .string("sprite", StringOptions),
     destroy: new Parser().skip(1)
         .string("command", StringOptions)
-        .string("entity_name", StringOptions)
+        .string("entity_name", StringOptions),
+    chat: new Parser().skip(1)
+        .string("command", StringOptions)
+        .string("message", StringOptions)
 };
 

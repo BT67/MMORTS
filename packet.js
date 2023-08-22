@@ -18,7 +18,7 @@ var zeroBuffer = Buffer.from("00", "hex");
 module.exports = packet = {
     //params is an array of javascript objects to be turned into buffers to send data to gamemaker
     build: function (params, clientId) {
-        if(clientId == null) {
+        if (clientId == null) {
             clientId = "unknown";
         }
         var packetParts = [];
@@ -66,23 +66,24 @@ module.exports = packet = {
         function login(username, password) {
             function setLogin(username, password) {
                 query = "UPDATE public.users SET online_status = true, current_client = " + client.id +
-                " WHERE username = '" + username + "' AND password = '" + password + "' AND online_status = false" +
-                " AND current_client is null;";
+                    " WHERE username = '" + username + "' AND password = '" + password + "' AND online_status = false" +
+                    " AND current_client is null;";
                 console.log(timeNow() + query);
                 try {
                     connection.query(query);
                 } catch (error) {
-                    console.log(timeNow() + config.err_msg_login);
+                    console.log(timeNow() + config.err_msg_login + client.id);
                     console.log(error.stack);
                 }
             }
+
             async function loginQuery(username, password) {
                 var data;
                 query = "SELECT * FROM public.users WHERE username = '" +
                     username + "' AND password = '" + password + "' AND online_status = false LIMIT 1;";
-                    // "UPDATE public.users SET online_status = true, current_client = " + client.id +
-                    // " WHERE username = '" + username + "' AND password = '" + password + "' AND online_status = false" +
-                    // " AND current_client is null;";
+                // "UPDATE public.users SET online_status = true, current_client = " + client.id +
+                // " WHERE username = '" + username + "' AND password = '" + password + "' AND online_status = false" +
+                // " AND current_client is null;";
                 console.log(timeNow() + query);
                 try {
                     data = await connection.query(query);
@@ -91,10 +92,11 @@ module.exports = packet = {
                 }
                 return data;
             }
+
             async function processLogin(username, password) {
                 data = await loginQuery(username, password);
                 var current_room, pos_x, pos_y, health, sprite;
-                if(data.length < 1){
+                if (data.length < 1) {
                     client.socket.write(packet.build(["LOGIN", "FALSE", config.err_msg_login_auth]));
                     console.log(timeNow() + config.err_msg_login_auth);
                     return;
@@ -110,45 +112,45 @@ module.exports = packet = {
                     console.log(error.stack);
                     return;
                 }
-                if(
-                    username     == null ||
+                if (
+                    username == null ||
                     current_room == null ||
-                    pos_x        == null ||
-                    pos_y        == null ||
-                    health       == null ||
-                    sprite       == null
-                ){
+                    pos_x == null ||
+                    pos_y == null ||
+                    health == null ||
+                    sprite == null
+                ) {
                     console.log(timeNow() + config.err_msg_db);
                     return;
                 }
                 client.socket.write(packet.build([
-                    "LOGIN", "TRUE", config.msg_login_success, username, current_room, pos_x, pos_y, health, sprite
+                    "LOGIN", "TRUE", config.msg_login_success, username, current_room, pos_x.toString(), pos_y.toString(), health, sprite
                 ], client.id));
                 //Send spawn player packet to other clients in the room who are online
                 maps[current_room].clients.push(client);
                 //TODO add spawn packet to other clients in the same room
-
-                // maps[current_room].clients.forEach(function (otherClient) {
-                //     if (otherClient.id !== client.id) {
-                //         otherClient.socket.write(packet.build([
-                //             "SPAWN", username, "player", pos_x, pos_y, health, sprite
-                //         ]));
-                //     }
-                // });
+                maps[current_room].clients.forEach(function (otherClient) {
+                    if (otherClient.id !== client.id) {
+                        otherClient.socket.write(packet.build([
+                            "SPAWN", username, "player", pos_x, pos_y, health, sprite
+                        ], otherClient.id));
+                    }
+                });
                 //Get list of current entities in the room with their positions, and send to player:
-                // maps[current_room].entities.forEach(function (entity) {
-                //     if (entity.name !== username) {
-                //         client.socket.write(packet.build([
-                //             "SPAWN", entity.name, entity.type, entity.pos_x, entity.pos_y, entity.health, entity.sprite
-                //         ]));
-                //     }
-                // });
+                maps[current_room].entities.forEach(function (entity) {
+                    if (entity.name !== username) {
+                        client.socket.write(packet.build([
+                            "SPAWN", entity.name, entity.type, entity.pos_x, entity.pos_y, entity.health, entity.sprite
+                        ], client.id));
+                    }
+                });
             }
-            //TODO fix all sql queries so that processing is included in the getLastRecord function
+
             try {
                 processLogin(username, password);
                 setLogin(username, password);
-            } catch(error) {
+                console.log(timeNow() + config.msg_login_success + ", clientId=" + client.id);
+            } catch (error) {
                 console.log(error.stack);
             }
         }
@@ -220,16 +222,37 @@ module.exports = packet = {
             // });
         }
 
-        //TODO console log for login/logout should show username and clientId
+        function chat(message) {
+            async function getClients() {
+                query = "SELECT current_room FROM public.users WHERE current_client = " + client.id + ");";
+                console.log(timeNow() + query);
+                try {
+                    connection.query(query);
+                } catch (error) {
+                    console.log(error.stack);
+                }
+            }
+            async function sendMessage(message){
+                var current_room = await getClients();
+                maps[current_room].clients.forEach(function (client) {
+                    client.socket.write(packet.build([
+                        "CHAT", client.username, message
+                    ], client.id));
+                });
+            }
+            sendMessage(message);
+        }
+
+        //TODO remove client from room.clients when client disconnects
         function logout(clientId) {
             query = "UPDATE public.users SET online_status = false, current_client = null " +
                 "WHERE current_client = '" + clientId.toString() + "' AND online_status = true";
             console.log(timeNow() + query);
             try {
                 connection.query(query);
-                console.log(timeNow() + config.msg_logout_success);
+                console.log(timeNow() + config.msg_logout_success + client.id);
             } catch (error) {
-                console.log(timeNow() + config.err_msg_logout_database)
+                console.log(timeNow() + config.err_msg_logout_database + client.id)
                 console.log(error.stack);
             }
             // maps[current_room].clients.forEach(function (OtherClient) {
@@ -262,6 +285,9 @@ module.exports = packet = {
                 data = PacketModels.logout.parse(datapacket);
                 logout(client.id);
                 break;
+            case "CHAT":
+                data = PacketModels.chat.parse(datapacket);
+                chat(message);
         }
 
         //TODO store mob and player positions IN MEMORY in jsons, only save to database on logout/server downtime
@@ -272,5 +298,3 @@ function timeNow() {
     var timeStamp = new Date().toISOString();
     return "[" + timeStamp + "] ";
 }
-
-//TODO add unique key to user table

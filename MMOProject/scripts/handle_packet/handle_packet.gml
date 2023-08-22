@@ -20,6 +20,15 @@ function handle_packet(data_buffer){
 				player_health = buffer_read(data_buffer, buffer_string);
 				player_sprite = buffer_read(data_buffer, buffer_string);
 				room_goto(asset_get_index(target_room));
+				var_player = "";
+				with(instance_create_layer(real(pos_x), real(pos_y), "Instances", player)){
+                var_player = other;
+				}
+				if(instance_exists(player)){
+					show_debug_message(date_datetime_string(date_current_datetime()) + " " + "Created player object at pos=" + string(player.x) + "," + string(player.y));
+				}
+				
+				//TODO make player object persistent, destroy player object on room exit  
 			} else {
 				if(instance_exists(lbl_msg_login)){
 				lbl_msg_login.text = msg;
@@ -51,6 +60,8 @@ function handle_packet(data_buffer){
 			room_goto(rm_login);
 			break;
 		case "DESTROY":
+			break;
+		case "CHAT":
 			break;
 	}
 }
