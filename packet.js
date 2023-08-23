@@ -1,6 +1,7 @@
 const {data} = require("./client");
 const q = require('q');
 const {Client} = require("pg");
+const {pos_x} = require("./Models/entity");
 const connection = new Client({
     host: '127.0.0.1',
     port: '5432',
@@ -236,6 +237,12 @@ module.exports = packet = {
         function entity(target_x, target_y) {
             client.pos_x = target_x;
             client.pos_y = target_y;
+            maps[client.current_room].entities.forEach(function(client){
+                if(entity.name === client.username) {
+                    entity.pos_x = target_x;
+                    entity.pos_y = target_y;
+                }
+            });
             maps[client.current_room].clients.forEach(function (client) {
                 client.socket.write(packet.build([
                     "ENTITY", client.username, target_x.toString(), target_y.toString(), "100", "sprite"

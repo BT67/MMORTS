@@ -76,16 +76,7 @@ this_entity.sprite = "sprite";
 maps["zone1"].entities.push(this_entity);
 
 //Initialise the database:
-var query_str = "CREATE TABLE IF NOT EXISTS users(" +
-    "username VARCHAR(30), " +
-    "password VARCHAR(30), " +
-    "email VARCHAR(100), " +
-    "current_room VARCHAR(100), " +
-    "current_client VARCHAR(30), " +
-    "pos_x INTEGER, " +
-    "pos_y INTEGER, " +
-    "sprite VARCHAR(100), " +
-    "online_status boolean)";
+var query_str = "";
 const connection = new Client({
     host: '127.0.0.1',
     port: '5432',
@@ -96,6 +87,17 @@ const connection = new Client({
 
 console.log(timeNow() + "Initialising database...");
 connection.connect();
+query_str = "CREATE TABLE IF NOT EXISTS users(" +
+    "username VARCHAR(30), " +
+    "password VARCHAR(30), " +
+    "email VARCHAR(100), " +
+    "current_room VARCHAR(100), " +
+    "current_client VARCHAR(30), " +
+    "pos_x INTEGER, " +
+    "pos_y INTEGER, " +
+    "sprite VARCHAR(100), " +
+    "online_status boolean);" +
+    "UPDATE public.users SET online_status = false, current_client = null;";
 connection.query(query_str, function (err) {
     if (err) {
         console.log(timeNow() + err);
