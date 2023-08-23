@@ -26,6 +26,7 @@
     {"name":"UI Framework","order":1,"path":"folders/Sprites/UI Framework.yy",},
     {"name":"Tile Sets","order":2,"path":"folders/Tile Sets.yy",},
     {"name":"Timelines","order":8,"path":"folders/Timelines.yy",},
+    {"name":"Mob Sprites","order":2,"path":"folders/Sprites/Entities/Mob Sprites.yy",},
   ],
   "ResourceOrderSettings": [
     {"name":"login_controller","order":7,"path":"objects/login_controller/login_controller.yy",},
@@ -34,6 +35,7 @@
     {"name":"ui_button_base","order":3,"path":"objects/ui_button_base/ui_button_base.yy",},
     {"name":"ui_focus_base","order":1,"path":"objects/ui_focus_base/ui_focus_base.yy",},
     {"name":"btn_login","order":2,"path":"objects/btn_login/btn_login.yy",},
+    {"name":"mob","order":2,"path":"objects/mob/mob.yy",},
     {"name":"rm_register","order":4,"path":"rooms/rm_register/rm_register.yy",},
     {"name":"rm_login","order":3,"path":"rooms/rm_login/rm_login.yy",},
     {"name":"entity","order":1,"path":"objects/entity/entity.yy",},

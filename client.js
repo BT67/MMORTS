@@ -32,6 +32,7 @@ module.exports = function () {
         console.log(timeNow() + config.err_msg_client_error + id);
         sendDestroyPackets(id);
     }
+    //TODO Error when client fails to login but DB registers login, when try to log in again, access is denied
     this.end = function () {
         sendDestroyPackets(id);
     }

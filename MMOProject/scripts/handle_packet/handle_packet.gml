@@ -25,7 +25,6 @@ function handle_packet(data_buffer){
 					var_player = other;
 				}
 				variable_instance_set(instance_find(player, 0), "entity_name", entity_name);
-				//TODO make player object persistent, destroy player object on room exit  
 			} else {
 				if(instance_exists(lbl_msg_login)){
 				lbl_msg_login.text = msg;
@@ -46,6 +45,24 @@ function handle_packet(data_buffer){
 			}
 			break;
 		case "SPAWN":
+			entity_name = buffer_read(data_buffer, buffer_string);
+			entity_type = buffer_read(data_buffer, buffer_string);
+			target_x = buffer_read(data_buffer, buffer_string);
+			target_y = buffer_read(data_buffer, buffer_string);
+			entity_health = buffer_read(data_buffer, buffer_string);
+			entity_sprite = buffer_read(data_buffer, buffer_string);
+			show_debug_message(string(entity_name));
+			show_debug_message(string(entity_type));
+			show_debug_message(string(target_x));
+			show_debug_message(string(target_y));
+			var_entity = "";
+			with(instance_create_layer(real(target_x), real(target_y), "Instances", asset_get_index(entity_type))){
+				var_entity = other;
+			}
+			variable_instance_set(instance_find(entity, instance_number(entity) - 1), "entity_name", entity_name);
+			variable_instance_set(instance_find(entity, instance_number(entity) - 1), "target_x", target_x);
+			variable_instance_set(instance_find(entity, instance_number(entity) - 1), "target_y", target_y);
+			show_debug_message(date_datetime_string(date_current_datetime()) + " Created entity: " + entity_name);
 			break;
 		case "ENTITY":
 			entity_name = buffer_read(data_buffer, buffer_string);
@@ -54,13 +71,9 @@ function handle_packet(data_buffer){
 			entity_health = buffer_read(data_buffer, buffer_string);
 			entity_sprite = buffer_read(data_buffer, buffer_string);
 			for(var i = 0; i < instance_number(entity); ++i;) {
-				show_debug_message("Packet entity name: " + entity_name);
-				show_debug_message("Entity name: " + entity.entity_name);
 				if(instance_find(entity, i).entity_name == entity_name){
 					instance_find(entity, i).target_x = target_x;
 					instance_find(entity, i).target_y = target_y;
-					show_debug_message("Moving to :" + string(target_x) + "," + string(target_y));
-					show_debug_message("Player at :" + string(instance_find(entity, i).target_x) + "," + string(instance_find(entity, i).target_y));
 				}
 			}
 			break;

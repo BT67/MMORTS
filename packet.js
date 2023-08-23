@@ -81,9 +81,6 @@ module.exports = packet = {
                 var data;
                 query = "SELECT * FROM public.users WHERE username = '" +
                     username + "' AND password = '" + password + "' AND online_status = false LIMIT 1;";
-                // "UPDATE public.users SET online_status = true, current_client = " + client.id +
-                // " WHERE username = '" + username + "' AND password = '" + password + "' AND online_status = false" +
-                // " AND current_client is null;";
                 console.log(timeNow() + query);
                 try {
                     data = await connection.query(query);
@@ -131,14 +128,19 @@ module.exports = packet = {
                 var entity_inst = require(__dirname + "/Models/entity.js");
                 var entity = new entity_inst();
                 entity.name = username;
+                entity.type = "player";
                 entity.pos_x = pos_x;
                 entity.pos_y = pos_y;
                 client.pos_x = pos_x;
                 client.pos_y = pos_y;
                 maps[current_room].entities.push(entity);
                 client.current_room = current_room;
-                console.log(timeNow() + config.msg_enter_room + ", clientId=" + client.id);
-                console.log(timeNow() + config.msg_clients_in_room + current_room + ": " + maps[current_room].clients.toString());
+                console.log(timeNow() + config.msg_enter_room + current_room + ", clientId=" + client.id);
+                clients_str = "";
+                maps[current_room].clients.forEach(function(otherClient){
+                    clients_str = clients_str + otherClient.id.toString + " ";
+                });
+                console.log(timeNow() + config.msg_clients_in_room + current_room + ": " + clients_str);
                 //TODO add spawn packet to other clients in the same room
                 maps[current_room].clients.forEach(function (otherClient) {
                     if (otherClient.id !== client.id) {
@@ -148,13 +150,25 @@ module.exports = packet = {
                     }
                 });
                 //Get list of current entities in the room with their positions, and send to player:
-                maps[current_room].entities.forEach(function (entity) {
-                    if (entity.name !== username) {
-                        client.socket.write(packet.build([
-                            "SPAWN", entity.name, entity.type, entity.pos_x, entity.pos_y, entity.health, entity.sprite
-                        ], client.id));
-                    }
-                });
+                async function spawnEntities(client) {
+                    maps[client.current_room].entities.forEach( async function (entity) {
+                        if (entity.name !== client.username) {
+                            client.socket.write(packet.build([
+                                "SPAWN", entity.name, entity.type, entity.pos_x.toString(), entity.pos_y.toString(), entity.health, entity.sprite
+                            ], client.id));
+                        }
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                    });
+                }
+
+                // function sleep(ms) {
+                //     return new Promise((resolve) => {
+                //         setTimeout(resolve, ms);
+                //     });
+                // }
+
+                spawnEntities(client);
+
             }
             try {
                 processLogin(username, password);
@@ -214,12 +228,13 @@ module.exports = packet = {
             });
         }
 
+        //TODO redo entity function to use entity_name instead of client.username
         function entity(target_x, target_y) {
             client.pos_x = target_x;
             client.pos_y = target_y;
             maps[client.current_room].clients.forEach(function (client) {
                 client.socket.write(packet.build([
-                    "ENTITY", client.username, target_x.toString(), target_y.toString(), "", ""
+                    "ENTITY", client.username, target_x.toString(), target_y.toString(), "100", "sprite"
                 ], client.id));
             });
         }
@@ -315,5 +330,3 @@ function timeNow() {
     var timeStamp = new Date().toISOString();
     return "[" + timeStamp + "] ";
 }
-
-//TODO save player position on logout

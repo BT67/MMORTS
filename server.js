@@ -43,6 +43,38 @@ map_files.forEach(function (mapFile) {
     maps[map.room] = map;
 });
 
+//Load mobs into each map:
+var entity_inst = new require("./Models/entity.js");
+var this_entity = new entity_inst();
+this_entity.health = 100;
+this_entity.sprite = "";
+this_entity.type = "mob";
+this_entity.name = "mob1";
+this_entity.pos_x = 150;
+this_entity.pos_y = 150;
+this_entity.sprite = "sprite";
+maps["zone1"].entities.push(this_entity);
+
+this_entity = new entity_inst();
+this_entity.health = 100;
+this_entity.sprite = "";
+this_entity.type = "mob";
+this_entity.name = "mob2";
+this_entity.pos_x = 150;
+this_entity.pos_y = 210;
+this_entity.sprite = "sprite";
+maps["zone1"].entities.push(this_entity);
+
+this_entity = new entity_inst();
+this_entity.health = 100;
+this_entity.sprite = "";
+this_entity.type = "mob";
+this_entity.name = "mob3";
+this_entity.pos_x = 300;
+this_entity.pos_y = 80;
+this_entity.sprite = "sprite";
+maps["zone1"].entities.push(this_entity);
+
 //Initialise the database:
 var query_str = "CREATE TABLE IF NOT EXISTS users(" +
     "username VARCHAR(30), " +
