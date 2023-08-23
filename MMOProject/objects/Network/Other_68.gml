@@ -1,5 +1,3 @@
-show_debug_message(date_datetime_string(date_current_datetime()) + " Networking event encountered");
-
 switch(async_load[? "type"]){
 	case network_type_data:
 		buffer_copy(async_load[? "buffer"],0,async_load[? "size"], saved_buffer, buffer_tell(saved_buffer));
@@ -15,14 +13,18 @@ switch(async_load[? "type"]){
 				if(buffer_get_size(saved_buffer) != reading + buffer_size){
 					reading += buffer_size;
 				} else {
-				//Resize the reading packet back to ;
-				buffer_resize(saved_buffer, 1);
-				reading = 0;
-				break;
+					//Resize the reading packet back to ;
+					buffer_resize(saved_buffer, 1);
+					reading = 0;
+					break;
 				}
 			} else {
 				break;
 			}	
-		}		
+		}	
+		buffer_resize(saved_buffer, 1);
+		buffer_resize(cut_buffer, 1);
+		buffer_size = 0;
+		reading = 0;
 		break;
 }

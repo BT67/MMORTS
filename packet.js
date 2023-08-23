@@ -149,23 +149,27 @@ module.exports = packet = {
                         ], otherClient.id));
                     }
                 });
-                //Get list of current entities in the room with their positions, and send to player:
-                async function spawnEntities(client) {
-                    maps[client.current_room].entities.forEach( async function (entity) {
-                        if (entity.name !== client.username) {
-                            client.socket.write(packet.build([
-                                "SPAWN", entity.name, entity.type, entity.pos_x.toString(), entity.pos_y.toString(), entity.health, entity.sprite
-                            ], client.id));
+                //TODO send all spawn data in a single packet to the client
+                function spawnEntities(client) {
+                    params = [];
+                    params.push("SPAWN");
+                    for(var i = 0; i < maps[current_room].entities.length; i++) {
+                        console.log("entity_name: " + maps[current_room].entities[i].name);
+                        console.log("username: " + client.username);
+                        if (maps[current_room].entities[i].name !== client.username) {
+                            console.log("here");
+                            params.push(maps[current_room].entities[i].name);
+                            params.push(maps[current_room].entities[i].type);
+                            params.push(maps[current_room].entities[i].pos_x.toString());
+                            params.push(maps[current_room].entities[i].pos_y.toString());
+                            params.push(maps[current_room].entities[i].health);
+                            params.push(maps[current_room].entities[i].sprite);
                         }
-                        await new Promise(resolve => setTimeout(resolve, 500));
-                    });
+                    }
+                    params.push("end");
+                    console.log(params.toString());
+                    client.socket.write(packet.build(params, client.id));
                 }
-
-                // function sleep(ms) {
-                //     return new Promise((resolve) => {
-                //         setTimeout(resolve, ms);
-                //     });
-                // }
 
                 spawnEntities(client);
 
