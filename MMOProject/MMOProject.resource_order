@@ -22,11 +22,11 @@
     {"name":"Sounds","order":3,"path":"folders/Sounds.yy",},
     {"name":"Sprites","order":1,"path":"folders/Sprites.yy",},
     {"name":"Entities","order":2,"path":"folders/Sprites/Entities.yy",},
+    {"name":"Mob Sprites","order":2,"path":"folders/Sprites/Entities/Mob Sprites.yy",},
     {"name":"Player Sprites","order":1,"path":"folders/Sprites/Entities/Player Sprites.yy",},
     {"name":"UI Framework","order":1,"path":"folders/Sprites/UI Framework.yy",},
     {"name":"Tile Sets","order":2,"path":"folders/Tile Sets.yy",},
     {"name":"Timelines","order":8,"path":"folders/Timelines.yy",},
-    {"name":"Mob Sprites","order":2,"path":"folders/Sprites/Entities/Mob Sprites.yy",},
   ],
   "ResourceOrderSettings": [
     {"name":"login_controller","order":7,"path":"objects/login_controller/login_controller.yy",},

@@ -59,7 +59,6 @@ function handle_packet(data_buffer){
 					target_y = buffer_read(data_buffer, buffer_string);
 					show_debug_message(string(target_y));
 					entity_health = buffer_read(data_buffer, buffer_string);
-					entity_sprite = buffer_read(data_buffer, buffer_string);
 				} catch(exception) {
 					cont = false;
 				}

@@ -150,6 +150,7 @@ module.exports = packet = {
                     }
                 });
                 //TODO send all spawn data in a single packet to the client
+                //Send all entity names, then send all positions separately
                 function spawnEntities(client) {
                     params = [];
                     params.push("SPAWN");
@@ -163,7 +164,6 @@ module.exports = packet = {
                             params.push(maps[current_room].entities[i].pos_x.toString());
                             params.push(maps[current_room].entities[i].pos_y.toString());
                             params.push(maps[current_room].entities[i].health);
-                            params.push(maps[current_room].entities[i].sprite);
                         }
                     }
                     params.push("end");
