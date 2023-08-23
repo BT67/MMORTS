@@ -39,6 +39,7 @@
     {"name":"rm_register","order":4,"path":"rooms/rm_register/rm_register.yy",},
     {"name":"rm_login","order":3,"path":"rooms/rm_login/rm_login.yy",},
     {"name":"entity","order":1,"path":"objects/entity/entity.yy",},
+    {"name":"hud_controller","order":2,"path":"objects/hud_controller/hud_controller.yy",},
     {"name":"ui_label_base","order":4,"path":"objects/ui_label_base/ui_label_base.yy",},
     {"name":"init_controller","order":2,"path":"objects/init_controller/init_controller.yy",},
     {"name":"network_write","order":1,"path":"scripts/network_write/network_write.yy",},

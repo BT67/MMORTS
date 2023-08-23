@@ -62,6 +62,7 @@
     {"id":{"name":"rm_register","path":"rooms/rm_register/rm_register.yy",},},
     {"id":{"name":"rm_login","path":"rooms/rm_login/rm_login.yy",},},
     {"id":{"name":"entity","path":"objects/entity/entity.yy",},},
+    {"id":{"name":"hud_controller","path":"objects/hud_controller/hud_controller.yy",},},
     {"id":{"name":"ui_label_base","path":"objects/ui_label_base/ui_label_base.yy",},},
     {"id":{"name":"init_controller","path":"objects/init_controller/init_controller.yy",},},
     {"id":{"name":"network_write","path":"scripts/network_write/network_write.yy",},},

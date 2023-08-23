@@ -88,6 +88,21 @@ function handle_packet(data_buffer){
 				}
 			}
 			break;
+		case "ROOM":
+			instance_destroy(entity);
+			entity_name = buffer_read(data_buffer, buffer_string);
+			target_room = buffer_read(data_buffer, buffer_string);
+			pos_x = buffer_read(data_buffer, buffer_string);
+			pos_y = buffer_read(data_buffer, buffer_string);
+			player_health = buffer_read(data_buffer, buffer_string);
+			player_sprite = buffer_read(data_buffer, buffer_string);
+			room_goto(asset_get_index(target_room));
+			var_player = "";
+			with(instance_create_layer(real(pos_x), real(pos_y), "Instances", player)){
+				var_player = other;
+			}
+			variable_instance_set(instance_find(player, 0), "entity_name", entity_name);
+			break;
 		case "ATTACK":
 			break;
 		case "LOGOUT":

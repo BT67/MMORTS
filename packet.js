@@ -305,6 +305,30 @@ module.exports = packet = {
             client.current_room = null;
         }
 
+        function room(room){
+            query = "UPDATE public.users SET current_room = '" + room + "' WHERE current_client = " + client.id + ";";
+            console.log(timeNow() + query);
+            try {
+                connection.query(query);
+                console.log(timeNow() + config.msg_client_enter_room + room + ", clientId=" + client.id);
+            } catch (error) {
+                console.log(timeNow() + config.err_msg_client_enter_room + room + ", clientId=" + client.id);
+                console.log(error.stack);
+                return;
+            }
+            delete maps[client.current_room].clients.client;
+            delete maps[client.current_room].entities[client.username];
+            client.current_room = room;
+            maps[room].clients.push(client);
+            var entity_inst = require(__dirname + "/Models/entity.js");
+            var entity = new entity_inst();
+            entity.name = username;
+            entity.type = "player";
+            entity.pos_x = maps[room].start_x;
+            entity.pos_y = maps[room].start_y;
+            maps[current_room].entities.push(entity);
+        }
+
         var data;
         //Interpret commands for client
         switch (header.command.toUpperCase()) {
@@ -330,10 +354,11 @@ module.exports = packet = {
                 break;
             case "CHAT":
                 data = PacketModels.chat.parse(datapacket);
-                chat(message);
+                chat(data.message);
+            case "ROOM":
+                data = PacketModels.room.parse(datapacket);
+                room(data.room);
         }
-
-        //TODO store mob and player positions IN MEMORY in jsons, only save to database on logout/server downtime
     }
 }
 
