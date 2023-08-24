@@ -26,7 +26,7 @@ function handle_packet(data_buffer){
 					var_player = other;
 				}
 				variable_instance_set(instance_find(player, 0), "entity_name", entity_name);
-				variable_instance_set(instance_find(hud_controller, 0), "username", entity_name);
+				network.username = entity_name;
 			} else {
 				if(instance_exists(lbl_msg_login)){
 				lbl_msg_login.text = msg;

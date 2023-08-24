@@ -1,3 +1,3 @@
-text = hud_controller.username + ":";
-
+text = "";
+focused = false;
 

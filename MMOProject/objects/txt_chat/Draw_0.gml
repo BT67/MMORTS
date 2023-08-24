@@ -1,1 +1,2 @@
-draw_text(x + 60, y - 40, string(text));
+draw_text(x, y, string(network.username) + ": " + string(text));
+

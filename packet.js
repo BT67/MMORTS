@@ -248,6 +248,7 @@ module.exports = packet = {
                     "ENTITY", client.username, target_x.toString(), target_y.toString(), "100", "sprite"
                 ], client.id));
             });
+            //TODO check is player has aggro'd any mobs and if so move mobs towards the player 
         }
 
         //Send entity attacks to other clients

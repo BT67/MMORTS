@@ -32,7 +32,6 @@ model_files.forEach(function (modelFile) {
 });
 
 var clientIdNo = 0;
-var clients = {};
 
 //Load game map data
 maps = {};
