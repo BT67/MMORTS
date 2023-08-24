@@ -26,6 +26,7 @@ function handle_packet(data_buffer){
 					var_player = other;
 				}
 				variable_instance_set(instance_find(player, 0), "entity_name", entity_name);
+				variable_instance_set(instance_find(hud_controller, 0), "username", entity_name);
 			} else {
 				if(instance_exists(lbl_msg_login)){
 				lbl_msg_login.text = msg;
@@ -77,12 +78,16 @@ function handle_packet(data_buffer){
 			break;
 		case "ENTITY":
 			entity_name = buffer_read(data_buffer, buffer_string);
+			//pos_x = buffer_read(data_buffer, buffer_string);
+			//pos_y = buffer_read(data_buffer, buffer_string);
 			target_x = buffer_read(data_buffer, buffer_string);
 			target_y = buffer_read(data_buffer, buffer_string);
 			entity_health = buffer_read(data_buffer, buffer_string);
 			entity_sprite = buffer_read(data_buffer, buffer_string);
 			for(var i = 0; i < instance_number(entity); ++i;) {
 				if(instance_find(entity, i).entity_name == entity_name){
+					//instance_find(entity, i).x = pos_x;
+					//instance_find(entity, i).y = pos_y;
 					instance_find(entity, i).target_x = target_x;
 					instance_find(entity, i).target_y = target_y;
 				}

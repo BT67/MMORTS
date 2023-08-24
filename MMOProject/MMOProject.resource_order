@@ -27,8 +27,10 @@
     {"name":"UI Framework","order":1,"path":"folders/Sprites/UI Framework.yy",},
     {"name":"Tile Sets","order":2,"path":"folders/Tile Sets.yy",},
     {"name":"Timelines","order":8,"path":"folders/Timelines.yy",},
+    {"name":"Portals","order":11,"path":"folders/Objects/Portals.yy",},
   ],
   "ResourceOrderSettings": [
+    {"name":"txt_chat","order":3,"path":"objects/txt_chat/txt_chat.yy",},
     {"name":"login_controller","order":7,"path":"objects/login_controller/login_controller.yy",},
     {"name":"lbl_msg_login","order":4,"path":"objects/lbl_msg_login/lbl_msg_login.yy",},
     {"name":"btn_back_register","order":2,"path":"objects/btn_back_register/btn_back_register.yy",},
@@ -56,6 +58,7 @@
     {"name":"btn_quit_init","order":3,"path":"objects/btn_quit_init/btn_quit_init.yy",},
     {"name":"txt_password_register","order":6,"path":"objects/txt_password_register/txt_password_register.yy",},
     {"name":"txt_email_register","order":9,"path":"objects/txt_email_register/txt_email_register.yy",},
+    {"name":"zone2","order":1,"path":"rooms/zone2/zone2.yy",},
     {"name":"ui_textbox_base","order":2,"path":"objects/ui_textbox_base/ui_textbox_base.yy",},
     {"name":"btn_register_init","order":1,"path":"objects/btn_register_init/btn_register_init.yy",},
     {"name":"lbl_email_register","order":8,"path":"objects/lbl_email_register/lbl_email_register.yy",},

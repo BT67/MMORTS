@@ -233,7 +233,7 @@ module.exports = packet = {
             });
         }
 
-        //TODO redo entity function to use entity_name instead of client.username
+        //TODO periodically update entity position, as well as target position
         function entity(target_x, target_y) {
             client.pos_x = target_x;
             client.pos_y = target_y;
@@ -366,3 +366,5 @@ function timeNow() {
     var timeStamp = new Date().toISOString();
     return "[" + timeStamp + "] ";
 }
+
+//TODO change HUD logout and quit buttons to Draw GUI
