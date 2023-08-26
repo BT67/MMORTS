@@ -133,8 +133,6 @@ function handle_packet(data_buffer){
 				var_attack = other;
 				//var_attack.target_entity = target_entity;
 			}
-			variable_instance_set(instance_find(attack, instance_count - 1), "target_entity", target_entity);
-			show_debug_message("Instance_count=" + string(instance_count));
 			break;
 		case "LOGOUT":
 			msg = buffer_read(data_buffer, buffer_string);

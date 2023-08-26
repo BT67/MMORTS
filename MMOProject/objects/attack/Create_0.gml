@@ -1,1 +1,1 @@
-target_entity = "";
+target_entity = network.target_entity;
