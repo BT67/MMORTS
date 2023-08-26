@@ -25,6 +25,7 @@ function handle_packet(data_buffer){
 				with(instance_create_layer(real(pos_x), real(pos_y), "Instances", player)){
 					var_player = other;
 				}
+				network.var_player = var_player;
 				variable_instance_set(instance_find(player, 0), "entity_name", entity_name);
 				network.username = entity_name;
 			} else {
@@ -67,13 +68,15 @@ function handle_packet(data_buffer){
 					cont = false;
 				}
 				var_entity = "";
-				with(instance_create_layer(real(target_x), real(target_y), "Instances", asset_get_index(entity_type))){
-					var_entity = other;
+				if(entity_type != "end" && entity_name != "end") {
+					with(instance_create_layer(real(target_x), real(target_y), "Instances", asset_get_index(entity_type))){
+						var_entity = other;
+					}
+					variable_instance_set(instance_find(entity, instance_number(entity) - 1), "entity_name", entity_name);
+					variable_instance_set(instance_find(entity, instance_number(entity) - 1), "target_x", target_x);
+					variable_instance_set(instance_find(entity, instance_number(entity) - 1), "target_y", target_y);
+					show_debug_message(date_datetime_string(date_current_datetime()) + " Created entity: " + entity_name);
 				}
-				variable_instance_set(instance_find(entity, instance_number(entity) - 1), "entity_name", entity_name);
-				variable_instance_set(instance_find(entity, instance_number(entity) - 1), "target_x", target_x);
-				variable_instance_set(instance_find(entity, instance_number(entity) - 1), "target_y", target_y);
-				show_debug_message(date_datetime_string(date_current_datetime()) + " Created entity: " + entity_name);
 			}
 			break;
 		case "ENTITY":
@@ -109,6 +112,29 @@ function handle_packet(data_buffer){
 			variable_instance_set(instance_find(player, 0), "entity_name", entity_name);
 			break;
 		case "ATTACK":
+			attack_type = buffer_read(data_buffer, buffer_string);
+			target_entity = buffer_read(data_buffer, buffer_string);
+			show_debug_message("target_entity=" + string(target_entity));
+			origin_entity = buffer_read(data_buffer, buffer_string);
+			show_debug_message("origin_entity=" + string(origin_entity));
+			origin_x = 0;
+			origin_y = 0;
+			for(var i = 0; i < instance_number(entity); ++i;) {
+				if(instance_find(entity, i).entity_name == origin_entity){
+					origin_entity = instance_find(entity, i).entity_name;
+					origin_x = instance_find(entity, i).x;
+					show_debug_message(string(origin_x));
+					origin_y = instance_find(entity, i).y;
+					show_debug_message(string(origin_y));
+				}
+			}
+			var_attack = "";
+			with(instance_create_layer(real(origin_x), real(origin_y), "Instances", attack)){
+				var_attack = other;
+				//var_attack.target_entity = target_entity;
+			}
+			variable_instance_set(instance_find(attack, instance_count - 1), "target_entity", target_entity);
+			show_debug_message("Instance_count=" + string(instance_count));
 			break;
 		case "LOGOUT":
 			msg = buffer_read(data_buffer, buffer_string);
@@ -116,6 +142,13 @@ function handle_packet(data_buffer){
 			room_goto(rm_login);
 			break;
 		case "DESTROY":
+			entity_name = buffer_read(data_buffer, buffer_string);
+			for(var i = 0; i < instance_number(entity); ++i;) {
+				if(instance_find(entity, i).entity_name == entity_name){
+					instance_destroy(instance_find(entity, i));
+					break;
+				}
+			}
 			break;
 		case "CHAT":
 			break;

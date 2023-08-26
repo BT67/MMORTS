@@ -7,6 +7,7 @@ buffer_size = 0;
 server_text = "";
 
 username = "";
+var_player = "";
 
 socket = network_create_socket(network_socket_tcp);
 network_connect_raw(socket, "127.0.0.1", 8082);

@@ -143,6 +143,7 @@ module.exports = packet = {
                 });
                 console.log(timeNow() + config.msg_clients_in_room + current_room + ": " + clients_str);
                 //TODO add spawn packet to other clients in the same room
+                //TODO only send spawn packets for live entities
                 maps[current_room].clients.forEach(function (otherClient) {
                     if (otherClient.id !== client.id) {
                         otherClient.socket.write(packet.build([
@@ -252,12 +253,21 @@ module.exports = packet = {
         }
 
         //Send entity attacks to other clients
-        function attack(attack_name, attack_type, target_entity, origin_entity, damage, sprite) {
-            // maps[origin_entity.current_room].clients.forEach(function (otherClient) {
-            //     otherClient.socket.write(packet.build([
-            //         "ATTACK", attack_name, attack_type, target_entity, origin_entity, damage, sprite
-            //     ], otherClient.id));
-            // });
+        function attack(target_entity) {
+            //TODO set attack type in attack packet
+            maps[client.current_room].clients.forEach(function (otherClient) {
+                otherClient.socket.write(packet.build([
+                    "ATTACK", "attack", target_entity, client.username
+                ], otherClient.id));
+            });
+            maps[client.current_room].entities.forEach(function (entity) {
+                if(entity.name === target_entity){
+                    entity.health -= 10;
+                    if(entity.health < 0){
+                        destroy(target_entity, client.current_room);
+                    }
+                }
+            });
         }
 
         function chat(message) {
@@ -306,6 +316,12 @@ module.exports = packet = {
             client.current_room = null;
         }
 
+        function destroy(target_entity, current_room){
+            maps[current_room].clients.forEach(function (OtherClient) {
+                OtherClient.socket.write(packet.build(["DESTROY", target_entity]));
+            });
+        }
+
         function room(room){
             query = "UPDATE public.users SET current_room = '" + room + "' WHERE current_client = " + client.id + ";";
             console.log(timeNow() + query);
@@ -347,7 +363,7 @@ module.exports = packet = {
                 break;
             case "ATTACK":
                 data = PacketModels.attack.parse(datapacket);
-                attack(data.attack_name, data.attack_type, data.target_entity, data.origin_entity, data.damage, data.sprite);
+                attack(data.target_entity);
                 break;
             case "LOGOUT":
                 data = PacketModels.logout.parse(datapacket);

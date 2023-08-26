@@ -28,6 +28,9 @@
     {"name":"UI Framework","order":1,"path":"folders/Sprites/UI Framework.yy",},
     {"name":"Tile Sets","order":2,"path":"folders/Tile Sets.yy",},
     {"name":"Timelines","order":8,"path":"folders/Timelines.yy",},
+    {"name":"Cursor","order":3,"path":"folders/Sprites/Cursor.yy",},
+    {"name":"attacks","order":12,"path":"folders/Objects/attacks.yy",},
+    {"name":"Attacks","order":4,"path":"folders/Sprites/Attacks.yy",},
   ],
   "ResourceOrderSettings": [
     {"name":"txt_chat","order":3,"path":"objects/txt_chat/txt_chat.yy",},
@@ -40,6 +43,7 @@
     {"name":"mob","order":2,"path":"objects/mob/mob.yy",},
     {"name":"rm_register","order":4,"path":"rooms/rm_register/rm_register.yy",},
     {"name":"rm_login","order":3,"path":"rooms/rm_login/rm_login.yy",},
+    {"name":"spr_attack_cursor","order":1,"path":"sprites/spr_attack_cursor/spr_attack_cursor.yy",},
     {"name":"entity","order":1,"path":"objects/entity/entity.yy",},
     {"name":"hud_controller","order":2,"path":"objects/hud_controller/hud_controller.yy",},
     {"name":"ui_label_base","order":4,"path":"objects/ui_label_base/ui_label_base.yy",},
