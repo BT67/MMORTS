@@ -156,20 +156,28 @@ module.exports = packet = {
                 function spawnEntities(client) {
                     params = [];
                     params.push("SPAWN");
-                    for(var i = 0; i < maps[current_room].entities.length; i++) {
-                        console.log("entity_name: " + maps[current_room].entities[i].name);
-                        console.log("username: " + client.username);
-                        if (maps[current_room].entities[i].name !== client.username) {
-                            console.log("here");
-                            params.push(maps[current_room].entities[i].name);
-                            params.push(maps[current_room].entities[i].type);
-                            params.push(maps[current_room].entities[i].pos_x.toString());
-                            params.push(maps[current_room].entities[i].pos_y.toString());
-                            params.push(maps[current_room].entities[i].health);
+
+                    maps[current_room].entities.forEach(function(entity){
+                        if(entity.name !== client.username && entity.alive) {
+                            params.push(entity.name);
+                            params.push(entity.type);
+                            params.push(entity.pos_x.toString());
+                            params.push(entity.pos_y.toString());
+                            params.push(entity.health);
                         }
-                    }
+                    });
+                    // for(var i = 0; i < maps[current_room].entities.length; i++) {
+                    //     console.log("entity_name: " + maps[current_room].entities[i].name);
+                    //     console.log("username: " + client.username);
+                    //     if (maps[current_room].entities[i].name !== client.username && ) {
+                    //         params.push(maps[current_room].entities[i].name);
+                    //         params.push(maps[current_room].entities[i].type);
+                    //         params.push(maps[current_room].entities[i].pos_x.toString());
+                    //         params.push(maps[current_room].entities[i].pos_y.toString());
+                    //         params.push(maps[current_room].entities[i].health);
+                    //     }
+                    // }
                     params.push("end");
-                    console.log(params.toString());
                     client.socket.write(packet.build(params, client.id));
                 }
 
@@ -265,6 +273,7 @@ module.exports = packet = {
                     entity.health -= 10;
                     if(entity.health < 0){
                         destroy(target_entity, client.current_room);
+                        entity.alive = false;
                     }
                 }
             });

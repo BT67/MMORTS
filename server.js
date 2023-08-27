@@ -45,6 +45,7 @@ map_files.forEach(function (mapFile) {
 //Load mobs into each map:
 var entity_inst = new require("./Models/entity.js");
 var this_entity = new entity_inst();
+this_entity.alive = true;
 this_entity.health = 100;
 this_entity.sprite = "";
 this_entity.type = "mob";
@@ -55,6 +56,7 @@ this_entity.sprite = "sprite";
 maps["zone1"].entities.push(this_entity);
 
 this_entity = new entity_inst();
+this_entity.alive = true;
 this_entity.health = 100;
 this_entity.sprite = "";
 this_entity.type = "mob";
@@ -65,6 +67,7 @@ this_entity.sprite = "sprite";
 maps["zone1"].entities.push(this_entity);
 
 this_entity = new entity_inst();
+this_entity.alive = true;
 this_entity.health = 100;
 this_entity.sprite = "";
 this_entity.type = "mob";
