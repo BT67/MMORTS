@@ -272,7 +272,9 @@ module.exports = packet = {
                 if(entity.name === target_entity){
                     entity.health -= 10;
                     if(entity.health < 0){
-                        destroy(target_entity, client.current_room);
+                        maps[client.current_room].clients.forEach(function (OtherClient) {
+                            OtherClient.socket.write(packet.build(["DESTROY", target_entity], OtherClient.id));
+                        });
                         entity.alive = false;
                     }
                 }
@@ -323,12 +325,6 @@ module.exports = packet = {
                 }
             });
             client.current_room = null;
-        }
-
-        function destroy(target_entity, current_room){
-            maps[current_room].clients.forEach(function (OtherClient) {
-                OtherClient.socket.write(packet.build(["DESTROY", target_entity]));
-            });
         }
 
         function room(room){

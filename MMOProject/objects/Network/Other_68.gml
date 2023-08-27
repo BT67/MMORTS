@@ -4,7 +4,7 @@ switch(async_load[? "type"]){
 		buffer_seek(saved_buffer, buffer_seek_relative, async_load[? "size"] + 1);
 		//While there is still data in the packet to read;
 		while (true){
-			buffer_size = buffer_peek(saved_buffer, 0, buffer_u8);
+			buffer_size = buffer_peek(saved_buffer, reading, buffer_u8);
 			if(buffer_get_size(saved_buffer) >= reading + buffer_size) {
 				buffer_copy(saved_buffer, reading, buffer_size, cut_buffer, 0);
 				buffer_seek(cut_buffer, 0, 1);
@@ -22,9 +22,9 @@ switch(async_load[? "type"]){
 				break;
 			}	
 		}	
-		buffer_resize(saved_buffer, 1);
-		buffer_resize(cut_buffer, 1);
-		buffer_size = 0;
-		reading = 0;
+		//buffer_resize(saved_buffer, 1);
+		//buffer_resize(cut_buffer, 1);
+		//buffer_size = 0;
+		//reading = 0;
 		break;
 }
