@@ -149,6 +149,9 @@ function handle_packet(data_buffer){
 			}
 			break;
 		case "CHAT":
+			msg = buffer_read(data_buffer, buffer_string);
+			show_debug_message(msg);
+			txt_chat_log.chat_log += (msg + "\n");
 			break;
 	}
 	//buffer_delete(data_buffer);

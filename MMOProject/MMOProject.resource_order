@@ -33,7 +33,8 @@
     {"name":"Timelines","order":8,"path":"folders/Timelines.yy",},
   ],
   "ResourceOrderSettings": [
-    {"name":"txt_chat","order":3,"path":"objects/txt_chat/txt_chat.yy",},
+    {"name":"txt_chat_log","order":4,"path":"objects/txt_chat_log/txt_chat_log.yy",},
+    {"name":"txt_chat_input","order":3,"path":"objects/txt_chat_input/txt_chat_input.yy",},
     {"name":"login_controller","order":7,"path":"objects/login_controller/login_controller.yy",},
     {"name":"lbl_msg_login","order":4,"path":"objects/lbl_msg_login/lbl_msg_login.yy",},
     {"name":"btn_back_register","order":2,"path":"objects/btn_back_register/btn_back_register.yy",},

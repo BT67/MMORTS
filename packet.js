@@ -138,7 +138,7 @@ module.exports = packet = {
                 client.current_room = current_room;
                 console.log(timeNow() + config.msg_enter_room + current_room + ", clientId=" + client.id);
                 clients_str = "";
-                maps[current_room].clients.forEach(function(otherClient){
+                maps[current_room].clients.forEach(function (otherClient) {
                     clients_str = clients_str + otherClient.id.toString + " ";
                 });
                 console.log(timeNow() + config.msg_clients_in_room + current_room + ": " + clients_str);
@@ -157,8 +157,8 @@ module.exports = packet = {
                     params = [];
                     params.push("SPAWN");
 
-                    maps[current_room].entities.forEach(function(entity){
-                        if(entity.name !== client.username && entity.alive) {
+                    maps[current_room].entities.forEach(function (entity) {
+                        if (entity.name !== client.username && entity.alive) {
                             params.push(entity.name);
                             params.push(entity.type);
                             params.push(entity.pos_x.toString());
@@ -184,6 +184,7 @@ module.exports = packet = {
                 spawnEntities(client);
 
             }
+
             try {
                 processLogin(username, password);
                 setLogin(username, password);
@@ -246,8 +247,8 @@ module.exports = packet = {
         function entity(target_x, target_y) {
             client.pos_x = target_x;
             client.pos_y = target_y;
-            maps[client.current_room].entities.forEach(function(client){
-                if(entity.name === client.username) {
+            maps[client.current_room].entities.forEach(function (client) {
+                if (entity.name === client.username) {
                     entity.pos_x = target_x;
                     entity.pos_y = target_y;
                 }
@@ -269,9 +270,9 @@ module.exports = packet = {
                 ], otherClient.id));
             });
             maps[client.current_room].entities.forEach(function (entity) {
-                if(entity.name === target_entity){
+                if (entity.name === target_entity) {
                     entity.health -= 10;
-                    if(entity.health < 0){
+                    if (entity.health < 0) {
                         maps[client.current_room].clients.forEach(function (OtherClient) {
                             OtherClient.socket.write(packet.build(["DESTROY", target_entity], OtherClient.id));
                         });
@@ -282,26 +283,12 @@ module.exports = packet = {
         }
 
         function chat(message) {
-            async function getClients() {
-                query = "SELECT current_room FROM public.users WHERE current_client = " + client.id + ");";
-                console.log(timeNow() + query);
-                try {
-                    connection.query(query);
-                } catch (error) {
-                    console.log(error.stack);
-                }
-            }
-
-            async function sendMessage(message) {
-                var current_room = await getClients();
-                maps[current_room].clients.forEach(function (client) {
-                    client.socket.write(packet.build([
-                        "CHAT", client.username, message
-                    ], client.id));
-                });
-            }
-
-            sendMessage(message);
+            var dateTime = new Date();
+            maps[client.current_room].clients.forEach(function (otherclient) {
+                client.socket.write(packet.build([
+                    "CHAT", dateTime.getHours() + ":" + dateTime.getMinutes() + " " + client.username + ": " + message
+                ], otherclient.id));
+            });
         }
 
         function logout(clientId) {
@@ -327,7 +314,7 @@ module.exports = packet = {
             client.current_room = null;
         }
 
-        function room(room){
+        function room(room) {
             query = "UPDATE public.users SET current_room = '" + room + "' WHERE current_client = " + client.id + ";";
             console.log(timeNow() + query);
             try {
@@ -377,9 +364,11 @@ module.exports = packet = {
             case "CHAT":
                 data = PacketModels.chat.parse(datapacket);
                 chat(data.message);
+                break;
             case "ROOM":
                 data = PacketModels.room.parse(datapacket);
                 room(data.room);
+                break;
         }
     }
 }
