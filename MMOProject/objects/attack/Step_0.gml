@@ -8,6 +8,9 @@ if(typeof(target_entity) == "string") {
 			break;
 		}
 	}
+	if(typeof(target_entity) == "string"){
+		instance_destroy();
+	}
 } else {
 	try {
 		move_towards_point(target_entity.x, target_entity.y, 2);
