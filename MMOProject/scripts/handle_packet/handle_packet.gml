@@ -81,11 +81,13 @@ function handle_packet(data_buffer){
 			break;
 		case "ENTITY":
 			entity_name = buffer_read(data_buffer, buffer_string);
+			show_debug_message("Entity name=" + entity_name);
 			//pos_x = buffer_read(data_buffer, buffer_string);
 			//pos_y = buffer_read(data_buffer, buffer_string);
 			target_x = buffer_read(data_buffer, buffer_string);
 			target_y = buffer_read(data_buffer, buffer_string);
 			entity_health = buffer_read(data_buffer, buffer_string);
+			show_debug_message("Entity health=" + entity_health);
 			entity_sprite = buffer_read(data_buffer, buffer_string);
 			for(var i = 0; i < instance_number(entity); ++i;) {
 				if(instance_find(entity, i).entity_name == entity_name){
@@ -93,6 +95,8 @@ function handle_packet(data_buffer){
 					//instance_find(entity, i).y = pos_y;
 					instance_find(entity, i).target_x = target_x;
 					instance_find(entity, i).target_y = target_y;
+					instance_find(entity, i).entity_health = real(entity_health);
+					show_debug_message("Entity health=" + string(instance_find(entity, i).entity_health));
 				}
 			}
 			break;

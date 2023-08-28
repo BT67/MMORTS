@@ -270,8 +270,13 @@ module.exports = packet = {
                 ], otherClient.id));
             });
             maps[client.current_room].entities.forEach(function (entity) {
-                if (entity.name === target_entity) {
+                if (entity.name === target_entity && entity.alive) {
                     entity.health -= 10;
+                    maps[client.current_room].clients.forEach(function (OtherClient) {
+                        OtherClient.socket.write(packet.build([
+                            "ENTITY", entity.name, entity.pos_x.toString(), entity.pos_y.toString(), entity.health.toString(), "sprite"
+                        ], client.id));
+                    });
                     if (entity.health < 0) {
                         maps[client.current_room].clients.forEach(function (OtherClient) {
                             OtherClient.socket.write(packet.build(["DESTROY", target_entity], OtherClient.id));

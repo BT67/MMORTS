@@ -4,3 +4,4 @@ target_y = y;
 moving = false;
 focused = false;
 target_entity = self;
+entity_health = 100;
