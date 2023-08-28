@@ -261,30 +261,43 @@ module.exports = packet = {
             //TODO check is player has aggro'd any mobs and if so move mobs towards the player 
         }
 
+        function checkAttack(target_entity){
+            return client.target_entity === target_entity;
+        }
+
         //Send entity attacks to other clients
-        function attack(target_entity) {
-            //TODO set attack type in attack packet
-            maps[client.current_room].clients.forEach(function (otherClient) {
-                otherClient.socket.write(packet.build([
-                    "ATTACK", "attack", target_entity, client.username
-                ], otherClient.id));
-            });
-            maps[client.current_room].entities.forEach(function (entity) {
-                if (entity.name === target_entity && entity.alive) {
-                    entity.health -= 10;
-                    maps[client.current_room].clients.forEach(function (OtherClient) {
-                        OtherClient.socket.write(packet.build([
-                            "ENTITY", entity.name, entity.pos_x.toString(), entity.pos_y.toString(), entity.health.toString(), "sprite"
-                        ], client.id));
-                    });
-                    if (entity.health < 0) {
-                        maps[client.current_room].clients.forEach(function (OtherClient) {
-                            OtherClient.socket.write(packet.build(["DESTROY", target_entity], OtherClient.id));
-                        });
-                        entity.alive = false;
-                    }
+        async function attack(target_entity) {
+            client.target_entity = target_entity;
+            var alive;
+            while(true) {
+                if(alive === false){
+                    break;
                 }
-            });
+                maps[client.current_room].clients.forEach(function (otherClient) {
+                    otherClient.socket.write(packet.build([
+                        "ATTACK", "attack", target_entity, client.username
+                    ], otherClient.id));
+                });
+                maps[client.current_room].entities.forEach(function (entity) {
+                    if (entity.name === target_entity && entity.alive) {
+                        entity.health -= 10;
+                        maps[client.current_room].clients.forEach(function (OtherClient) {
+                            OtherClient.socket.write(packet.build([
+                                "ENTITY", entity.name, entity.pos_x.toString(), entity.pos_y.toString(), entity.health.toString(), "sprite"
+                            ], client.id));
+                        });
+                        if (entity.health < 0) {
+                            maps[client.current_room].clients.forEach(function (OtherClient) {
+                                OtherClient.socket.write(packet.build(["DESTROY", target_entity], OtherClient.id));
+                            });
+                            entity.alive = false;
+                            alive = entity.alive;
+                            client.target_entity = "";
+                        }
+                    }
+                });
+                await new Promise(resolve => setTimeout(resolve, config.attack_step));
+            }
         }
 
         function chat(message) {
@@ -360,6 +373,9 @@ module.exports = packet = {
                 break;
             case "ATTACK":
                 data = PacketModels.attack.parse(datapacket);
+                if(checkAttack(data.target_entity)){
+                    break;
+                }
                 attack(data.target_entity);
                 break;
             case "LOGOUT":

@@ -120,6 +120,7 @@ net.createServer(function (socket) {
     thisClient.current_room = "";
     thisClient.pos_x = 0;
     thisClient.pos_y = 0;
+    thisClient.target_entity = "";
     clientIdNo += 1;
     //TODO create clientId allocation system
     thisClient.initiate();

@@ -31,6 +31,7 @@
     {"name":"UI Framework","order":1,"path":"folders/Sprites/UI Framework.yy",},
     {"name":"Tile Sets","order":2,"path":"folders/Tile Sets.yy",},
     {"name":"Timelines","order":8,"path":"folders/Timelines.yy",},
+    {"name":"Faces","order":5,"path":"folders/Sprites/Faces.yy",},
   ],
   "ResourceOrderSettings": [
     {"name":"spr_princess_new","order":2,"path":"sprites/spr_princess_new/spr_princess_new.yy",},

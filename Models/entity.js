@@ -5,5 +5,6 @@ exports.pos_y = 0;
 exports.health = 100;
 exports.sprite = "sprite";
 exports.alive = true;
+exports.target_entity = "";
 
 module.exports = function () {};

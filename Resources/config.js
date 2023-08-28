@@ -20,6 +20,7 @@ var common_conf = {
         items: __dirname + "\\Game Data\\" + "Items\\",
         maps: __dirname + "\\Game Data\\" + "Maps\\",
     },
+    attack_step: 1000,
     start_room: "zone1",
     start_x: 0,
     start_y: 0,
