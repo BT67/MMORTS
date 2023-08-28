@@ -33,6 +33,7 @@
     {"name":"Timelines","order":8,"path":"folders/Timelines.yy",},
   ],
   "ResourceOrderSettings": [
+    {"name":"spr_princess_new","order":2,"path":"sprites/spr_princess_new/spr_princess_new.yy",},
     {"name":"txt_chat_log","order":4,"path":"objects/txt_chat_log/txt_chat_log.yy",},
     {"name":"txt_chat_input","order":3,"path":"objects/txt_chat_input/txt_chat_input.yy",},
     {"name":"login_controller","order":7,"path":"objects/login_controller/login_controller.yy",},
@@ -52,6 +53,7 @@
     {"name":"network_write","order":1,"path":"scripts/network_write/network_write.yy",},
     {"name":"player_test","order":3,"path":"objects/player_test/player_test.yy",},
     {"name":"lbl_password_login","order":6,"path":"objects/lbl_password_login/lbl_password_login.yy",},
+    {"name":"spr_mob_new","order":3,"path":"sprites/spr_mob_new/spr_mob_new.yy",},
     {"name":"btn_logout_hud","order":1,"path":"objects/btn_logout_hud/btn_logout_hud.yy",},
     {"name":"lbl_msg_register_success","order":1,"path":"objects/lbl_msg_register_success/lbl_msg_register_success.yy",},
     {"name":"btn_back_login","order":8,"path":"objects/btn_back_login/btn_back_login.yy",},
