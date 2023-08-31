@@ -1,7 +1,7 @@
 const {data} = require("./client");
 const q = require('q');
 const {Client} = require("pg");
-const {pos_x} = require("./Models/entity");
+//const {pos_x} = require("./Models/entity");
 const connection = new Client({
     host: '127.0.0.1',
     port: '5432',
@@ -242,6 +242,8 @@ module.exports = packet = {
                 }
             });
         }
+
+        //TODO pursue packet for mobs
 
         //TODO periodically update entity position, as well as target position
         function entity(target_x, target_y) {

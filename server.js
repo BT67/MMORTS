@@ -132,9 +132,52 @@ net.createServer(function (socket) {
 console.log(timeNow() + config.msg_server_init + config.ip + ":" + config.port + "/" + config.environment)
 console.log(timeNow() + config.msg_server_db + config.database);
 
+//TODO update moves for all mobs and NPCs:
+maps.forEach(function (map) {
+    map.entities.forEach(function (entity) {
+
+        dist = distance(entity.pos_x, entity.pos_y, entity.origin_x, entity.origin_y);
+        if (dist > entity.roam_range) {
+            entity.in_combat = false;
+            entity.target_x = entity.origin_x;
+            entity.target_y = entity.origin_y;
+            map.clients.forEach(function (client) {
+                client.socket.write(packet.build([
+                    "ENTITY", entity.name, entity.target_x.toString(), entity.target_y.toString(), "100", "sprite"
+                ], client.id));
+            });
+            return;
+        }
+
+        if (entity.aggressive) {
+            map.clients.forEach(function (otherClient) {
+                dist = distance(otherClient.pos_x, otherClient.pos_y, entity.pos_x, entity.pos_y);
+                if (dist < entity.view_range) {
+                    entity.in_combat = true;
+                    target_entity = otherClient.username;
+                    entity.target_x = otherClient.pos_x;
+                    entity.target_y = otherClient.pos_y;
+                    //TODO implement pursue packet for mobs chasing players
+                    map.clients.forEach(function (client) {
+                        client.socket.write(packet.build([
+                            "ENTITY", entity.name, entity.target_x.toString(), entity.target_y.toString(), "100", "sprite"
+                        ], client.id));
+                    });
+                }
+            })
+        }
+    })
+})
+
+
 function timeNow() {
     var timeStamp = new Date().toISOString();
     return "[" + timeStamp + "] ";
+}
+
+//Calculate the distance between two points
+function distance(x1, y1, x2, y2) {
+    return parseInt(Math.pow(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2), 0.5));
 }
 
 //TODO add function that sets all users' online status to false on server startup
