@@ -35,6 +35,7 @@
     {"name":"Timelines","order":8,"path":"folders/Timelines.yy",},
   ],
   "ResourceOrderSettings": [
+    {"name":"camera_controller","order":5,"path":"objects/camera_controller/camera_controller.yy",},
     {"name":"spr_princess_new","order":2,"path":"sprites/spr_princess_new/spr_princess_new.yy",},
     {"name":"txt_chat_log","order":4,"path":"objects/txt_chat_log/txt_chat_log.yy",},
     {"name":"dungeon2","order":1,"path":"tilesets/dungeon2/dungeon2.yy",},
@@ -91,6 +92,7 @@
     {"name":"btn_register_init","order":1,"path":"objects/btn_register_init/btn_register_init.yy",},
     {"name":"lbl_email_register","order":8,"path":"objects/lbl_email_register/lbl_email_register.yy",},
     {"name":"rm_register_success","order":5,"path":"rooms/rm_register_success/rm_register_success.yy",},
+    {"name":"Sprite29","order":4,"path":"sprites/Sprite29/Sprite29.yy",},
     {"name":"txt_password_login","order":1,"path":"objects/txt_password_login/txt_password_login.yy",},
     {"name":"txt_username_register","order":7,"path":"objects/txt_username_register/txt_username_register.yy",},
     {"name":"register_controller","order":1,"path":"objects/register_controller/register_controller.yy",},

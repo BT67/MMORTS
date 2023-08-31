@@ -1,0 +1,2 @@
+zoom += zoom_speed;
+
