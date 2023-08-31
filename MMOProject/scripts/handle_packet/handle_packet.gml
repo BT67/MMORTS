@@ -148,10 +148,18 @@ function handle_packet(data_buffer){
 			break;
 		case "PURSUE":
 			origin_entity = buffer_read(data_buffer, buffer_string);
+			pos_x = buffer_read(data_buffer, buffer_string);
+			pos_y = buffer_read(data_buffer, buffer_string);
 			target_entity = buffer_read(data_buffer, buffer_string);
 			for(var i = 0; i < instance_number(entity); ++i;) {
 				if(instance_find(entity, i).entity_name == origin_entity){
 					origin_entity = instance_find(entity, i);
+					if(abs(instance_find(entity, i).x - pos_x) > 50){
+						instance_find(entity, i).x = pos_x;
+					}
+					if(abs(instance_find(entity, i).y - pos_y) > 50){
+						instance_find(entity, i).y = pos_y;
+					}
 					break;
 				}
 			}
@@ -161,6 +169,7 @@ function handle_packet(data_buffer){
 					break;
 				}
 			}
+			
 			origin_entity.target_entity = target_entity;
 			break;
 		case "POS":

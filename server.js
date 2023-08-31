@@ -57,6 +57,14 @@ this_entity.pos_x = 150;
 this_entity.pos_y = 150;
 this_entity.target_x = this_entity.pos_x;
 this_entity.target_y = this_entity.pos_y;
+this_entity.origin_x = this_entity.pos_x;
+this_entity.origin_y = this_entity.pos_y;
+this_entity.target_entity = null;
+this_entity.roam_range = 100;
+this_entity.view_range = 100;
+this_entity.in_combat = false;
+this_entity.aggressive = true;
+this_entity.move_speed = 12;
 this_entity.sprite = "sprite";
 maps["zone1"].entities.push(this_entity);
 
@@ -70,6 +78,14 @@ this_entity.pos_x = 150;
 this_entity.pos_y = 210;
 this_entity.target_x = this_entity.pos_x;
 this_entity.target_y = this_entity.pos_y;
+this_entity.origin_x = this_entity.pos_x;
+this_entity.origin_y = this_entity.pos_y;
+this_entity.target_entity = null;
+this_entity.roam_range = 100;
+this_entity.view_range = 100;
+this_entity.in_combat = false;
+this_entity.aggressive = true;
+this_entity.move_speed = 12;
 this_entity.sprite = "sprite";
 maps["zone1"].entities.push(this_entity);
 
@@ -83,6 +99,14 @@ this_entity.pos_x = 300;
 this_entity.pos_y = 80;
 this_entity.target_x = this_entity.pos_x;
 this_entity.target_y = this_entity.pos_y;
+this_entity.origin_x = this_entity.pos_x;
+this_entity.origin_y = this_entity.pos_y;
+this_entity.target_entity = null;
+this_entity.roam_range = 100;
+this_entity.view_range = 100;
+this_entity.in_combat = false;
+this_entity.aggressive = true;
+this_entity.move_speed = 12;
 this_entity.sprite = "sprite";
 maps["zone1"].entities.push(this_entity);
 
@@ -131,7 +155,7 @@ net.createServer(function (socket) {
     thisClient.pos_y = 0;
     thisClient.target_x = thisClient.pos_x;
     thisClient.target_y = thisClient.pos_y;
-    thisClient.target_entity = "";
+    thisClient.target_entity = null;
     thisClient.move_speed = 12;
     thisClient.health = 100;
     clientIdNo += 1;
@@ -153,35 +177,41 @@ async function updateEntities() {
     while (true) {
         mapList.forEach(function (map) {
             maps[map].entities.forEach(function (entity) {
-                if(entity.in_combat){
-                    dist = distance(entity.pos_x, entity.pos_y, entity.origin_x, entity.origin_y);
-                    if(dist > entity.roam_range) {
-                        entity.in_combat = false;
-                        target_entity = "";
-                        entity.target_x = entity.origin_x;
-                        entity.target_y = entity.origin_y;
+                if (entity.aggressive) {
+                    if (!entity.in_combat) {
+                        maps[map].clients.forEach(function (client) {
+                            dist = distance(client.pos_x, client.pos_y, entity.pos_x, entity.pos_y);
+                            if (dist < entity.view_range) {
+                                console.log(timeNow() + "Mob aggro triggered");
+                                entity.in_combat = true;
+                                entity.target_entity = client;
+                            }
+                        })
+                    } else if (entity.in_combat) {
+                        dist = distance(entity.pos_x, entity.pos_y, entity.origin_x, entity.origin_y);
+                        if (dist > entity.roam_range) {
+                            entity.in_combat = false;
+                            entity.target_entity = null;
+                            entity.target_x = entity.origin_x;
+                            entity.target_y = entity.origin_y;
+                        }
                     }
                 }
-                moveTowardsTarget(entity);
-                maps[map].clients.forEach(function (client) {
-                    client.socket.write(packet.build([
-                        "POS", entity.name, entity.pos_x.toString(), entity.pos_y.toString(), entity.target_x.toString(), entity.target_y.toString()
-                    ], client.id));
-                });
 
-                if (entity.aggressive && entity.target_x !== entity.origin_x && entity.target_y !== entity.origin_y) {
+                moveTowardsTarget(entity);
+
+                if(entity.target_entity == null){
                     maps[map].clients.forEach(function (client) {
-                        dist = distance(client.pos_x, client.pos_y, entity.pos_x, entity.pos_y);
-                        if (dist < entity.view_range) {
-                            entity.in_combat = true;
-                            entity.target_entity = client.username;
-                            maps[map].clients.forEach(function (client) {
-                                client.socket .write(packet.build([
-                                    "PURSUE", entity.name, entity.target_entity
-                                ], client.id));
-                            });
-                        }
-                    })
+                        client.socket.write(packet.build([
+                            "POS", entity.name, entity.pos_x.toString(), entity.pos_y.toString(), entity.target_x.toString(), entity.target_y.toString()
+                        ], client.id));
+                    });
+                } else {
+                    maps[map].clients.forEach(function (client) {
+                        client.socket.write(packet.build([
+                            "PURSUE", entity.name, entity.pos_x.toString(), entity.pos_y.toString(), entity.target_entity.username
+                        ], client.id));
+                    });
                 }
             });
             //Update client pos
@@ -200,45 +230,50 @@ async function updateEntities() {
 
 function moveTowardsTarget(entity) {
 
+    if(entity.target_entity !== null){
+        entity.target_x = entity.target_entity.pos_x;
+        entity.target_y = entity.target_entity.pos_y
+    }
+
+    if (entity.target_x < entity.pos_x) {
+        entity.pos_x -= entity.move_speed;
+        if (entity.target_x > entity.pos_x) {
+            entity.pos_x = entity.target_x;
+        }
+    } else if (entity.target_x > entity.pos_x) {
+        entity.pos_x += entity.move_speed;
         if (entity.target_x < entity.pos_x) {
-            entity.pos_x -= entity.move_speed;
-            if(entity.target_x > entity.pos_x){
-                entity.pos_x = entity.target_x;
-            }
-        } else if (entity.target_x > entity.pos_x) {
-            entity.pos_x += entity.move_speed;
-            if(entity.target_x < entity.pos_x){
-                entity.pos_x = entity.target_x;
-            }
+            entity.pos_x = entity.target_x;
         }
+    }
 
-        vert_speed = Math.abs(entity.target_y - entity.pos_y) / Math.abs(entity.target_x - entity.pos_x);
-        vert_speed *= entity.move_speed;
-        if (vert_speed === undefined || vert_speed === null || isNaN(vert_speed)) {
-            vert_speed = 1;
-        }
+    vert_speed = Math.abs(entity.target_y - entity.pos_y) / Math.abs(entity.target_x - entity.pos_x);
+    vert_speed *= entity.move_speed;
+    if (vert_speed === undefined || vert_speed === null || isNaN(vert_speed)) {
+        vert_speed = 1;
+    }
 
-        if (vert_speed > entity.move_speed){
-            vert_speed = entity.move_speed;
-        }
-        if(vert_speed < (entity.move_speed * -1)){
-            vert_speed = (entity.move_speed * -1);
-        }
+    if (vert_speed > entity.move_speed) {
+        vert_speed = entity.move_speed;
+    }
+    if (vert_speed < (entity.move_speed * -1)) {
+        vert_speed = (entity.move_speed * -1);
+    }
 
+    if (entity.target_y < entity.pos_y) {
+        entity.pos_y -= vert_speed;
+        if (entity.target_y > entity.pos_y) {
+            entity.pos_y = entity.target_y;
+        }
+    } else if (entity.target_y > entity.pos_y) {
+        entity.pos_y += vert_speed;
         if (entity.target_y < entity.pos_y) {
-            entity.pos_y -= vert_speed;
-            if(entity.target_y > entity.pos_y){
-                entity.pos_y = entity.target_y;
-            }
-        } else if (entity.target_y > entity.pos_y) {
-            entity.pos_y += vert_speed;
-            if(entity.target_y < entity.pos_y){
-                entity.pos_y = entity.target_y;
-            }
+            entity.pos_y = entity.target_y;
         }
+    }
 
-        entity.pos_x = parseInt(entity.pos_x);
-        entity.pos_y = parseInt(entity.pos_y);
+    entity.pos_x = parseInt(entity.pos_x);
+    entity.pos_y = parseInt(entity.pos_y);
 }
 
 function timeNow() {
