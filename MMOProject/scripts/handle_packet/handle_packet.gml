@@ -168,12 +168,18 @@ function handle_packet(data_buffer){
 			show_debug_message(string(entity_name));
 			pos_x = buffer_read(data_buffer, buffer_string);
 			pos_y = buffer_read(data_buffer, buffer_string);
+			show_debug_message(string(pos_x) + "," + string(pos_y));
 			target_x = buffer_read(data_buffer, buffer_string);
 			target_y = buffer_read(data_buffer, buffer_string);
+			show_debug_message(string(target_x) + "," + string(target_y));
 			for(var i = 0; i < instance_number(entity); ++i;) {
 				if(instance_find(entity, i).entity_name == entity_name){
-					instance_find(entity, i).x = pos_x;
-					instance_find(entity, i).y = pos_y;
+					if(abs(instance_find(entity, i).x - pos_x) > 50){
+						instance_find(entity, i).x = pos_x;
+					}
+					if(abs(instance_find(entity, i).y - pos_y) > 50){
+						instance_find(entity, i).y = pos_y;
+					}
 					instance_find(entity, i).target_entity = "";
 					instance_find(entity, i).target_x = target_x;
 					instance_find(entity, i).target_y = target_y;

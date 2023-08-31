@@ -106,6 +106,8 @@ module.exports = packet = {
                     pos_y = parseInt(data.rows[0].pos_y);
                     client.pos_x = pos_x;
                     client.pos_y = pos_y;
+                    client.target_x = client.pos_x;
+                    client.target_y = client.pos_y;
                     health = parseInt(data.rows[0].health);
                     sprite = data.rows[0].sprite;
                 } catch (error) {
@@ -239,18 +241,16 @@ module.exports = packet = {
             });
         }
 
-        //TODO pursue packet for mobs
-
-        //TODO periodically update entity position, as well as target position
-        function entity(target_x, target_y) {
-            client.pos_x = target_x;
-            client.pos_y = target_y;
-            maps[client.current_room].clients.forEach(function (client) {
-                client.socket.write(packet.build([
-                    "ENTITY", client.username, target_x.toString(), target_y.toString(), "100", "sprite"
-                ], client.id));
+        function pos(target_x, target_y) {
+            maps[client.current_room].clients.forEach(function (otherClient) {
+                if(otherClient.username === client.username){
+                    otherClient.target_x = target_x;
+                    otherClient.target_y = target_y;
+                }
+                otherClient.socket.write(packet.build([
+                    "POS", client.username, client.pos_x.toString(), client.pos_y.toString(), target_x.toString(), target_y.toString()
+                ], otherClient.id));
             });
-            //TODO check is player has aggro'd any mobs and if so move mobs towards the player 
         }
 
         function checkAttack(target_entity) {
@@ -361,9 +361,9 @@ module.exports = packet = {
                 data = PacketModels.register.parse(datapacket);
                 register(data.email, data.username, data.password);
                 break;
-            case "ENTITY":
+            case "POS":
                 data = PacketModels.entity.parse(datapacket);
-                entity(data.target_x, data.target_y);
+                pos(data.target_x, data.target_y);
                 break;
             case "ATTACK":
                 data = PacketModels.attack.parse(datapacket);

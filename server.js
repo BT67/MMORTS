@@ -44,6 +44,7 @@ map_files.forEach(function (mapFile) {
 
 //Load mobs into each map:
 var entity_inst = new require("./Models/entity.js");
+const {move_speed} = require("./Models/entity");
 //const {target_entity} = require("./Models/entity");
 //const {target_entity} = require("./Models/entity");
 var this_entity = new entity_inst();
@@ -131,7 +132,7 @@ net.createServer(function (socket) {
     thisClient.target_x = thisClient.pos_x;
     thisClient.target_y = thisClient.pos_y;
     thisClient.target_entity = "";
-    thisClient.move_speed = 1;
+    thisClient.move_speed = 12;
     thisClient.health = 100;
     clientIdNo += 1;
     //TODO create clientId allocation system
@@ -184,14 +185,14 @@ async function updateEntities() {
                 }
             });
             //Update client pos
-            // maps[map].clients.forEach(function (client) {
-            //     moveTowardsTarget(client);
-            //     maps[map].clients.forEach(function (otherClient) {
-            //         otherClient.socket.write(packet.build([
-            //             "POS", client.username, client.pos_x.toString(), client.pos_y.toString(), client.target_x.toString(), client.target_y.toString()
-            //         ], otherClient.id));
-            //     });
-            // });
+            maps[map].clients.forEach(function (client) {
+                moveTowardsTarget(client);
+                maps[map].clients.forEach(function (otherClient) {
+                    otherClient.socket.write(packet.build([
+                        "POS", client.username, client.pos_x.toString(), client.pos_y.toString(), client.target_x.toString(), client.target_y.toString()
+                    ], otherClient.id));
+                });
+            });
         });
         await new Promise(resolve => setTimeout(resolve, config.step));
     }
@@ -199,18 +200,45 @@ async function updateEntities() {
 
 function moveTowardsTarget(entity) {
 
-    if (entity.target_x < entity.pos_x) {
-        entity.pos_x -= entity.move_speed;
-    } else if (entity.target_x > entity.pos_x) {
-        entity.pos_y += entity.move_speed;
-    }
+        if (entity.target_x < entity.pos_x) {
+            entity.pos_x -= entity.move_speed;
+            if(entity.target_x > entity.pos_x){
+                entity.pos_x = entity.target_x;
+            }
+        } else if (entity.target_x > entity.pos_x) {
+            entity.pos_x += entity.move_speed;
+            if(entity.target_x < entity.pos_x){
+                entity.pos_x = entity.target_x;
+            }
+        }
 
-    if (entity.target_y < entity.pos_y) {
-        entity.pos_y -= entity.move_speed;
-    } else if (entity.target_y > entity.pos_y) {
-        entity.pos_y += entity.move_speed;
-    }
+        vert_speed = Math.abs(entity.target_y - entity.pos_y) / Math.abs(entity.target_x - entity.pos_x);
+        vert_speed *= entity.move_speed;
+        if (vert_speed === undefined || vert_speed === null || isNaN(vert_speed)) {
+            vert_speed = 1;
+        }
 
+        if (vert_speed > entity.move_speed){
+            vert_speed = entity.move_speed;
+        }
+        if(vert_speed < (entity.move_speed * -1)){
+            vert_speed = (entity.move_speed * -1);
+        }
+
+        if (entity.target_y < entity.pos_y) {
+            entity.pos_y -= vert_speed;
+            if(entity.target_y > entity.pos_y){
+                entity.pos_y = entity.target_y;
+            }
+        } else if (entity.target_y > entity.pos_y) {
+            entity.pos_y += vert_speed;
+            if(entity.target_y < entity.pos_y){
+                entity.pos_y = entity.target_y;
+            }
+        }
+
+        entity.pos_x = parseInt(entity.pos_x);
+        entity.pos_y = parseInt(entity.pos_y);
 }
 
 function timeNow() {
