@@ -126,15 +126,6 @@ module.exports = packet = {
                 ], client.id));
                 //Send spawn player packet to other clients in the room who are online
                 maps[current_room].clients.push(client)
-                var entity_inst = require(__dirname + "/Models/entity.js");
-                var entity = new entity_inst();
-                entity.name = username;
-                entity.type = "player";
-                entity.pos_x = pos_x;
-                entity.pos_y = pos_y;
-                client.pos_x = pos_x;
-                client.pos_y = pos_y;
-                maps[current_room].entities.push(entity);
                 client.current_room = current_room;
                 console.log(timeNow() + config.msg_enter_room + current_room + ", clientId=" + client.id);
                 clients_str = "";
@@ -156,7 +147,6 @@ module.exports = packet = {
                 function spawnEntities(client) {
                     params = [];
                     params.push("SPAWN");
-
                     maps[current_room].entities.forEach(function (entity) {
                         if (entity.name !== client.username && entity.alive) {
                             params.push(entity.name);
@@ -166,22 +156,32 @@ module.exports = packet = {
                             params.push(entity.health);
                         }
                     });
-                    // for(var i = 0; i < maps[current_room].entities.length; i++) {
-                    //     console.log("entity_name: " + maps[current_room].entities[i].name);
-                    //     console.log("username: " + client.username);
-                    //     if (maps[current_room].entities[i].name !== client.username && ) {
-                    //         params.push(maps[current_room].entities[i].name);
-                    //         params.push(maps[current_room].entities[i].type);
-                    //         params.push(maps[current_room].entities[i].pos_x.toString());
-                    //         params.push(maps[current_room].entities[i].pos_y.toString());
-                    //         params.push(maps[current_room].entities[i].health);
-                    //     }
-                    // }
                     params.push("end");
                     client.socket.write(packet.build(params, client.id));
                 }
 
+                function spawnClients(client) {
+                    params = [];
+                    params.push("SPAWN");
+                    maps[current_room].clients.forEach(function (otherClient) {
+                        if (otherClient.username !== client.username) {
+                            params.push(otherClient.username);
+                            params.push("player");
+                            params.push(otherClient.pos_x.toString());
+                            params.push(otherClient.pos_y.toString());
+                            params.push(otherClient.health);
+                        }
+                    });
+                    params.push("end");
+                    try {
+                        client.socket.write(packet.build(params, client.id));
+                    } catch(error){
+                        console.log(timeNow() + error.stack);
+                    }
+                }
+
                 spawnEntities(client);
+                spawnClients(client);
 
             }
 
@@ -249,12 +249,6 @@ module.exports = packet = {
         function entity(target_x, target_y) {
             client.pos_x = target_x;
             client.pos_y = target_y;
-            maps[client.current_room].entities.forEach(function (client) {
-                if (entity.name === client.username) {
-                    entity.pos_x = target_x;
-                    entity.pos_y = target_y;
-                }
-            });
             maps[client.current_room].clients.forEach(function (client) {
                 client.socket.write(packet.build([
                     "ENTITY", client.username, target_x.toString(), target_y.toString(), "100", "sprite"
@@ -324,8 +318,10 @@ module.exports = packet = {
                 console.log(error.stack);
                 return;
             }
-            delete maps[client.current_room].clients.client;
-            delete maps[client.current_room].entities[client.username];
+            //delete maps[client.current_room].clients[client.username];
+
+            maps[client.current_room].clients = maps[client.current_room].clients.filter(item => item !== client);
+
             maps[client.current_room].clients.forEach(function (OtherClient) {
                 if (OtherClient.username !== client.username) {
                     OtherClient.socket.write(packet.build(["DESTROY", client.username]));

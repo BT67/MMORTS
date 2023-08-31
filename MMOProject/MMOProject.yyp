@@ -84,7 +84,6 @@
     {"id":{"name":"init_controller","path":"objects/init_controller/init_controller.yy",},},
     {"id":{"name":"network_write","path":"scripts/network_write/network_write.yy",},},
     {"id":{"name":"dungeon_all","path":"sprites/dungeon_all/dungeon_all.yy",},},
-    {"id":{"name":"player_test","path":"objects/player_test/player_test.yy",},},
     {"id":{"name":"lbl_password_login","path":"objects/lbl_password_login/lbl_password_login.yy",},},
     {"id":{"name":"spr_mob_new","path":"sprites/spr_mob_new/spr_mob_new.yy",},},
     {"id":{"name":"btn_logout_hud","path":"objects/btn_logout_hud/btn_logout_hud.yy",},},

@@ -93,6 +93,7 @@ function handle_packet(data_buffer){
 				if(instance_find(entity, i).entity_name == entity_name){
 					//instance_find(entity, i).x = pos_x;
 					//instance_find(entity, i).y = pos_y;
+					instance_find(entity, i).target_entity = "";
 					instance_find(entity, i).target_x = target_x;
 					instance_find(entity, i).target_y = target_y;
 					instance_find(entity, i).entity_health = real(entity_health);
@@ -130,6 +131,7 @@ function handle_packet(data_buffer){
 					show_debug_message(string(origin_x));
 					origin_y = instance_find(entity, i).y;
 					show_debug_message(string(origin_y));
+					break;
 				}
 			}
 			var_attack = "";
@@ -157,6 +159,39 @@ function handle_packet(data_buffer){
 			show_debug_message(msg);
 			txt_chat_log.chat_log += (msg + "\n");
 			break;
+		case "PURSUE":
+			origin_entity = buffer_read(data_buffer, buffer_string);
+			target_entity = buffer_read(data_buffer, buffer_string);
+			for(var i = 0; i < instance_number(entity); ++i;) {
+				if(instance_find(entity, i).entity_name == origin_entity){
+					origin_entity = instance_find(entity, i);
+					break;
+				}
+			}
+			for(var i = 0; i < instance_number(entity); ++i;) {
+				if(instance_find(entity, i).entity_name == target_entity){
+					target_entity = instance_find(entity, i);
+					break;
+				}
+			}
+			origin_entity.target_entity = target_entity;
+			break;
+		case "POS":
+			entity_name = buffer_read(data_buffer, buffer_string);
+			pos_x = buffer_read(data_buffer, buffer_string);
+			pos_y = buffer_read(data_buffer, buffer_string);
+			target_x = buffer_read(data_buffer, buffer_string);
+			target_y = buffer_read(data_buffer, buffer_string);
+			for(var i = 0; i < instance_number(entity); ++i;) {
+				if(instance_find(entity, i).entity_name == entity_name){
+					instance_find(entity, i).x = pos_x;
+					instance_find(entity, i).y = pos_y;
+					instance_find(entity, i).target_entity = "";
+					instance_find(entity, i).target_x = target_x;
+					instance_find(entity, i).target_y = target_y;
+				}
+			}
+			
 	}
 	//buffer_delete(data_buffer);
 }
