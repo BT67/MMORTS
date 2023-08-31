@@ -18,6 +18,7 @@ function handle_packet(data_buffer){
 				target_room = buffer_read(data_buffer, buffer_string);
 				pos_x = buffer_read(data_buffer, buffer_string);
 				pos_y = buffer_read(data_buffer, buffer_string);
+				show_debug_message(string(pos_x) + "," + string(pos_y));
 				player_health = buffer_read(data_buffer, buffer_string);
 				player_sprite = buffer_read(data_buffer, buffer_string);
 				room_goto(asset_get_index(target_room));
@@ -48,36 +49,22 @@ function handle_packet(data_buffer){
 			}
 			break;
 		case "SPAWN":
-			cont = true;
-			show_debug_message("data_buffer size=" + string(buffer_get_size(data_buffer)));
-			while(cont) {
-				try {
-					entity_name = buffer_read(data_buffer, buffer_string);
-					show_debug_message(string(entity_name));
-					entity_type = buffer_read(data_buffer, buffer_string);
-					show_debug_message(string(entity_type));
-					target_x = buffer_read(data_buffer, buffer_string);
-					show_debug_message(string(target_x));
-					target_y = buffer_read(data_buffer, buffer_string);
-					show_debug_message(string(target_y));
-					entity_health = buffer_read(data_buffer, buffer_string);
-				} catch(exception) {
-					cont = false;
-				}
-				if(entity_name == "end"){
-					cont = false;
-				}
-				var_entity = "";
-				if(entity_type != "end" && entity_name != "end") {
-					with(instance_create_layer(real(target_x), real(target_y), "Instances", asset_get_index(entity_type))){
-						var_entity = other;
-					}
-					variable_instance_set(instance_find(entity, instance_number(entity) - 1), "entity_name", entity_name);
-					variable_instance_set(instance_find(entity, instance_number(entity) - 1), "target_x", target_x);
-					variable_instance_set(instance_find(entity, instance_number(entity) - 1), "target_y", target_y);
-					show_debug_message(date_datetime_string(date_current_datetime()) + " Created entity: " + entity_name);
-				}
+			entity_name = buffer_read(data_buffer, buffer_string);
+			show_debug_message(string(entity_name));
+			entity_type = buffer_read(data_buffer, buffer_string);
+			show_debug_message(string(entity_type));
+			target_x = buffer_read(data_buffer, buffer_string);
+			show_debug_message(string(target_x));
+			target_y = buffer_read(data_buffer, buffer_string);
+			show_debug_message(string(target_y));
+			entity_health = buffer_read(data_buffer, buffer_string);
+			with(instance_create_layer(real(target_x), real(target_y), "Instances", asset_get_index(entity_type))){
+				var_entity = other;
 			}
+			variable_instance_set(instance_find(entity, instance_number(entity) - 1), "entity_name", entity_name);
+			variable_instance_set(instance_find(entity, instance_number(entity) - 1), "target_x", target_x);
+			variable_instance_set(instance_find(entity, instance_number(entity) - 1), "target_y", target_y);
+			show_debug_message(date_datetime_string(date_current_datetime()) + " Created entity: " + entity_name);
 			break;
 		case "ENTITY":
 			entity_name = buffer_read(data_buffer, buffer_string);
@@ -178,6 +165,7 @@ function handle_packet(data_buffer){
 			break;
 		case "POS":
 			entity_name = buffer_read(data_buffer, buffer_string);
+			show_debug_message(string(entity_name));
 			pos_x = buffer_read(data_buffer, buffer_string);
 			pos_y = buffer_read(data_buffer, buffer_string);
 			target_x = buffer_read(data_buffer, buffer_string);

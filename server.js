@@ -132,6 +132,7 @@ net.createServer(function (socket) {
     thisClient.target_y = thisClient.pos_y;
     thisClient.target_entity = "";
     thisClient.move_speed = 1;
+    thisClient.health = 100;
     clientIdNo += 1;
     //TODO create clientId allocation system
     thisClient.initiate();
@@ -183,14 +184,14 @@ async function updateEntities() {
                 }
             });
             //Update client pos
-            maps[map].clients.forEach(function (client) {
-                moveTowardsTarget(client);
-                maps[map].clients.forEach(function (otherClient) {
-                    otherClient.socket.write(packet.build([
-                        "POS", client.username, client.pos_x.toString(), client.pos_y.toString(), client.target_x.toString(), client.target_y.toString()
-                    ], otherClient.id));
-                });
-            });
+            // maps[map].clients.forEach(function (client) {
+            //     moveTowardsTarget(client);
+            //     maps[map].clients.forEach(function (otherClient) {
+            //         otherClient.socket.write(packet.build([
+            //             "POS", client.username, client.pos_x.toString(), client.pos_y.toString(), client.target_x.toString(), client.target_y.toString()
+            //         ], otherClient.id));
+            //     });
+            // });
         });
         await new Promise(resolve => setTimeout(resolve, config.step));
     }

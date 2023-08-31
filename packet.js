@@ -104,12 +104,15 @@ module.exports = packet = {
                     current_room = data.rows[0].current_room;
                     pos_x = parseInt(data.rows[0].pos_x);
                     pos_y = parseInt(data.rows[0].pos_y);
+                    client.pos_x = pos_x;
+                    client.pos_y = pos_y;
                     health = parseInt(data.rows[0].health);
                     sprite = data.rows[0].sprite;
                 } catch (error) {
                     console.log(error.stack);
                     return;
                 }
+                //TODO important: on login, set client x and y pos before sending spawn packet
                 if (
                     username == null ||
                     current_room == null ||
@@ -142,42 +145,35 @@ module.exports = packet = {
                         ], otherClient.id));
                     }
                 });
-                //TODO send all spawn data in a single packet to the client
-                //Send all entity names, then send all positions separately
+
                 function spawnEntities(client) {
-                    params = [];
-                    params.push("SPAWN");
                     maps[current_room].entities.forEach(function (entity) {
                         if (entity.name !== client.username && entity.alive) {
+                            params = [];
+                            params.push("SPAWN");
                             params.push(entity.name);
                             params.push(entity.type);
                             params.push(entity.pos_x.toString());
                             params.push(entity.pos_y.toString());
                             params.push(entity.health);
+                            client.socket.write(packet.build(params, client.id));
                         }
                     });
-                    params.push("end");
-                    client.socket.write(packet.build(params, client.id));
                 }
 
                 function spawnClients(client) {
-                    params = [];
-                    params.push("SPAWN");
                     maps[current_room].clients.forEach(function (otherClient) {
-                        if (otherClient.username !== client.username) {
+                        if(otherClient.username !== client.username) {
+                            params = [];
+                            params.push("SPAWN");
                             params.push(otherClient.username);
                             params.push("player");
                             params.push(otherClient.pos_x.toString());
                             params.push(otherClient.pos_y.toString());
                             params.push(otherClient.health);
+                            client.socket.write(packet.build(params, client.id));
                         }
                     });
-                    params.push("end");
-                    try {
-                        client.socket.write(packet.build(params, client.id));
-                    } catch(error){
-                        console.log(timeNow() + error.stack);
-                    }
                 }
 
                 spawnEntities(client);
@@ -257,7 +253,7 @@ module.exports = packet = {
             //TODO check is player has aggro'd any mobs and if so move mobs towards the player 
         }
 
-        function checkAttack(target_entity){
+        function checkAttack(target_entity) {
             return client.target_entity === target_entity;
         }
 
@@ -265,8 +261,8 @@ module.exports = packet = {
         async function attack(target_entity) {
             client.target_entity = target_entity;
             var alive;
-            while(true) {
-                if(alive === false){
+            while (true) {
+                if (alive === false) {
                     break;
                 }
                 maps[client.current_room].clients.forEach(function (otherClient) {
@@ -371,7 +367,7 @@ module.exports = packet = {
                 break;
             case "ATTACK":
                 data = PacketModels.attack.parse(datapacket);
-                if(checkAttack(data.target_entity)){
+                if (checkAttack(data.target_entity)) {
                     break;
                 }
                 attack(data.target_entity);
