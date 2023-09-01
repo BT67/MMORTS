@@ -6,3 +6,4 @@ focused = false;
 target_entity = "";
 entity_health = 100;
 move_speed = 1;
+path = path_add();

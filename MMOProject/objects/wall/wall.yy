@@ -25,7 +25,10 @@
   "physicsStartAwake": true,
   "properties": [],
   "solid": true,
-  "spriteId": null,
+  "spriteId": {
+    "name": "dungeon_wall_top_column",
+    "path": "sprites/dungeon_wall_top_column/dungeon_wall_top_column.yy",
+  },
   "spriteMaskId": null,
   "visible": true,
 }
