@@ -44,9 +44,7 @@ map_files.forEach(function (mapFile) {
 
 //Load mobs into each map:
 var entity_inst = new require("./Models/entity.js");
-const {move_speed} = require("./Models/entity");
-//const {target_entity} = require("./Models/entity");
-//const {target_entity} = require("./Models/entity");
+const {grid_height, grid_width} = require("./Resources/Game Data/Maps/zone1");
 var this_entity = new entity_inst();
 this_entity.alive = true;
 this_entity.health = 100;
@@ -69,6 +67,7 @@ this_entity.sprite = "sprite";
 this_entity.max_health = 100;
 this_entity.respawn_period = 300;
 this_entity.respawn_timer = this_entity.respawn_period;
+this_entity.path = [];
 maps["zone1"].entities.push(this_entity);
 
 this_entity = new entity_inst();
@@ -93,6 +92,7 @@ this_entity.sprite = "sprite";
 this_entity.max_health = 100;
 this_entity.respawn_period = 300;
 this_entity.respawn_timer = this_entity.respawn_period;
+this_entity.path = [];
 maps["zone1"].entities.push(this_entity);
 
 this_entity = new entity_inst();
@@ -117,6 +117,7 @@ this_entity.sprite = "sprite";
 this_entity.max_health = 100;
 this_entity.respawn_period = 300;
 this_entity.respawn_timer = this_entity.respawn_period;
+this_entity.path = [];
 maps["zone1"].entities.push(this_entity);
 
 //Initialise the database:
@@ -167,6 +168,7 @@ net.createServer(function (socket) {
     thisClient.target_entity = null;
     thisClient.move_speed = 12;
     thisClient.health = 100;
+    thisClient.path = [];
     clientIdNo += 1;
     //TODO create clientId allocation system
     thisClient.initiate();
@@ -187,7 +189,7 @@ async function updateEntities() {
         mapList.forEach(function (map) {
             maps[map].entities.forEach(function (entity) {
 
-                if(entity.alive) {
+                if (entity.alive) {
                     if (entity.aggressive) {
                         if (!entity.in_combat) {
                             maps[map].clients.forEach(function (client) {
@@ -224,9 +226,9 @@ async function updateEntities() {
                             ], client.id));
                         });
                     }
-                } else if(!entity.alive){
+                } else if (!entity.alive) {
                     entity.respawn_timer -= 10;
-                    if(entity.respawn_timer <= 0){
+                    if (entity.respawn_timer <= 0) {
                         entity.alive = true;
                         entity.health = entity.max_health;
                         entity.respawn_timer = entity.respawn_period;
@@ -259,12 +261,12 @@ async function updateEntities() {
                     params.push(client.pos_y.toString());
                     try {
                         params.push(client.target_x.toString());
-                    } catch(error) {
+                    } catch (error) {
                         params.push(client.pos_x.toString());
                     }
                     try {
                         params.push(client.target_y.toString());
-                    } catch(error) {
+                    } catch (error) {
                         params.push(client.pos_y.toString());
                     }
                     otherClient.socket.write(packet.build(params, otherClient.id));
@@ -280,7 +282,7 @@ async function updateEntities() {
 
 function moveTowardsTarget(entity) {
 
-    if(entity.target_entity !== null){
+    if (entity.target_entity !== null) {
         entity.target_x = entity.target_entity.pos_x;
         entity.target_y = entity.target_entity.pos_y
     }
@@ -334,6 +336,94 @@ function timeNow() {
 //Calculate the distance between two points
 function distance(x1, y1, x2, y2) {
     return parseInt(Math.pow(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2), 0.5));
+}
+
+function initMapGrid(map) {
+    for (var i = 0; i < map.grid_width; i++) {
+        map.grid[i] = []
+        for (var k = 0; k < map.grid_height; k++) {
+            map.grid[i][j] = "";
+        }
+    }
+}
+
+function createPath(map, x1, y1, x2, y2) {
+    function check_point(current_point, direction, grid){
+        var new_path = current_point.path.slice();
+        new_path.push(direction);
+        var pos_x = current_point.x;
+        var pos_y = current_point.y;
+        switch(direction){
+            case "up":
+                pos_y -= 1;
+                break;
+            case "down":
+                pos_y += 1;
+                break;
+            case "left":
+                pos_x -= 1;
+                break;
+            case "right":
+                pos_x += 1;
+                break;
+        }
+
+        var new_point = {
+            x: pos_x,
+            y: pos_y,
+            path: new_path,
+            status: "unknown"
+        }
+
+        if (point.x < 0 ||
+            point.x >= grid_width ||
+            point.y < 0 ||
+            point.y >= grid_height
+        ) {
+            new_point.status = "invalid";
+        } else if (grid[point.x][point.y] !== "") {
+            new_point.status = "blocked";
+        } else if(point.x === dest_point.x && point.y === dest_point.y){
+            new_point.status = "end";
+        } else {
+            new_point.status = "valid";
+            grid[new_point.x][new_point.y] = "checked";
+        }
+        return new_point;
+    }
+
+    var start_point = {
+        x: x1,
+        y: y1,
+        path: [],
+        status: "start"
+    };
+
+    var dest_point = {
+        x: x2,
+        y: y2,
+        path: [],
+        status: "end"
+    }
+
+    var points = [start_point]; //Init array of points, beginning with the start point
+
+    while(points.length > 0){
+        var current_point = points.shift(); //remove and return the first point from the array
+        var new_point;
+        var directions = ["up", "down", "left", "right"];
+        directions.forEach(function(direction){
+            new_point = check_point(current_point, direction, map.grid);
+            if(new_point.status === "end"){
+                return new_point.path;
+            } else if(new_point.status === "valid"){
+                points.push(new_point);
+            }
+        });
+    }
+
+    return []; //No path found
+
 }
 
 
