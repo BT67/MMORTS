@@ -17,3 +17,5 @@ zoom_speed = 0.1;
 
 camera_width = camera_get_view_width(camera);
 camera_height = camera_get_view_height(camera);
+
+hud_elements = [btn_logout_hud, btn_quit_hud, txt_chat_input, txt_chat_log];

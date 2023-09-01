@@ -43,6 +43,7 @@
     {"name":"login_controller","order":7,"path":"objects/login_controller/login_controller.yy",},
     {"name":"lbl_msg_login","order":4,"path":"objects/lbl_msg_login/lbl_msg_login.yy",},
     {"name":"btn_back_register","order":2,"path":"objects/btn_back_register/btn_back_register.yy",},
+    {"name":"gui_test","order":6,"path":"objects/gui_test/gui_test.yy",},
     {"name":"ui_button_base","order":3,"path":"objects/ui_button_base/ui_button_base.yy",},
     {"name":"ui_focus_base","order":1,"path":"objects/ui_focus_base/ui_focus_base.yy",},
     {"name":"dungeon_wall_top_end_right","order":11,"path":"sprites/dungeon_wall_top_end_right/dungeon_wall_top_end_right.yy",},
