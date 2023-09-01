@@ -150,7 +150,7 @@ module.exports = packet = {
 
                 function spawnEntities(client) {
                     maps[current_room].entities.forEach(function (entity) {
-                        if (entity.name !== client.username && entity.alive) {
+                        if (entity.alive) {
                             params = [];
                             params.push("SPAWN");
                             params.push(entity.name);
@@ -275,7 +275,7 @@ module.exports = packet = {
                         entity.health -= 10;
                         maps[client.current_room].clients.forEach(function (OtherClient) {
                             OtherClient.socket.write(packet.build([
-                                "ENTITY", entity.name, entity.pos_x.toString(), entity.pos_y.toString(), entity.health.toString(), "sprite"
+                                "HEALTH", entity.name, entity.health.toString()
                             ], client.id));
                         });
                         if (entity.health < 0) {
@@ -284,7 +284,7 @@ module.exports = packet = {
                             });
                             entity.alive = false;
                             alive = entity.alive;
-                            client.target_entity = "";
+                            client.target_entity = null;
                         }
                     }
                 });

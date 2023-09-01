@@ -66,6 +66,9 @@ this_entity.in_combat = false;
 this_entity.aggressive = true;
 this_entity.move_speed = 12;
 this_entity.sprite = "sprite";
+this_entity.max_health = 100;
+this_entity.respawn_period = 300;
+this_entity.respawn_timer = this_entity.respawn_period;
 maps["zone1"].entities.push(this_entity);
 
 this_entity = new entity_inst();
@@ -87,6 +90,9 @@ this_entity.in_combat = false;
 this_entity.aggressive = true;
 this_entity.move_speed = 12;
 this_entity.sprite = "sprite";
+this_entity.max_health = 100;
+this_entity.respawn_period = 300;
+this_entity.respawn_timer = this_entity.respawn_period;
 maps["zone1"].entities.push(this_entity);
 
 this_entity = new entity_inst();
@@ -108,6 +114,9 @@ this_entity.in_combat = false;
 this_entity.aggressive = true;
 this_entity.move_speed = 12;
 this_entity.sprite = "sprite";
+this_entity.max_health = 100;
+this_entity.respawn_period = 300;
+this_entity.respawn_timer = this_entity.respawn_period;
 maps["zone1"].entities.push(this_entity);
 
 //Initialise the database:
@@ -177,50 +186,91 @@ async function updateEntities() {
     while (true) {
         mapList.forEach(function (map) {
             maps[map].entities.forEach(function (entity) {
-                if (entity.aggressive) {
-                    if (!entity.in_combat) {
-                        maps[map].clients.forEach(function (client) {
-                            dist = distance(client.pos_x, client.pos_y, entity.pos_x, entity.pos_y);
-                            if (dist < entity.view_range) {
-                                console.log(timeNow() + "Mob aggro triggered");
-                                entity.in_combat = true;
-                                entity.target_entity = client;
+
+                if(entity.alive) {
+                    if (entity.aggressive) {
+                        if (!entity.in_combat) {
+                            maps[map].clients.forEach(function (client) {
+                                dist = distance(client.pos_x, client.pos_y, entity.pos_x, entity.pos_y);
+                                if (dist < entity.view_range) {
+                                    console.log(timeNow() + "Mob aggro triggered");
+                                    entity.in_combat = true;
+                                    entity.target_entity = client;
+                                }
+                            })
+                        } else if (entity.in_combat) {
+                            dist = distance(entity.pos_x, entity.pos_y, entity.origin_x, entity.origin_y);
+                            if (dist > entity.roam_range) {
+                                entity.in_combat = false;
+                                entity.target_entity = null;
+                                entity.target_x = entity.origin_x;
+                                entity.target_y = entity.origin_y;
                             }
-                        })
-                    } else if (entity.in_combat) {
-                        dist = distance(entity.pos_x, entity.pos_y, entity.origin_x, entity.origin_y);
-                        if (dist > entity.roam_range) {
-                            entity.in_combat = false;
-                            entity.target_entity = null;
-                            entity.target_x = entity.origin_x;
-                            entity.target_y = entity.origin_y;
                         }
                     }
-                }
 
-                moveTowardsTarget(entity);
+                    moveTowardsTarget(entity);
 
-                if(entity.target_entity == null){
-                    maps[map].clients.forEach(function (client) {
-                        client.socket.write(packet.build([
-                            "POS", entity.name, entity.pos_x.toString(), entity.pos_y.toString(), entity.target_x.toString(), entity.target_y.toString()
-                        ], client.id));
-                    });
-                } else {
-                    maps[map].clients.forEach(function (client) {
-                        client.socket.write(packet.build([
-                            "PURSUE", entity.name, entity.pos_x.toString(), entity.pos_y.toString(), entity.target_entity.username
-                        ], client.id));
-                    });
+                    if (entity.target_entity == null) {
+                        maps[map].clients.forEach(function (client) {
+                            client.socket.write(packet.build([
+                                "POS", entity.name, entity.pos_x.toString(), entity.pos_y.toString(), entity.target_x.toString(), entity.target_y.toString()
+                            ], client.id));
+                        });
+                    } else {
+                        maps[map].clients.forEach(function (client) {
+                            client.socket.write(packet.build([
+                                "PURSUE", entity.name, entity.pos_x.toString(), entity.pos_y.toString(), entity.target_entity.username
+                            ], client.id));
+                        });
+                    }
+                } else if(!entity.alive){
+                    entity.respawn_timer -= 10;
+                    if(entity.respawn_timer <= 0){
+                        entity.alive = true;
+                        entity.health = entity.max_health;
+                        entity.respawn_timer = entity.respawn_period;
+                        entity.pos_x = entity.origin_x;
+                        entity.pos_y = entity.origin_y;
+                        entity.target_x = entity.origin_x;
+                        entity.target_y = entity.origin_y;
+                        entity.target_entity = null;
+                        maps[map].clients.forEach(function (client) {
+                            params = [];
+                            params.push("SPAWN");
+                            params.push(entity.name);
+                            params.push(entity.type);
+                            params.push(entity.pos_x.toString());
+                            params.push(entity.pos_y.toString());
+                            params.push(entity.health);
+                            client.socket.write(packet.build(params, client.id));
+                        });
+                    }
                 }
             });
             //Update client pos
             maps[map].clients.forEach(function (client) {
                 moveTowardsTarget(client);
                 maps[map].clients.forEach(function (otherClient) {
-                    otherClient.socket.write(packet.build([
-                        "POS", client.username, client.pos_x.toString(), client.pos_y.toString(), client.target_x.toString(), client.target_y.toString()
-                    ], otherClient.id));
+                    params = [];
+                    params.push("POS");
+                    params.push(client.username);
+                    params.push(client.pos_x.toString());
+                    params.push(client.pos_y.toString());
+                    try {
+                        params.push(client.target_x.toString());
+                    } catch(error) {
+                        params.push(client.pos_x.toString());
+                    }
+                    try {
+                        params.push(client.target_y.toString());
+                    } catch(error) {
+                        params.push(client.pos_y.toString());
+                    }
+                    otherClient.socket.write(packet.build(params, otherClient.id));
+                    // otherClient.socket.write(packet.build([
+                    //     "POS", client.username, client.pos_x.toString(), client.pos_y.toString(), client.target_x.toString(), client.target_y.toString()
+                    // ], otherClient.id));
                 });
             });
         });

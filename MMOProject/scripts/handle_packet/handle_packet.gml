@@ -87,6 +87,14 @@ function handle_packet(data_buffer){
 					show_debug_message("Entity health=" + string(instance_find(entity, i).entity_health));
 				}
 			}
+		case "HEALTH":
+			entity_name = buffer_read(data_buffer, buffer_string);
+			entity_health = buffer_read(data_buffer, buffer_string);
+			for(var i = 0; i < instance_number(entity); ++i;) {
+				if(instance_find(entity, i).entity_name == entity_name){
+					instance_find(entity, i).entity_health = real(entity_health);
+				}
+			}			
 			break;
 		case "ROOM":
 			instance_destroy(entity);
@@ -115,16 +123,13 @@ function handle_packet(data_buffer){
 				if(instance_find(entity, i).entity_name == origin_entity){
 					origin_entity = instance_find(entity, i).entity_name;
 					origin_x = instance_find(entity, i).x;
-					show_debug_message(string(origin_x));
 					origin_y = instance_find(entity, i).y;
-					show_debug_message(string(origin_y));
 					break;
 				}
 			}
 			var_attack = "";
 			with(instance_create_layer(real(origin_x), real(origin_y), "Instances", attack)){
 				var_attack = other;
-				//var_attack.target_entity = target_entity;
 			}
 			break;
 		case "LOGOUT":
@@ -169,7 +174,6 @@ function handle_packet(data_buffer){
 					break;
 				}
 			}
-			
 			origin_entity.target_entity = target_entity;
 			break;
 		case "POS":

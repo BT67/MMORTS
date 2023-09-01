@@ -15,5 +15,7 @@ exports.target_entity = "";
 exports.origin_x = 0;
 exports.origin_y = 0;
 exports.roam_range = 100;
-
+exports.max_health = 100;
+exports.respawn_period = 300;
+exports.respawn_timer = 300;
 module.exports = function () {};
