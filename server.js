@@ -42,6 +42,8 @@ map_files.forEach(function (mapFile) {
     maps[map.room] = map;
 });
 
+maps["zone1"].grid = initMapGrid(maps["zone1"]);
+
 //Load mobs into each map:
 var entity_inst = new require("./Models/entity.js");
 const {grid_height, grid_width} = require("./Resources/Game Data/Maps/zone1");
@@ -51,24 +53,25 @@ this_entity.health = 100;
 this_entity.sprite = "";
 this_entity.type = "mob";
 this_entity.name = "mob1";
-this_entity.pos_x = 150;
-this_entity.pos_y = 150;
+this_entity.pos_x = 15;
+this_entity.pos_y = 15;
 this_entity.target_x = this_entity.pos_x;
 this_entity.target_y = this_entity.pos_y;
 this_entity.origin_x = this_entity.pos_x;
 this_entity.origin_y = this_entity.pos_y;
 this_entity.target_entity = null;
-this_entity.roam_range = 100;
-this_entity.view_range = 100;
+this_entity.roam_range = 10;
+this_entity.view_range = 10;
 this_entity.in_combat = false;
 this_entity.aggressive = true;
-this_entity.move_speed = 12;
+this_entity.move_speed = 1;
 this_entity.sprite = "sprite";
 this_entity.max_health = 100;
 this_entity.respawn_period = 300;
 this_entity.respawn_timer = this_entity.respawn_period;
 this_entity.path = [];
 maps["zone1"].entities.push(this_entity);
+maps["zone1"].grid[this_entity.pos_x][this_entity.pos_y] = "entity";
 
 this_entity = new entity_inst();
 this_entity.alive = true;
@@ -76,24 +79,25 @@ this_entity.health = 100;
 this_entity.sprite = "";
 this_entity.type = "mob";
 this_entity.name = "mob2";
-this_entity.pos_x = 150;
-this_entity.pos_y = 210;
+this_entity.pos_x = 15;
+this_entity.pos_y = 21;
 this_entity.target_x = this_entity.pos_x;
 this_entity.target_y = this_entity.pos_y;
 this_entity.origin_x = this_entity.pos_x;
 this_entity.origin_y = this_entity.pos_y;
 this_entity.target_entity = null;
-this_entity.roam_range = 100;
-this_entity.view_range = 100;
+this_entity.roam_range = 10;
+this_entity.view_range = 10;
 this_entity.in_combat = false;
 this_entity.aggressive = true;
-this_entity.move_speed = 12;
+this_entity.move_speed = 1;
 this_entity.sprite = "sprite";
 this_entity.max_health = 100;
 this_entity.respawn_period = 300;
 this_entity.respawn_timer = this_entity.respawn_period;
 this_entity.path = [];
 maps["zone1"].entities.push(this_entity);
+maps["zone1"].grid[this_entity.pos_x][this_entity.pos_y] = "entity";
 
 this_entity = new entity_inst();
 this_entity.alive = true;
@@ -101,24 +105,25 @@ this_entity.health = 100;
 this_entity.sprite = "";
 this_entity.type = "mob";
 this_entity.name = "mob3";
-this_entity.pos_x = 300;
-this_entity.pos_y = 80;
+this_entity.pos_x = 30;
+this_entity.pos_y = 8;
 this_entity.target_x = this_entity.pos_x;
 this_entity.target_y = this_entity.pos_y;
 this_entity.origin_x = this_entity.pos_x;
 this_entity.origin_y = this_entity.pos_y;
 this_entity.target_entity = null;
-this_entity.roam_range = 100;
-this_entity.view_range = 100;
+this_entity.roam_range = 10;
+this_entity.view_range = 10;
 this_entity.in_combat = false;
 this_entity.aggressive = true;
-this_entity.move_speed = 12;
+this_entity.move_speed = 1;
 this_entity.sprite = "sprite";
 this_entity.max_health = 100;
 this_entity.respawn_period = 300;
 this_entity.respawn_timer = this_entity.respawn_period;
 this_entity.path = [];
 maps["zone1"].entities.push(this_entity);
+maps["zone1"].grid[this_entity.pos_x][this_entity.pos_y] = "entity";
 
 //Initialise the database:
 var query_str = "";
@@ -166,7 +171,7 @@ net.createServer(function (socket) {
     thisClient.target_x = thisClient.pos_x;
     thisClient.target_y = thisClient.pos_y;
     thisClient.target_entity = null;
-    thisClient.move_speed = 12;
+    thisClient.move_speed = 1;
     thisClient.health = 100;
     thisClient.path = [];
     clientIdNo += 1;
@@ -211,7 +216,9 @@ async function updateEntities() {
                         }
                     }
 
-                    moveTowardsTarget(entity);
+                    entity.path = createPath(map, entity.pos_x, entity.pos_y, entity.target_x, entity.target_y);
+                    followPath(entity);
+                    moveTowardsTarget(map, entity);
 
                     if (entity.target_entity == null) {
                         maps[map].clients.forEach(function (client) {
@@ -252,6 +259,7 @@ async function updateEntities() {
             });
             //Update client pos
             maps[map].clients.forEach(function (client) {
+                //followPath(client);
                 moveTowardsTarget(client);
                 maps[map].clients.forEach(function (otherClient) {
                     params = [];
@@ -280,7 +288,9 @@ async function updateEntities() {
     }
 }
 
-function moveTowardsTarget(entity) {
+function moveTowardsTarget(map, entity) {
+
+    maps[map].grid[entity.pos_x][entity.pos_y] = "empty";
 
     if (entity.target_entity !== null) {
         entity.target_x = entity.target_entity.pos_x;
@@ -326,6 +336,22 @@ function moveTowardsTarget(entity) {
 
     entity.pos_x = parseInt(entity.pos_x);
     entity.pos_y = parseInt(entity.pos_y);
+
+    maps[map].grid[entity.pos_x][entity.pos_y] = entity.username;
+
+}
+
+function followPath(entity){
+    var next_point;
+    try {
+        next_point = entity.path.shift();
+        entity.target_x = next_point.x;
+        entity.target_y = next_point.y;
+    } catch(error) {
+        entity.path = [];
+        entity.target_x = entity.origin_x;
+        entity.target_y = entity.origin_y;
+    }
 }
 
 function timeNow() {
@@ -339,18 +365,22 @@ function distance(x1, y1, x2, y2) {
 }
 
 function initMapGrid(map) {
+    var grid = [];
     for (var i = 0; i < map.grid_width; i++) {
-        map.grid[i] = []
+        grid.push([])
         for (var k = 0; k < map.grid_height; k++) {
-            map.grid[i][j] = "";
+            grid[i][k] = "empty";
         }
     }
+    return grid;
 }
 
 function createPath(map, x1, y1, x2, y2) {
+
+    var grid_copy = maps[map].grid;
+
     function check_point(current_point, direction, grid){
         var new_path = current_point.path.slice();
-        new_path.push(direction);
         var pos_x = current_point.x;
         var pos_y = current_point.y;
         switch(direction){
@@ -366,6 +396,22 @@ function createPath(map, x1, y1, x2, y2) {
             case "right":
                 pos_x += 1;
                 break;
+            case "up-left":
+                pos_x -= 1;
+                pos_y -= 1;
+                break;
+            case "up-right":
+                pos_x += 1;
+                pos_y -= 1;
+                break;
+            case "down-left":
+                pos_x -= 1;
+                pos_y += 1;
+                break;
+            case "down-right":
+                pos_x += 1;
+                pos_y -= 1;
+                break;
         }
 
         var new_point = {
@@ -375,15 +421,18 @@ function createPath(map, x1, y1, x2, y2) {
             status: "unknown"
         }
 
-        if (point.x < 0 ||
-            point.x >= grid_width ||
-            point.y < 0 ||
-            point.y >= grid_height
+        new_path.push(new_point);
+        new_point.path = new_path;
+
+        if (new_point.x < 0 ||
+            new_point.x >= grid_width ||
+            new_point.y < 0 ||
+            new_point.y >= grid_height
         ) {
             new_point.status = "invalid";
-        } else if (grid[point.x][point.y] !== "") {
+        } else if(grid.at(new_point.x).at(new_point.y) !== "empty") {
             new_point.status = "blocked";
-        } else if(point.x === dest_point.x && point.y === dest_point.y){
+        } else if(new_point.x === dest_point.x && new_point.y === dest_point.y){
             new_point.status = "end";
         } else {
             new_point.status = "valid";
@@ -411,9 +460,9 @@ function createPath(map, x1, y1, x2, y2) {
     while(points.length > 0){
         var current_point = points.shift(); //remove and return the first point from the array
         var new_point;
-        var directions = ["up", "down", "left", "right"];
+        var directions = ["up", "down", "left", "right", "up-left", "up-right", "down-left", "down-right"];
         directions.forEach(function(direction){
-            new_point = check_point(current_point, direction, map.grid);
+            new_point = check_point(current_point, direction, grid_copy);
             if(new_point.status === "end"){
                 return new_point.path;
             } else if(new_point.status === "valid"){

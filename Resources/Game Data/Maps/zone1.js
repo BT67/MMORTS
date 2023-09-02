@@ -8,8 +8,8 @@ exports.entities = [];
 
 exports.grid_size = 32;
 exports.grid = [];
-exports.grid_width = 0;
-exports.grid_height = 0;
+exports.grid_width = 40;
+exports.grid_height = 20;
 
 
 

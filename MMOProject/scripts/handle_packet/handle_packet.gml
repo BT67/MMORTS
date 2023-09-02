@@ -17,7 +17,9 @@ function handle_packet(data_buffer){
 				show_debug_message("Entity_name=" + string(entity_name));
 				target_room = buffer_read(data_buffer, buffer_string);
 				pos_x = buffer_read(data_buffer, buffer_string);
+				pos_x = (real(pos_x) + 1) * 32;
 				pos_y = buffer_read(data_buffer, buffer_string);
+				pos_y = (real(pos_y) + 1) * 32;
 				show_debug_message(string(pos_x) + "," + string(pos_y));
 				player_health = buffer_read(data_buffer, buffer_string);
 				player_sprite = buffer_read(data_buffer, buffer_string);
@@ -54,8 +56,10 @@ function handle_packet(data_buffer){
 			entity_type = buffer_read(data_buffer, buffer_string);
 			show_debug_message(string(entity_type));
 			target_x = buffer_read(data_buffer, buffer_string);
+			target_x = (real(target_x) + 1) * 32;
 			show_debug_message(string(target_x));
 			target_y = buffer_read(data_buffer, buffer_string);
+			target_y = (real(target_y) + 1) * 32;
 			show_debug_message(string(target_y));
 			entity_health = buffer_read(data_buffer, buffer_string);
 			with(instance_create_layer(real(target_x), real(target_y), "Instances", asset_get_index(entity_type))){
@@ -72,7 +76,9 @@ function handle_packet(data_buffer){
 			//pos_x = buffer_read(data_buffer, buffer_string);
 			//pos_y = buffer_read(data_buffer, buffer_string);
 			target_x = buffer_read(data_buffer, buffer_string);
+			target_x = (real(target_x) + 1) * 32;
 			target_y = buffer_read(data_buffer, buffer_string);
+			target_y = (real(target_y) + 1) * 32;
 			entity_health = buffer_read(data_buffer, buffer_string);
 			show_debug_message("Entity health=" + entity_health);
 			entity_sprite = buffer_read(data_buffer, buffer_string);
@@ -101,7 +107,9 @@ function handle_packet(data_buffer){
 			entity_name = buffer_read(data_buffer, buffer_string);
 			target_room = buffer_read(data_buffer, buffer_string);
 			pos_x = buffer_read(data_buffer, buffer_string);
+			pos_x = (real(pos_x) + 1) * 32;
 			pos_y = buffer_read(data_buffer, buffer_string);
+			pos_y = (real(pos_y) + 1) * 32;
 			player_health = buffer_read(data_buffer, buffer_string);
 			player_sprite = buffer_read(data_buffer, buffer_string);
 			room_goto(asset_get_index(target_room));
@@ -154,7 +162,9 @@ function handle_packet(data_buffer){
 		case "PURSUE":
 			origin_entity = buffer_read(data_buffer, buffer_string);
 			pos_x = buffer_read(data_buffer, buffer_string);
+			pos_x = (real(pos_x) + 1) * 32;
 			pos_y = buffer_read(data_buffer, buffer_string);
+			pos_y = (real(pos_y) + 1) * 32;
 			target_entity = buffer_read(data_buffer, buffer_string);
 			for(var i = 0; i < instance_number(entity); ++i;) {
 				if(instance_find(entity, i).entity_name == origin_entity){
@@ -180,10 +190,14 @@ function handle_packet(data_buffer){
 			entity_name = buffer_read(data_buffer, buffer_string);
 			show_debug_message(string(entity_name));
 			pos_x = buffer_read(data_buffer, buffer_string);
+			pos_x = (real(pos_x) + 1) * 32;
 			pos_y = buffer_read(data_buffer, buffer_string);
+			pos_y = (real(pos_y) + 1) * 32;
 			show_debug_message(string(pos_x) + "," + string(pos_y));
 			target_x = buffer_read(data_buffer, buffer_string);
+			target_x = (real(target_x) + 1) * 32;
 			target_y = buffer_read(data_buffer, buffer_string);
+			target_y = (real(target_y) + 1) * 32;
 			show_debug_message(string(target_x) + "," + string(target_y));
 			for(var i = 0; i < instance_number(entity); ++i;) {
 				if(instance_find(entity, i).entity_name == entity_name){
