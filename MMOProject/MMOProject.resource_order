@@ -61,6 +61,7 @@
     {"name":"network_write","order":1,"path":"scripts/network_write/network_write.yy",},
     {"name":"dungeon_all","order":2,"path":"sprites/dungeon_all/dungeon_all.yy",},
     {"name":"lbl_password_login","order":6,"path":"objects/lbl_password_login/lbl_password_login.yy",},
+    {"name":"spr_player_running","order":5,"path":"sprites/spr_player_running/spr_player_running.yy",},
     {"name":"spr_mob_new","order":3,"path":"sprites/spr_mob_new/spr_mob_new.yy",},
     {"name":"btn_logout_hud","order":1,"path":"objects/btn_logout_hud/btn_logout_hud.yy",},
     {"name":"lbl_msg_register_success","order":1,"path":"objects/lbl_msg_register_success/lbl_msg_register_success.yy",},
