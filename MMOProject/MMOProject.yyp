@@ -130,7 +130,7 @@
     {"id":{"name":"btn_register_init","path":"objects/btn_register_init/btn_register_init.yy",},},
     {"id":{"name":"lbl_email_register","path":"objects/lbl_email_register/lbl_email_register.yy",},},
     {"id":{"name":"rm_register_success","path":"rooms/rm_register_success/rm_register_success.yy",},},
-    {"id":{"name":"Sprite29","path":"sprites/Sprite29/Sprite29.yy",},},
+    {"id":{"name":"spr_player_idle","path":"sprites/spr_player_idle/spr_player_idle.yy",},},
     {"id":{"name":"spr_attack","path":"sprites/spr_attack/spr_attack.yy",},},
     {"id":{"name":"txt_password_login","path":"objects/txt_password_login/txt_password_login.yy",},},
     {"id":{"name":"btn_back_register_success","path":"objects/btn_back_register_success/btn_back_register_success.yy",},},
