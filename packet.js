@@ -243,6 +243,7 @@ module.exports = packet = {
                 if(otherClient.username === client.username){
                     target_x = parseInt((target_x / 32) - 1);
                     target_y = parseInt((target_y / 32) - 1);
+                    otherClient.target_entity = null;
                     otherClient.target_x = target_x;
                     otherClient.target_y = target_y;
                 }
@@ -259,6 +260,9 @@ module.exports = packet = {
             var alive;
             while (true) {
                 if (alive === false) {
+                    break;
+                }
+                if(client.target_entity !== target_entity){
                     break;
                 }
                 maps[client.current_room].clients.forEach(function (otherClient) {
