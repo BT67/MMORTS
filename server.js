@@ -193,7 +193,6 @@ async function updateEntities() {
     while (true) {
         mapList.forEach(function (map) {
             maps[map].entities.forEach(function (entity) {
-
                 if (entity.alive) {
                     if (entity.aggressive) {
                         if (!entity.in_combat) {
@@ -215,23 +214,25 @@ async function updateEntities() {
                             }
                         }
                     }
-
-                    entity.path = createPath(map, entity.pos_x, entity.pos_y, entity.target_x, entity.target_y);
-                    followPath(entity);
-                    moveTowardsTarget(map, entity);
-
-                    if (entity.target_entity == null) {
-                        maps[map].clients.forEach(function (client) {
-                            client.socket.write(packet.build([
-                                "POS", entity.name, entity.pos_x.toString(), entity.pos_y.toString(), entity.target_x.toString(), entity.target_y.toString()
-                            ], client.id));
-                        });
-                    } else {
-                        maps[map].clients.forEach(function (client) {
-                            client.socket.write(packet.build([
-                                "PURSUE", entity.name, entity.pos_x.toString(), entity.pos_y.toString(), entity.target_entity.username
-                            ], client.id));
-                        });
+                    if(entity.target_x !== entity.pos_x || entity.target_y !== entity.pos_y) {
+                        entity.path = createPath(map, entity.pos_x, entity.pos_y, entity.target_x, entity.target_y);
+                    }
+                    //check if entity is at target loc
+                    if(entity.path.length > 0){
+                        moveTowardsTarget(map, entity);
+                        if (entity.target_entity == null) {
+                            maps[map].clients.forEach(function (client) {
+                                client.socket.write(packet.build([
+                                    "POS", entity.name, entity.pos_x.toString(), entity.pos_y.toString(), entity.target_x.toString(), entity.target_y.toString()
+                                ], client.id));
+                            });
+                        } else {
+                            maps[map].clients.forEach(function (client) {
+                                client.socket.write(packet.build([
+                                    "PURSUE", entity.name, entity.pos_x.toString(), entity.pos_y.toString(), entity.target_entity.username
+                                ], client.id));
+                            });
+                        }
                     }
                 } else if (!entity.alive) {
                     entity.respawn_timer -= 10;
@@ -259,29 +260,24 @@ async function updateEntities() {
             });
             //Update client pos
             maps[map].clients.forEach(function (client) {
-                //followPath(client);
-                moveTowardsTarget(client);
-                maps[map].clients.forEach(function (otherClient) {
-                    params = [];
-                    params.push("POS");
-                    params.push(client.username);
-                    params.push(client.pos_x.toString());
-                    params.push(client.pos_y.toString());
-                    try {
-                        params.push(client.target_x.toString());
-                    } catch (error) {
+                if(client.target_x !== client.pos_x || client.target_y !== client.pos_y) {
+                    client.path = createPath(map, client.pos_x, client.pos_y, client.target_x, client.target_y);
+                }
+                if(client.path.length > 0){
+                    prev_pos_x = client.pos_x;
+                    prev_pos_y = client.pos_y;
+                    moveTowardsTarget(map, client);
+                    maps[map].clients.forEach(function (otherClient) {
+                        params = [];
+                        params.push("POS");
+                        params.push(client.username);
+                        params.push(prev_pos_x.toString());
+                        params.push(prev_pos_y.toString());
                         params.push(client.pos_x.toString());
-                    }
-                    try {
-                        params.push(client.target_y.toString());
-                    } catch (error) {
                         params.push(client.pos_y.toString());
-                    }
-                    otherClient.socket.write(packet.build(params, otherClient.id));
-                    // otherClient.socket.write(packet.build([
-                    //     "POS", client.username, client.pos_x.toString(), client.pos_y.toString(), client.target_x.toString(), client.target_y.toString()
-                    // ], otherClient.id));
-                });
+                        otherClient.socket.write(packet.build(params, otherClient.id));
+                    });
+                }
             });
         });
         await new Promise(resolve => setTimeout(resolve, config.step));
@@ -292,46 +288,12 @@ function moveTowardsTarget(map, entity) {
 
     maps[map].grid[entity.pos_x][entity.pos_y] = "empty";
 
-    if (entity.target_entity !== null) {
-        entity.target_x = entity.target_entity.pos_x;
-        entity.target_y = entity.target_entity.pos_y
-    }
-
-    if (entity.target_x < entity.pos_x) {
-        entity.pos_x -= entity.move_speed;
-        if (entity.target_x > entity.pos_x) {
-            entity.pos_x = entity.target_x;
-        }
-    } else if (entity.target_x > entity.pos_x) {
-        entity.pos_x += entity.move_speed;
-        if (entity.target_x < entity.pos_x) {
-            entity.pos_x = entity.target_x;
-        }
-    }
-
-    vert_speed = Math.abs(entity.target_y - entity.pos_y) / Math.abs(entity.target_x - entity.pos_x);
-    vert_speed *= entity.move_speed;
-    if (vert_speed === undefined || vert_speed === null || isNaN(vert_speed)) {
-        vert_speed = 1;
-    }
-
-    if (vert_speed > entity.move_speed) {
-        vert_speed = entity.move_speed;
-    }
-    if (vert_speed < (entity.move_speed * -1)) {
-        vert_speed = (entity.move_speed * -1);
-    }
-
-    if (entity.target_y < entity.pos_y) {
-        entity.pos_y -= vert_speed;
-        if (entity.target_y > entity.pos_y) {
-            entity.pos_y = entity.target_y;
-        }
-    } else if (entity.target_y > entity.pos_y) {
-        entity.pos_y += vert_speed;
-        if (entity.target_y < entity.pos_y) {
-            entity.pos_y = entity.target_y;
-        }
+    try {
+        next_point = entity.path.shift();
+        entity.pos_x = next_point.x;
+        entity.pos_y = next_point.y;
+    } catch (error) {
+        entity.path = [];
     }
 
     entity.pos_x = parseInt(entity.pos_x);
@@ -339,19 +301,6 @@ function moveTowardsTarget(map, entity) {
 
     maps[map].grid[entity.pos_x][entity.pos_y] = entity.username;
 
-}
-
-function followPath(entity){
-    var next_point;
-    try {
-        next_point = entity.path.shift();
-        entity.target_x = next_point.x;
-        entity.target_y = next_point.y;
-    } catch(error) {
-        entity.path = [];
-        entity.target_x = entity.origin_x;
-        entity.target_y = entity.origin_y;
-    }
 }
 
 function timeNow() {
@@ -376,10 +325,14 @@ function initMapGrid(map) {
 }
 
 function createPath(map, x1, y1, x2, y2) {
-
-    var grid_copy = maps[map].grid;
-
-    function check_point(current_point, direction, grid){
+    if (x1 === x2 && y1 === y2) {
+        return [];
+    }
+    var grid_copy = [];
+    for (var i = 0; i < maps[map].grid.length; i++) {
+        grid_copy[i] = maps[map].grid[i].slice();
+    }
+    function check_point(current_point, direction, grid_copy){
         var new_path = current_point.path.slice();
         var pos_x = current_point.x;
         var pos_y = current_point.y;
@@ -413,50 +366,34 @@ function createPath(map, x1, y1, x2, y2) {
                 pos_y -= 1;
                 break;
         }
-
         var new_point = {
             x: pos_x,
             y: pos_y,
             path: new_path,
             status: "unknown"
         }
-
         new_path.push(new_point);
         new_point.path = new_path;
-
         if (new_point.x < 0 ||
             new_point.x >= grid_width ||
             new_point.y < 0 ||
             new_point.y >= grid_height
-        ) {
+        ){
             new_point.status = "invalid";
-        } else if(grid.at(new_point.x).at(new_point.y) !== "empty") {
+        } else if(grid_copy.at(new_point.x).at(new_point.y) !== "empty") {
             new_point.status = "blocked";
-        } else if(new_point.x === dest_point.x && new_point.y === dest_point.y){
+        } else if(new_point.x === x2 && new_point.y === y2){
             new_point.status = "end";
         } else {
             new_point.status = "valid";
-            grid[new_point.x][new_point.y] = "checked";
+            grid_copy[new_point.x][new_point.y] = "checked";
         }
         return new_point;
     }
-
-    var start_point = {
-        x: x1,
-        y: y1,
-        path: [],
-        status: "start"
-    };
-
-    var dest_point = {
-        x: x2,
-        y: y2,
-        path: [],
-        status: "end"
-    }
-
+    var start_point = {x: x1, y: y1, path: [], status: "start"};
     var points = [start_point]; //Init array of points, beginning with the start point
-
+    var final_path = [];
+    final = false;
     while(points.length > 0){
         var current_point = points.shift(); //remove and return the first point from the array
         var new_point;
@@ -464,14 +401,18 @@ function createPath(map, x1, y1, x2, y2) {
         directions.forEach(function(direction){
             new_point = check_point(current_point, direction, grid_copy);
             if(new_point.status === "end"){
-                return new_point.path;
+                if(!final) {
+                    final_path = new_point.path;
+                    final = true;
+                }
             } else if(new_point.status === "valid"){
                 points.push(new_point);
             }
         });
     }
 
-    return []; //No path found
+    grid_copy = [];
+    return final_path;
 
 }
 

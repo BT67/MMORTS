@@ -12,7 +12,7 @@ view_visible[0] = true;
 camera = camera_create_view(0,0,view_width, view_height);
 view_set_camera(0, camera);
 
-scroll_speed = 3;
+scroll_speed = 8;
 zoom_speed = 0.1;
 
 camera_width = camera_get_view_width(camera);

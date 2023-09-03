@@ -114,7 +114,6 @@ module.exports = packet = {
                     console.log(error.stack);
                     return;
                 }
-                //TODO important: on login, set client x and y pos before sending spawn packet
                 if (
                     username == null ||
                     current_room == null ||
@@ -138,8 +137,6 @@ module.exports = packet = {
                     clients_str = clients_str + otherClient.id.toString + " ";
                 });
                 console.log(timeNow() + config.msg_clients_in_room + current_room + ": " + clients_str);
-                //TODO add spawn packet to other clients in the same room
-                //TODO only send spawn packets for live entities
                 maps[current_room].clients.forEach(function (otherClient) {
                     if (otherClient.id !== client.id) {
                         otherClient.socket.write(packet.build([
@@ -244,12 +241,11 @@ module.exports = packet = {
         function pos(target_x, target_y) {
             maps[client.current_room].clients.forEach(function (otherClient) {
                 if(otherClient.username === client.username){
+                    target_x = parseInt((target_x / 32) - 1);
+                    target_y = parseInt((target_y / 32) - 1);
                     otherClient.target_x = target_x;
                     otherClient.target_y = target_y;
                 }
-                otherClient.socket.write(packet.build([
-                    "POS", client.username, client.pos_x.toString(), client.pos_y.toString(), target_x.toString(), target_y.toString()
-                ], otherClient.id));
             });
         }
 
@@ -338,16 +334,8 @@ module.exports = packet = {
                 return;
             }
             delete maps[client.current_room].clients.client;
-            delete maps[client.current_room].entities[client.username];
             client.current_room = room;
             maps[room].clients.push(client);
-            var entity_inst = require(__dirname + "/Models/entity.js");
-            var entity = new entity_inst();
-            entity.name = username;
-            entity.type = "player";
-            entity.pos_x = maps[room].start_x;
-            entity.pos_y = maps[room].start_y;
-            maps[current_room].entities.push(entity);
         }
 
         var data;
