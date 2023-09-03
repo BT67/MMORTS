@@ -363,7 +363,7 @@ function createPath(map, x1, y1, x2, y2) {
                 break;
             case "down-right":
                 pos_x += 1;
-                pos_y -= 1;
+                pos_y += 1;
                 break;
         }
         var new_point = {
