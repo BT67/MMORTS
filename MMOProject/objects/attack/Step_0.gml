@@ -13,9 +13,9 @@ if(typeof(target_entity) == "string") {
 	}
 } else {
 	try {
-		move_towards_point(target_entity.x, target_entity.y, 2);
+		move_towards_point(target_entity.x, target_entity.y, move_speed);
 	} catch(error) {
-		move_towards_point(target_x, target_y, 2);
+		move_towards_point(target_x, target_y, move_speed);
 	}
 	if(distance_to_point(target_x, target_y) < 10){
 		instance_destroy();
