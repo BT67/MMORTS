@@ -7,7 +7,11 @@ if(focused){
 		buffer_write(chat_packet, buffer_string, text);
 		network_write(network.socket, chat_packet);
 		text = "";
-	} else if(keyboard_key != vk_tab){
-		text += keyboard_lastchar;	
+	} else if(keyboard_key != vk_tab && 
+		keyboard_key != vk_up &&
+		keyboard_key != vk_down &&
+		keyboard_key != vk_left &&
+		keyboard_key != vk_right){
+			text += keyboard_lastchar;	
 	}
 }
