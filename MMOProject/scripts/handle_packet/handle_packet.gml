@@ -139,6 +139,7 @@ function handle_packet(data_buffer){
 			with(instance_create_layer(real(origin_x), real(origin_y), "Instances", attack)){
 				var_attack = other;
 			}
+			//variable_instance_set(instance_find(attack, instance_number(attack) - 1), "target_entity", target_entity);
 			break;
 		case "LOGOUT":
 			msg = buffer_read(data_buffer, buffer_string);

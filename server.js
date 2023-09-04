@@ -61,8 +61,9 @@ this_entity.target_y = this_entity.pos_y;
 this_entity.origin_x = this_entity.pos_x;
 this_entity.origin_y = this_entity.pos_y;
 this_entity.target_entity = null;
-this_entity.roam_range = 5;
+this_entity.roam_range = 10;
 this_entity.view_range = 5;
+this_entity.attack_range = 3;
 this_entity.in_combat = false;
 this_entity.aggressive = true;
 this_entity.move_speed = 1;
@@ -71,6 +72,8 @@ this_entity.max_health = 100;
 this_entity.respawn_period = 100;
 this_entity.respawn_timer = this_entity.respawn_period;
 this_entity.path = [];
+this_entity.attack_period = 5;
+this_entity.attack_timer = this_entity.attack_period;
 maps["zone1"].entities.push(this_entity);
 
 this_entity = new entity_inst();
@@ -86,8 +89,9 @@ this_entity.target_y = this_entity.pos_y;
 this_entity.origin_x = this_entity.pos_x;
 this_entity.origin_y = this_entity.pos_y;
 this_entity.target_entity = null;
-this_entity.roam_range = 5;
+this_entity.roam_range = 10;
 this_entity.view_range = 5;
+this_entity.attack_range = 3;
 this_entity.in_combat = false;
 this_entity.aggressive = true;
 this_entity.move_speed = 1;
@@ -96,6 +100,8 @@ this_entity.max_health = 100;
 this_entity.respawn_period = 100;
 this_entity.respawn_timer = this_entity.respawn_period;
 this_entity.path = [];
+this_entity.attack_period = 5;
+this_entity.attack_timer = this_entity.attack_period;
 maps["zone1"].entities.push(this_entity);
 
 this_entity = new entity_inst();
@@ -113,6 +119,7 @@ this_entity.origin_y = this_entity.pos_y;
 this_entity.target_entity = null;
 this_entity.roam_range = 10;
 this_entity.view_range = 5;
+this_entity.attack_range = 3;
 this_entity.in_combat = false;
 this_entity.aggressive = true;
 this_entity.move_speed = 1;
@@ -121,6 +128,8 @@ this_entity.max_health = 100;
 this_entity.respawn_period = 100;
 this_entity.respawn_timer = this_entity.respawn_period;
 this_entity.path = [];
+this_entity.attack_period = 5;
+this_entity.attack_timer = this_entity.attack_period;
 maps["zone1"].entities.push(this_entity);
 
 //Initialise the database:
@@ -227,6 +236,25 @@ async function updateEntities() {
                                                 //Else, if target is still in view range, continue pursuit
                                                 entity.target_x = client.pos_x;
                                                 entity.target_y = client.pos_y;
+                                                //If target is within attack range, attack the target
+                                                if(dist <= entity.attack_range){
+                                                    //attack the target
+                                                    if(entity.attack_timer === entity.attack_period) {
+                                                        maps[map].clients.forEach(function (otherClient) {
+                                                            otherClient.socket.write(packet.build([
+                                                                "ATTACK", "attack", client.username, entity.name
+                                                            ], otherClient.id));
+                                                        });
+                                                        client.health -= 1;
+                                                        maps[map].clients.forEach(function (otherClient) {
+                                                            otherClient.socket.write(packet.build([
+                                                                "HEALTH", client.username, client.health.toString()
+                                                            ], otherClient.id));
+                                                        });
+                                                        entity.attack_timer = 0;
+                                                    }
+                                                    entity.attack_timer += 1;
+                                                }
                                             }
                                         }
                                     });
@@ -299,9 +327,6 @@ async function updateEntities() {
 }
 
 function moveTowardsTarget(map, entity) {
-
-    //maps[map].grid[entity.pos_x][entity.pos_y] = "empty";
-
     try {
         next_point = entity.path.shift();
         entity.pos_x = next_point.x;
@@ -309,12 +334,8 @@ function moveTowardsTarget(map, entity) {
     } catch (error) {
         entity.path = [];
     }
-
     entity.pos_x = parseInt(entity.pos_x);
     entity.pos_y = parseInt(entity.pos_y);
-
-    //maps[map].grid[entity.pos_x][entity.pos_y] = entity.username;
-
 }
 
 function timeNow() {
@@ -346,7 +367,6 @@ function createPath(map, x1, y1, x2, y2) {
     for (var i = 0; i < maps[map].grid.length; i++) {
         grid_copy[i] = maps[map].grid[i].slice();
     }
-
     function check_point(current_point, direction, grid_copy) {
         var new_path = current_point.path.slice();
         var pos_x = current_point.x;
@@ -405,7 +425,6 @@ function createPath(map, x1, y1, x2, y2) {
         }
         return new_point;
     }
-
     var start_point = {x: x1, y: y1, path: [], status: "start"};
     var points = [start_point]; //Init array of points, beginning with the start point
     var final_path = [];
@@ -426,10 +445,8 @@ function createPath(map, x1, y1, x2, y2) {
             }
         });
     }
-
     grid_copy = [];
     return final_path;
-
 }
 
 
