@@ -314,10 +314,7 @@ module.exports = packet = {
                 console.log(error.stack);
                 return;
             }
-            //delete maps[client.current_room].clients[client.username];
-
             maps[client.current_room].clients = maps[client.current_room].clients.filter(item => item !== client);
-
             maps[client.current_room].clients.forEach(function (OtherClient) {
                 if (OtherClient.username !== client.username) {
                     OtherClient.socket.write(packet.build(["DESTROY", client.username]));

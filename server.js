@@ -162,7 +162,7 @@ net.createServer(function (socket) {
     thisClient.id = clientIdNo;
     thisClient.loggedin = 0;
     thisClient.username = "";
-    thisClient.current_room = "";
+    thisClient.current_room = null;
     thisClient.pos_x = 0;
     thisClient.pos_y = 0;
     thisClient.target_x = thisClient.pos_x;

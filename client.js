@@ -30,7 +30,7 @@ module.exports = function () {
     this.error = function () {
         console.log(timeNow() + config.err_msg_client_error + id);
         //maps[client.current_room].clients[client.username];
-        if(client.current_room != null){
+        if(client.current_room !== null){
             maps[client.current_room].clients = maps[client.current_room].clients.filter(item => item !== client);
         }
         sendDestroyPackets(id);
