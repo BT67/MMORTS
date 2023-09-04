@@ -72,6 +72,7 @@
     {"name":"dungeon_wall_top_vertical","order":5,"path":"sprites/dungeon_wall_top_vertical/dungeon_wall_top_vertical.yy",},
     {"name":"dungeon_all_2","order":3,"path":"sprites/dungeon_all_2/dungeon_all_2.yy",},
     {"name":"dungeon_wall","order":1,"path":"sprites/dungeon_wall/dungeon_wall.yy",},
+    {"name":"hud_health","order":6,"path":"objects/hud_health/hud_health.yy",},
     {"name":"spr_ui_base_black","order":1,"path":"sprites/spr_ui_base_black/spr_ui_base_black.yy",},
     {"name":"dungeon_wall_top_column","order":9,"path":"sprites/dungeon_wall_top_column/dungeon_wall_top_column.yy",},
     {"name":"lbl_username_register","order":4,"path":"objects/lbl_username_register/lbl_username_register.yy",},
