@@ -9,7 +9,9 @@
     "performance-now": "*",
     "pg": "*",
     "q": "*",
-    "underscore": "*"
+    "underscore": "*",
+    "nodemailer": "*",
+    "generate-password": "*"
   },
   "author": "Jean-Luc Gallo",
   "license": "ISC"

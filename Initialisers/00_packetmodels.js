@@ -21,6 +21,9 @@ module.exports = PacketModels = {
         .string("password", StringOptions),
     logout: new Parser().skip(1)
         .string("command", StringOptions),
+    resetpassword: new Parser().skip(1)
+        .string("command", StringOptions)
+        .string("email", StringOptions),
     spawn: new Parser().skip(1)
         .string("command", StringOptions)
         .string("entity_name", StringOptions)

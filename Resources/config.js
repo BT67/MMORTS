@@ -38,6 +38,7 @@ var common_conf = {
     msg_server_packet: "Sending packet to clientId=",
     msg_packet_data: "Packet data=",
     msg_packet_size: "Packet size=",
+    err_msg_password_reset_error: "Unable to reset password for clientId=",
     msg_client_disconnect: "Client disconnected, clientId=",
     msg_logout_success: "Successfully logged out",
     msg_enter_room: "Player entered room=",

@@ -1,6 +1,9 @@
 const {data} = require("./client");
 const q = require('q');
 const {Client} = require("pg");
+const nodemailer = require('nodemailer');
+const generator = require('generate-password');
+const {generate} = require("generate-password");
 //const {pos_x} = require("./Models/entity");
 const connection = new Client({
     host: '127.0.0.1',
@@ -61,7 +64,6 @@ module.exports = packet = {
     //Interpret commands from individual data packets
     interpret: function (client, datapacket) {
         var query;
-        var values;
         var header = PacketModels.header.parse(datapacket);
 
         function login(username, password) {
@@ -362,7 +364,6 @@ module.exports = packet = {
                 attack(data.target_entity);
                 break;
             case "LOGOUT":
-                data = PacketModels.logout.parse(datapacket);
                 logout(client.id);
                 break;
             case "CHAT":
@@ -373,6 +374,10 @@ module.exports = packet = {
                 data = PacketModels.room.parse(datapacket);
                 room(data.room);
                 break;
+            case "RESETPASSWORD":
+                data = PacketModels.resetpassword.parse(datapacket);
+                password_reset(client, data.email);
+                break;
         }
     }
 }
@@ -382,4 +387,47 @@ function timeNow() {
     return "[" + timeStamp + "] ";
 }
 
-//TODO change HUD logout and quit buttons to Draw GUI
+function password_reset(client, email){
+
+    password = generate_password();
+
+    query = "UPDATE public.users SET password = '" + password + "' WHERE email = '" + email + "';";
+    console.log(timeNow() + query);
+    try {
+        connection.query(query);
+    } catch (error) {
+        console.log(timeNow() + config.err_msg_password_reset_error + client.id);
+        console.log(error.stack);
+        return;
+    }
+
+    var transporter = nodemailer.createTransport({
+        service: 'outlook',
+        auth: {
+            user: 'passwordreset1905@outlook.com',
+            pass: 'kpy333Xseries10'
+        }
+    });
+
+    var mailOptions = {
+        from: 'passwordreset1905@outlook.com',
+        to: email,
+        subject: 'PASSWORD RESET EMAIL',
+        text: password
+    };
+
+    transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+            console.log(error);
+        } else {
+            console.log(timeNow() + 'Email sent: ' + info.response);
+        }
+    });
+}
+
+function generate_password(){
+    return generator.generate({
+        length: 16,
+        numbers: true
+    });
+}

@@ -3,6 +3,7 @@ var fs = require("fs");
 var net = require("net");
 require("./packet.js");
 require((__dirname + '/Resources/config.js'));
+
 const pg = require("pg");
 const {Client} = require("pg");
 
