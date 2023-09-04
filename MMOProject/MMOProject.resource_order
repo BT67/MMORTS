@@ -87,7 +87,6 @@
     {"name":"txt_password_register","order":6,"path":"objects/txt_password_register/txt_password_register.yy",},
     {"name":"txt_email_register","order":9,"path":"objects/txt_email_register/txt_email_register.yy",},
     {"name":"dungeon_wall_top_corner_right_up","order":16,"path":"sprites/dungeon_wall_top_corner_right_up/dungeon_wall_top_corner_right_up.yy",},
-    {"name":"zone2","order":1,"path":"rooms/zone2/zone2.yy",},
     {"name":"ui_textbox_base","order":2,"path":"objects/ui_textbox_base/ui_textbox_base.yy",},
     {"name":"dungeon_wall_top_corner_left_down","order":13,"path":"sprites/dungeon_wall_top_corner_left_down/dungeon_wall_top_corner_left_down.yy",},
     {"name":"btn_register_init","order":1,"path":"objects/btn_register_init/btn_register_init.yy",},

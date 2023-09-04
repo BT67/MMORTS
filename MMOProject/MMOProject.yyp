@@ -125,7 +125,6 @@
     {"id":{"name":"txt_email_register","path":"objects/txt_email_register/txt_email_register.yy",},},
     {"id":{"name":"dungeon_wall_top_corner_right_up","path":"sprites/dungeon_wall_top_corner_right_up/dungeon_wall_top_corner_right_up.yy",},},
     {"id":{"name":"txt_username_login","path":"objects/txt_username_login/txt_username_login.yy",},},
-    {"id":{"name":"zone2","path":"rooms/zone2/zone2.yy",},},
     {"id":{"name":"ui_textbox_base","path":"objects/ui_textbox_base/ui_textbox_base.yy",},},
     {"id":{"name":"dungeon_wall_top_corner_left_down","path":"sprites/dungeon_wall_top_corner_left_down/dungeon_wall_top_corner_left_down.yy",},},
     {"id":{"name":"btn_register_init","path":"objects/btn_register_init/btn_register_init.yy",},},
@@ -145,7 +144,6 @@
     {"roomId":{"name":"rm_register","path":"rooms/rm_register/rm_register.yy",},},
     {"roomId":{"name":"rm_register_success","path":"rooms/rm_register_success/rm_register_success.yy",},},
     {"roomId":{"name":"zone1","path":"rooms/zone1/zone1.yy",},},
-    {"roomId":{"name":"zone2","path":"rooms/zone2/zone2.yy",},},
   ],
   "TextureGroups": [
     {"resourceType":"GMTextureGroup","resourceVersion":"1.3","name":"Default","autocrop":true,"border":2,"compressFormat":"bz2","directory":"","groupParent":null,"isScaled":true,"loadType":"default","mipsToGenerate":0,"targets":-1,},
