@@ -155,6 +155,9 @@ function handle_packet(data_buffer){
 				}
 			}
 			break;
+		case "PLAYERDEATH":
+			
+			break;	
 		case "CHAT":
 			msg = buffer_read(data_buffer, buffer_string);
 			show_debug_message(msg);

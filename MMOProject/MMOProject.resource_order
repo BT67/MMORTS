@@ -10,6 +10,7 @@
     {"name":"HUD","order":9,"path":"folders/Objects/HUD.yy",},
     {"name":"Init","order":6,"path":"folders/Objects/Init.yy",},
     {"name":"Login","order":2,"path":"folders/Objects/Login.yy",},
+    {"name":"Password Reset","order":15,"path":"folders/Objects/Password Reset.yy",},
     {"name":"Portals","order":11,"path":"folders/Objects/Portals.yy",},
     {"name":"Register_Success","order":8,"path":"folders/Objects/Register_Success.yy",},
     {"name":"Register","order":7,"path":"folders/Objects/Register.yy",},
@@ -34,7 +35,7 @@
     {"name":"Dungeon","order":1,"path":"folders/Sprites/Tiles/Dungeon.yy",},
     {"name":"Tile Sets","order":2,"path":"folders/Tile Sets.yy",},
     {"name":"Timelines","order":8,"path":"folders/Timelines.yy",},
-    {"name":"Password Reset","order":15,"path":"folders/Objects/Password Reset.yy",},
+    {"name":"Dialogues","order":16,"path":"folders/Objects/Dialogues.yy",},
   ],
   "ResourceOrderSettings": [
     {"name":"camera_controller","order":5,"path":"objects/camera_controller/camera_controller.yy",},

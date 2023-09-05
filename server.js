@@ -179,8 +179,12 @@ net.createServer(function (socket) {
     thisClient.target_y = thisClient.pos_y;
     thisClient.target_entity = null;
     thisClient.move_speed = 1;
-    thisClient.health = 100;
+    thisClient.max_health = 100;
+    thisClient.health = thisClient.max_health;
     thisClient.path = [];
+    thisClient.alive = true;
+    thisClient.respawn_period = 10;
+    thisClient.respawn_timer = thisClient.respawn_period;
     clientIdNo += 1;
     //TODO create clientId allocation system
     thisClient.initiate();
@@ -204,13 +208,15 @@ async function updateEntities() {
                         if (entity.aggressive) {
                             if (entity.target_entity === null) {
                                 maps[map].clients.forEach(function (client) {
-                                    dist = distance(client.pos_x, client.pos_y, entity.pos_x, entity.pos_y);
-                                    if (dist < entity.view_range) {
-                                        console.log(timeNow() + "Mob aggro triggered");
-                                        entity.in_combat = true;
-                                        entity.target_entity = client.username;
-                                        entity.target_x = client.pos_x;
-                                        entity.target_y = client.pos_y;
+                                    if(client.alive) {
+                                        dist = distance(client.pos_x, client.pos_y, entity.pos_x, entity.pos_y);
+                                        if (dist < entity.view_range) {
+                                            console.log(timeNow() + "Mob aggro triggered");
+                                            entity.in_combat = true;
+                                            entity.target_entity = client.username;
+                                            entity.target_x = client.pos_x;
+                                            entity.target_y = client.pos_y;
+                                        }
                                     }
                                 });
                             } else {
@@ -245,12 +251,30 @@ async function updateEntities() {
                                                                 "ATTACK", "attack", client.username, entity.name
                                                             ], otherClient.id));
                                                         });
-                                                        client.health -= 1;
+                                                        client.health -= 10;
                                                         maps[map].clients.forEach(function (otherClient) {
                                                             otherClient.socket.write(packet.build([
                                                                 "HEALTH", client.username, client.health.toString()
                                                             ], otherClient.id));
                                                         });
+                                                        if(client.health <= 0){
+                                                            client.alive = false;
+                                                            client.health = client.max_health;
+                                                            client.path = [];
+                                                            client.target_entity = null;
+                                                            client.pos_x = maps[map].start_x;
+                                                            client.pos_y = maps[map].start_y;
+                                                            client.target_x = client.pos_x;
+                                                            client.target_y = client.pos_y;
+                                                            maps[map].clients.forEach(function (otherClient) {
+                                                                //Send player death packet to all clients in the room
+                                                                otherClient.socket.write(packet.build(["DESTROY", client.username], otherClient.id));
+                                                            });
+                                                            entity.in_combat = false;
+                                                            entity.target_entity = null;
+                                                            entity.target_x = entity.origin_x;
+                                                            entity.target_y = entity.origin_y;
+                                                        }
                                                         entity.attack_timer = 0;
                                                     }
                                                     entity.attack_timer += 1;
@@ -301,23 +325,42 @@ async function updateEntities() {
                 });
                 //Update client pos
                 maps[map].clients.forEach(function (client) {
-                    if (client.target_x !== client.pos_x || client.target_y !== client.pos_y) {
-                        client.path = createPath(map, client.pos_x, client.pos_y, client.target_x, client.target_y);
-                    }
-                    if (client.path.length > 0) {
-                        prev_pos_x = client.pos_x;
-                        prev_pos_y = client.pos_y;
-                        moveTowardsTarget(map, client);
-                        maps[map].clients.forEach(function (otherClient) {
-                            params = [];
-                            params.push("POS");
-                            params.push(client.username);
-                            params.push(prev_pos_x.toString());
-                            params.push(prev_pos_y.toString());
-                            params.push(client.pos_x.toString());
-                            params.push(client.pos_y.toString());
-                            otherClient.socket.write(packet.build(params, otherClient.id));
-                        });
+                    if(client.alive) {
+                        if (client.target_x !== client.pos_x || client.target_y !== client.pos_y) {
+                            client.path = createPath(map, client.pos_x, client.pos_y, client.target_x, client.target_y);
+                        }
+                        if (client.path.length > 0) {
+                            prev_pos_x = client.pos_x;
+                            prev_pos_y = client.pos_y;
+                            moveTowardsTarget(map, client);
+                            maps[map].clients.forEach(function (otherClient) {
+                                params = [];
+                                params.push("POS");
+                                params.push(client.username);
+                                params.push(prev_pos_x.toString());
+                                params.push(prev_pos_y.toString());
+                                params.push(client.pos_x.toString());
+                                params.push(client.pos_y.toString());
+                                otherClient.socket.write(packet.build(params, otherClient.id));
+                            });
+                        }
+                    } else {
+                        //If client is not alive, update client spawn timer:
+                        client.respawn_timer -= 1;
+                        if(client.respawn_timer <= 0){
+                            client.alive = true;
+                            client.respawn_timer = client.respawn_period;
+                            maps[map].clients.forEach(function (otherClient) {
+                                params = [];
+                                params.push("SPAWN");
+                                params.push(client.username);
+                                params.push("player");
+                                params.push(client.pos_x.toString());
+                                params.push(client.pos_y.toString());
+                                params.push(client.health);
+                                otherClient.socket.write(packet.build(params, otherClient.id));
+                            });
+                        }
                     }
                 });
             }
