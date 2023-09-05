@@ -10,3 +10,4 @@ mp_potential_path(path, real(target_x), real(target_y), move_speed, 4, 0);
 //mp_linear_step_object(target_x, target_y, move_speed, wall);
 path_start(path, move_speed, path_action_stop, true);
 
+
