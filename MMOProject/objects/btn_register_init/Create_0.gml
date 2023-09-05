@@ -1,5 +1,5 @@
 event_inherited();
-text = "REGISTER";
+text = "REGISTER\nNEW USER";
 
 
 

@@ -60,60 +60,65 @@ maps["zone1"].doors.push(this_door);
 var entity_inst = new require("./Models/entity.js");
 const {grid_height, grid_width} = require("./Resources/Game Data/Maps/zone1");
 var this_entity = new entity_inst();
-this_entity.alive = true;
-this_entity.health = 100;
-this_entity.sprite = "";
-this_entity.type = "mob";
-this_entity.name = "mob1";
-this_entity.pos_x = 15;
-this_entity.pos_y = 15;
-this_entity.target_x = this_entity.pos_x;
-this_entity.target_y = this_entity.pos_y;
-this_entity.origin_x = this_entity.pos_x;
-this_entity.origin_y = this_entity.pos_y;
-this_entity.target_entity = null;
-this_entity.roam_range = 10;
-this_entity.view_range = 5;
-this_entity.attack_range = 3;
-this_entity.in_combat = false;
-this_entity.aggressive = true;
-this_entity.move_speed = 1;
-this_entity.sprite = "sprite";
-this_entity.max_health = 100;
-this_entity.respawn_period = 100;
-this_entity.respawn_timer = this_entity.respawn_period;
-this_entity.path = [];
-this_entity.attack_period = 5;
-this_entity.attack_timer = this_entity.attack_period;
-maps["zone1"].entities.push(this_entity);
-
-this_entity = new entity_inst();
-this_entity.alive = true;
-this_entity.health = 100;
-this_entity.sprite = "";
-this_entity.type = "mob";
-this_entity.name = "mob2";
-this_entity.pos_x = 15;
-this_entity.pos_y = 21;
-this_entity.target_x = this_entity.pos_x;
-this_entity.target_y = this_entity.pos_y;
-this_entity.origin_x = this_entity.pos_x;
-this_entity.origin_y = this_entity.pos_y;
-this_entity.target_entity = null;
-this_entity.roam_range = 10;
-this_entity.view_range = 5;
-this_entity.attack_range = 3;
-this_entity.in_combat = false;
-this_entity.aggressive = true;
-this_entity.move_speed = 1;
-this_entity.sprite = "sprite";
-this_entity.max_health = 100;
-this_entity.respawn_period = 100;
-this_entity.respawn_timer = this_entity.respawn_period;
-this_entity.path = [];
-this_entity.attack_period = 5;
-this_entity.attack_timer = this_entity.attack_period;
-maps["zone1"].entities.push(this_entity);
+// this_entity.alive = true;
+// this_entity.health = 100;
+// this_entity.sprite = "";
+// this_entity.type = "mob";
+// this_entity.name = "mob1";
+// this_entity.pos_x = 15;
+// this_entity.pos_y = 15;
+// this_entity.target_x = this_entity.pos_x;
+// this_entity.target_y = this_entity.pos_y;
+// this_entity.origin_x = this_entity.pos_x;
+// this_entity.origin_y = this_entity.pos_y;
+// this_entity.target_entity = null;
+// this_entity.roam_range = 10;
+// this_entity.view_range = 5;
+// this_entity.attack_range = 3;
+// this_entity.in_combat = false;
+// this_entity.aggressive = true;
+// this_entity.move_speed = 1;
+// this_entity.sprite = "sprite";
+// this_entity.max_health = 100;
+// this_entity.respawn_period = 100;
+// this_entity.respawn_timer = this_entity.respawn_period;
+// this_entity.path = [];
+// this_entity.attack_period = 5;
+// this_entity.attack_timer = this_entity.attack_period;
+// this_entity.patrol_path = [{x: 15, y: 15},{x: 25, y: 15}];
+// this_entity.patrol_point = 0;
+// maps["zone1"].entities.push(this_entity);
+//
+//
+// this_entity = new entity_inst();
+// this_entity.alive = true;
+// this_entity.health = 100;
+// this_entity.sprite = "";
+// this_entity.type = "mob";
+// this_entity.name = "mob2";
+// this_entity.pos_x = 15;
+// this_entity.pos_y = 21;
+// this_entity.target_x = this_entity.pos_x;
+// this_entity.target_y = this_entity.pos_y;
+// this_entity.origin_x = this_entity.pos_x;
+// this_entity.origin_y = this_entity.pos_y;
+// this_entity.target_entity = null;
+// this_entity.roam_range = 10;
+// this_entity.view_range = 5;
+// this_entity.attack_range = 3;
+// this_entity.in_combat = false;
+// this_entity.aggressive = true;
+// this_entity.move_speed = 1;
+// this_entity.sprite = "sprite";
+// this_entity.max_health = 100;
+// this_entity.respawn_period = 100;
+// this_entity.respawn_timer = this_entity.respawn_period;
+// this_entity.path = [];
+// this_entity.attack_period = 5;
+// this_entity.attack_timer = this_entity.attack_period;
+// this_entity.patrol_path = [{x: 15, y: 21},{x: 10, y: 15}];
+// this_entity.patrol_point = 0;
+// maps["zone1"].entities.push(this_entity);
 
 this_entity = new entity_inst();
 this_entity.alive = true;
@@ -141,6 +146,8 @@ this_entity.respawn_timer = this_entity.respawn_period;
 this_entity.path = [];
 this_entity.attack_period = 5;
 this_entity.attack_timer = this_entity.attack_period;
+this_entity.patrol_path = [{x: 20, y: 2},{x: 25, y: 10}];
+this_entity.patrol_point = 0;
 maps["zone1"].entities.push(this_entity);
 
 //Initialise the database:
@@ -219,6 +226,22 @@ async function updateEntities() {
                     if (entity.alive) {
                         if (entity.aggressive) {
                             if (entity.target_entity === null) {
+                                //Follow patrol path:
+                                if(entity.patrol_path !== []){
+                                    if(
+                                        (entity.patrol_path[entity.patrol_point].x === entity.pos_x &&
+                                        entity.patrol_path[entity.patrol_point].y === entity.pos_y) ||
+                                        (entity.pos_x === entity.origin_x && entity.pos_y === entity.origin_y)
+                                    ){
+                                        entity.patrol_point += 1;
+                                        if(entity.patrol_point > entity.patrol_path.length - 1){
+                                            entity.patrol_point = 0;
+                                        }
+                                        entity.target_x = entity.patrol_path[entity.patrol_point].x;
+                                        entity.target_y = entity.patrol_path[entity.patrol_point].y;
+                                    }
+                                }
+                                //Check if any clients are within mob's view range
                                 maps[map].clients.forEach(function (client) {
                                     if (client.alive) {
                                         dist = distance(client.pos_x, client.pos_y, entity.pos_x, entity.pos_y);
@@ -271,6 +294,7 @@ async function updateEntities() {
                                                         });
                                                         if (client.health <= 0) {
                                                             client.alive = false;
+                                                            entity.patrol_point = 0;
                                                             client.health = client.max_health;
                                                             client.path = [];
                                                             client.target_entity = null;
