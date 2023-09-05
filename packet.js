@@ -4,7 +4,6 @@ const {Client} = require("pg");
 const nodemailer = require('nodemailer');
 const generator = require('generate-password');
 const {generate} = require("generate-password");
-//const {pos_x} = require("./Models/entity");
 const connection = new Client({
     host: '127.0.0.1',
     port: '5432',
