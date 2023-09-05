@@ -274,7 +274,7 @@ module.exports = packet = {
                 });
                 maps[client.current_room].entities.forEach(function (entity) {
                     if (entity.name === target_entity && entity.alive) {
-                        entity.health -= 10;
+                        entity.health -= 1;
                         maps[client.current_room].clients.forEach(function (OtherClient) {
                             OtherClient.socket.write(packet.build([
                                 "HEALTH", entity.name, entity.health.toString()
