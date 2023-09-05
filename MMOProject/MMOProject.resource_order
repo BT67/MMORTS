@@ -36,6 +36,8 @@
     {"name":"Tile Sets","order":2,"path":"folders/Tile Sets.yy",},
     {"name":"Timelines","order":8,"path":"folders/Timelines.yy",},
     {"name":"Dialogues","order":16,"path":"folders/Objects/Dialogues.yy",},
+    {"name":"Doors","order":6,"path":"folders/Sprites/Doors.yy",},
+    {"name":"Doors","order":17,"path":"folders/Objects/Doors.yy",},
   ],
   "ResourceOrderSettings": [
     {"name":"camera_controller","order":5,"path":"objects/camera_controller/camera_controller.yy",},

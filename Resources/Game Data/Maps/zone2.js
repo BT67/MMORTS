@@ -1,5 +1,5 @@
-exports.name = "zone1";
-exports.room = "zone1";
+exports.name = "zone2";
+exports.room = "zone2";
 exports.start_x = 2;
 exports.start_y = 2;
 exports.clients = [];

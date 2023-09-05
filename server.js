@@ -44,6 +44,17 @@ map_files.forEach(function (mapFile) {
 });
 
 maps["zone1"].grid = initMapGrid(maps["zone1"]);
+maps["zone2"].grid = initMapGrid(maps["zone2"]);
+
+
+//Load doors to each map:
+var door_inst = new require("./Models/door.js");
+var this_door = new door_inst();
+this_door.room_to = "zone2";
+this_door.pos_x = 4;
+this_door.pos_y = 4;
+this_door.name = "zone1-door1";
+maps["zone1"].doors.push(this_door);
 
 //Load mobs into each map:
 var entity_inst = new require("./Models/entity.js");
@@ -358,6 +369,59 @@ async function updateEntities() {
                                 otherClient.socket.write(packet.build(params, otherClient.id));
                             });
                         }
+                        //Check if client is in same grid as a door:
+                        maps[map].doors.forEach(function(door){
+                            if(client.pos_x === door.pos_x && client.pos_y === door.pos_y){
+                                maps[map].clients = maps[map].clients.filter(item => item !== client);
+                                client.current_room = door.room_to;
+                                maps[door.room_to].clients.push(client);
+                                maps[map].clients.forEach(function (otherClient) {
+                                    //Send player destroy packet to all clients in the old room
+                                    otherClient.socket.write(packet.build(["DESTROY", client.username], otherClient.id));
+                                });
+                                //Send move room packet to target client:
+                                params = [];
+                                params.push("ROOM");
+                                params.push(door.room_to);
+                                client.socket.write(packet.build(params,client.id));
+                                //Send target client spawn packets for all other entities and clients in the new room:
+                                maps[door.room_to].entities.forEach(function (entity) {
+                                    if (entity.alive) {
+                                        params = [];
+                                        params.push("SPAWN");
+                                        params.push(entity.name);
+                                        params.push(entity.type);
+                                        params.push(entity.pos_x.toString());
+                                        params.push(entity.pos_y.toString());
+                                        params.push(entity.health);
+                                        client.socket.write(packet.build(params, client.id));
+                                    }
+                                });
+                                maps[door.room_to].clients.forEach(function (otherClient) {
+                                    if (otherClient.alive) {
+                                        params = [];
+                                        params.push("SPAWN");
+                                        params.push(otherClient.username);
+                                        params.push("player");
+                                        params.push(otherClient.pos_x.toString());
+                                        params.push(otherClient.pos_y.toString());
+                                        params.push(otherClient.health);
+                                        client.socket.write(packet.build(params, client.id));
+                                    }
+                                });
+                                maps[door.room_to].clients.forEach(function (otherClient) {
+                                    //Send player spawn packet to all clients in the new room
+                                    params = [];
+                                    params.push("SPAWN");
+                                    params.push(client.username);
+                                    params.push("player");
+                                    params.push(client.pos_x.toString());
+                                    params.push(client.pos_y.toString());
+                                    params.push(client.health);
+                                    otherClient.socket.write(packet.build(params,otherClient.id));
+                                });
+                            }
+                        })
                     } else {
                         //If client is not alive, update client spawn timer:
                         client.respawn_timer -= 1;
