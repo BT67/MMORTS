@@ -19,6 +19,7 @@ connection.connect((error) => {
     }
 });
 var zeroBuffer = Buffer.from("00", "hex");
+
 module.exports = packet = {
     //params is an array of javascript objects to be turned into buffers to send data to gamemaker
     build: function (params, clientId) {
@@ -258,38 +259,49 @@ module.exports = packet = {
 
         //Send entity attacks to other clients
         async function attack(target_entity) {
-            client.target_entity = target_entity;
+            maps[client.current_room].entities.forEach(function(entity){
+                if(entity.name === target_entity){
+                    target_entity = entity;
+                }
+            });
+            client.target_entity = target_entity.name;
             var alive;
             while (true) {
                 if (alive === false) {
                     break;
                 }
-                if(client.target_entity !== target_entity){
+                if(client.target_entity !== target_entity.name){
                     break;
                 }
-                maps[client.current_room].clients.forEach(function (otherClient) {
-                    otherClient.socket.write(packet.build([
-                        "ATTACK", "attack", target_entity, client.username
-                    ], otherClient.id));
-                });
-                maps[client.current_room].entities.forEach(function (entity) {
-                    if (entity.name === target_entity && entity.alive) {
-                        entity.health -= 1;
-                        maps[client.current_room].clients.forEach(function (OtherClient) {
-                            OtherClient.socket.write(packet.build([
-                                "HEALTH", entity.name, entity.health.toString()
-                            ], client.id));
-                        });
-                        if (entity.health < 0) {
+                dist = distance(client.pos_x, client.pos_y, target_entity.pos_x, target_entity.pos_y);
+                if(dist <= client.attack_range) {
+                    maps[client.current_room].clients.forEach(function (otherClient) {
+                        otherClient.socket.write(packet.build([
+                            "ATTACK", "attack", target_entity.name, client.username
+                        ], otherClient.id));
+                    });
+                    maps[client.current_room].entities.forEach(function (entity) {
+                        if (entity.name === target_entity.name && entity.alive) {
+                            entity.health -= 10;
                             maps[client.current_room].clients.forEach(function (OtherClient) {
-                                OtherClient.socket.write(packet.build(["DESTROY", target_entity], OtherClient.id));
+                                OtherClient.socket.write(packet.build([
+                                    "HEALTH", entity.name, entity.health.toString()
+                                ], client.id));
                             });
-                            entity.alive = false;
-                            alive = entity.alive;
-                            client.target_entity = null;
+                            if (entity.health < 0) {
+                                maps[client.current_room].clients.forEach(function (OtherClient) {
+                                    OtherClient.socket.write(packet.build(["DESTROY", target_entity.name], OtherClient.id));
+                                });
+                                entity.alive = false;
+                                alive = entity.alive;
+                                client.target_entity = null;
+                            }
                         }
-                    }
-                });
+                    });
+                } else {
+                    client.target_x = target_entity.pos_x;
+                    client.target_y = target_entity.pos_y;
+                }
                 await new Promise(resolve => setTimeout(resolve, config.attack_step));
             }
         }
@@ -430,4 +442,9 @@ function generate_password(){
         length: 16,
         numbers: true
     });
+}
+
+//Calculate the distance between two points
+function distance(x1, y1, x2, y2) {
+    return parseInt(Math.pow(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2), 0.5));
 }

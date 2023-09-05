@@ -104,6 +104,7 @@ function handle_packet(data_buffer){
 			break;
 		case "ROOM":
 			instance_destroy(entity);
+			instance_destroy(attack);
 			target_room = buffer_read(data_buffer, buffer_string);
 			room_goto(asset_get_index(target_room));
 			break;

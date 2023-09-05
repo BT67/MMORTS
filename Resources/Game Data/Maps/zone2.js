@@ -7,8 +7,8 @@ exports.entities = [];
 exports.doors = [];
 exports.grid_size = 32;
 exports.grid = [];
-exports.grid_width = 40;
-exports.grid_height = 20;
+exports.grid_width = 80;
+exports.grid_height = 40;
 
 
 

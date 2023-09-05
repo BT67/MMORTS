@@ -51,8 +51,8 @@ maps["zone2"].grid = initMapGrid(maps["zone2"]);
 var door_inst = new require("./Models/door.js");
 var this_door = new door_inst();
 this_door.room_to = "zone2";
-this_door.pos_x = 4;
-this_door.pos_y = 4;
+this_door.pos_x = 2;
+this_door.pos_y = 7;
 this_door.name = "zone1-door1";
 maps["zone1"].doors.push(this_door);
 
@@ -186,6 +186,8 @@ net.createServer(function (socket) {
     thisClient.current_room = null;
     thisClient.pos_x = 0;
     thisClient.pos_y = 0;
+    thisClient.view_range = 5;
+    thisClient.attack_range = 5;
     thisClient.target_x = thisClient.pos_x;
     thisClient.target_y = thisClient.pos_y;
     thisClient.target_entity = null;
@@ -262,7 +264,7 @@ async function updateEntities() {
                                                                 "ATTACK", "attack", client.username, entity.name
                                                             ], otherClient.id));
                                                         });
-                                                        client.health -= 1;
+                                                        client.health -= 10;
                                                         maps[map].clients.forEach(function (otherClient) {
                                                             otherClient.socket.write(packet.build([
                                                                 "HEALTH", client.username, client.health.toString()
