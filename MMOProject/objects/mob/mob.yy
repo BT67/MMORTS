@@ -32,8 +32,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_mob",
-    "path": "sprites/spr_mob/spr_mob.yy",
+    "name": "spr_rat_idle",
+    "path": "sprites/spr_rat_idle/spr_rat_idle.yy",
   },
   "spriteMaskId": null,
   "visible": true,
