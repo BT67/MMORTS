@@ -11,3 +11,4 @@ path = path_add();
 dest_x = x;
 dest_y = y;
 remainder = 0;
+attacking = false;
