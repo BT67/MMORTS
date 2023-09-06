@@ -3,7 +3,7 @@
   "resourceVersion": "1.0",
   "name": "mob",
   "eventList": [
-    {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,},
+    {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,},
   ],
   "managed": true,
   "overriddenProperties": [],
@@ -31,8 +31,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_mob",
-    "path": "sprites/spr_mob/spr_mob.yy",
+    "name": "spr_player_idle_placeholder",
+    "path": "sprites/spr_player_idle_placeholder/spr_player_idle_placeholder.yy",
   },
   "spriteMaskId": null,
   "visible": true,

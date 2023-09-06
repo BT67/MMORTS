@@ -68,7 +68,6 @@ function handle_packet(data_buffer){
 			variable_instance_set(instance_find(entity, instance_number(entity) - 1), "entity_name", entity_name);
 			variable_instance_set(instance_find(entity, instance_number(entity) - 1), "target_x", target_x);
 			variable_instance_set(instance_find(entity, instance_number(entity) - 1), "target_y", target_y);
-			show_debug_message(date_datetime_string(date_current_datetime()) + " Created entity: " + entity_name);
 			break;
 		case "HEALTH":
 			entity_name = buffer_read(data_buffer, buffer_string);
@@ -91,22 +90,27 @@ function handle_packet(data_buffer){
 			origin_entity = buffer_read(data_buffer, buffer_string);
 			origin_x = 0;
 			origin_y = 0;
-			var i = 0;
-			for(i = 0; i < instance_number(entity); ++i;) {
+			for(var i = 0; i < instance_number(moving_animation); ++i){
+				if(instance_find(moving_animation,i).parent_entity == origin_entity){
+					variable_instance_set(instance_find(moving_animation, i), "is_visible", false);
+					break;
+				}
+			}
+			for(var i = 0; i < instance_number(entity); ++i;) {
 				if(instance_find(entity, i).entity_name == origin_entity){
 					origin_entity = instance_find(entity, i).entity_name;
 					origin_entity_index = i;
 					origin_x = instance_find(entity, i).x;
 					origin_y = instance_find(entity, i).y;
+					variable_instance_set(instance_find(entity, i), "is_visible", false);
+					var obj = "";
+					with(instance_create_layer(real(origin_x), real(origin_y), "Instances", asset_get_index(instance_find(entity, i).attack_anim))){
+						obj = other;
+					}
+					variable_instance_set(instance_find(attack_animation, instance_number(attack_animation) - 1), "parent_entity", origin_entity);
 					break;
 				}
 			}
-			variable_instance_set(instance_find(entity, i), "is_visible", false);
-			var_attack = "";
-			with(instance_create_layer(real(origin_x), real(origin_y), "Instances", player_attack_left)){
-				var_attack = other;
-			}
-			variable_instance_set(instance_find(player_attack_left, instance_number(player_attack_left) - 1), "parent_index", i);
 			break;
 		case "LOGOUT":
 			msg = buffer_read(data_buffer, buffer_string);
@@ -116,9 +120,14 @@ function handle_packet(data_buffer){
 			break;
 		case "DESTROY":
 			entity_name = buffer_read(data_buffer, buffer_string);
+			//Destroy all child animations of the target object
+			for(var i = 0; i < instance_number(animation); ++i){
+				if(instance_find(animation,i).parent_entity == entity_name){
+					instance_destroy(instance_find(animation,i));
+				}
+			}
 			for(var i = 0; i < instance_number(entity); ++i;) {
 				if(instance_find(entity, i).entity_name == entity_name){
-					
 					instance_destroy(instance_find(entity, i));
 					break;
 				}
@@ -131,19 +140,17 @@ function handle_packet(data_buffer){
 			break;
 		case "POS":
 			entity_name = buffer_read(data_buffer, buffer_string);
-			show_debug_message(string(entity_name));
 			pos_x = buffer_read(data_buffer, buffer_string);
 			pos_x = (real(pos_x) + 1) * 32;
 			pos_y = buffer_read(data_buffer, buffer_string);
 			pos_y = (real(pos_y) + 1) * 32;
-			show_debug_message(string(pos_x) + "," + string(pos_y));
 			target_x = buffer_read(data_buffer, buffer_string);
 			target_x = (real(target_x) + 1) * 32;
 			target_y = buffer_read(data_buffer, buffer_string);
 			target_y = (real(target_y) + 1) * 32;
-			show_debug_message(string(target_x) + "," + string(target_y));
 			for(var i = 0; i < instance_number(entity); ++i;) {
 				if(instance_find(entity, i).entity_name == entity_name){
+					variable_instance_set(instance_find(entity, i), "is_visible", false);
 					if(abs(instance_find(entity, i).x - pos_x) > 50){
 						instance_find(entity, i).x = pos_x;
 					}
@@ -152,6 +159,22 @@ function handle_packet(data_buffer){
 					}
 					instance_find(entity, i).target_x = target_x;
 					instance_find(entity, i).target_y = target_y;
+					break;
+				}
+			}
+			var cont = true;
+			for(var j = 0; j < instance_number(attack_animation); ++j){
+				if(instance_find(attack_animation,j).parent_entity == entity_name){
+					cont = false;
+					break;
+				}
+			}
+			if(cont){
+				for(var i = 0; i < instance_number(moving_animation); ++i){
+					if(instance_find(moving_animation, i).parent_entity == entity_name){
+						variable_instance_set(instance_find(moving_animation, i), "is_visible", true);
+						break;
+					}
 				}
 			}
 			break;

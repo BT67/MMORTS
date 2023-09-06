@@ -1,15 +1,18 @@
 {
   "resourceType": "GMObject",
   "resourceVersion": "1.0",
-  "name": "player_run_left",
+  "name": "player_move",
   "eventList": [],
   "managed": true,
   "overriddenProperties": [],
   "parent": {
-    "name": "Entities",
-    "path": "folders/Objects/Entities.yy",
+    "name": "Animations",
+    "path": "folders/Objects/Animations.yy",
   },
-  "parentObjectId": null,
+  "parentObjectId": {
+    "name": "moving_animation",
+    "path": "objects/moving_animation/moving_animation.yy",
+  },
   "persistent": false,
   "physicsAngularDamping": 0.1,
   "physicsDensity": 0.5,

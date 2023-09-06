@@ -135,7 +135,7 @@ this_entity.origin_y = this_entity.pos_y;
 this_entity.target_entity = null;
 this_entity.roam_range = 10;
 this_entity.view_range = 5;
-this_entity.attack_range = 0;
+this_entity.attack_range = 3;
 this_entity.in_combat = false;
 this_entity.aggressive = true;
 this_entity.move_speed = 1;
@@ -283,7 +283,7 @@ async function updateEntities() {
                                                 //If target is within attack range, attack the target
                                                 if (dist <= entity.attack_range) {
                                                     //attack the target
-                                                    if (entity.attack_timer === entity.attack_period) {
+                                                    if (entity.attack_timer >= entity.attack_period) {
                                                         maps[map].clients.forEach(function (otherClient) {
                                                             otherClient.socket.write(packet.build([
                                                                 "ATTACK", "attack", client.username, entity.name

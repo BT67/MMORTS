@@ -14,3 +14,7 @@ remainder = 0;
 attacking = false;
 is_visible = true;
 entity_index = 0;
+move_anim = "";
+attack_anim = "";
+death_anim = "";
+animations_created = false;
