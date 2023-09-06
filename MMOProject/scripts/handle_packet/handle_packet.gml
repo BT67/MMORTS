@@ -70,29 +70,6 @@ function handle_packet(data_buffer){
 			variable_instance_set(instance_find(entity, instance_number(entity) - 1), "target_y", target_y);
 			show_debug_message(date_datetime_string(date_current_datetime()) + " Created entity: " + entity_name);
 			break;
-		case "ENTITY":
-			entity_name = buffer_read(data_buffer, buffer_string);
-			show_debug_message("Entity name=" + entity_name);
-			//pos_x = buffer_read(data_buffer, buffer_string);
-			//pos_y = buffer_read(data_buffer, buffer_string);
-			target_x = buffer_read(data_buffer, buffer_string);
-			target_x = (real(target_x) + 1) * 32;
-			target_y = buffer_read(data_buffer, buffer_string);
-			target_y = (real(target_y) + 1) * 32;
-			entity_health = buffer_read(data_buffer, buffer_string);
-			show_debug_message("Entity health=" + entity_health);
-			entity_sprite = buffer_read(data_buffer, buffer_string);
-			for(var i = 0; i < instance_number(entity); ++i;) {
-				if(instance_find(entity, i).entity_name == entity_name){
-					//instance_find(entity, i).x = pos_x;
-					//instance_find(entity, i).y = pos_y;
-					instance_find(entity, i).target_entity = "";
-					instance_find(entity, i).target_x = target_x;
-					instance_find(entity, i).target_y = target_y;
-					instance_find(entity, i).entity_health = real(entity_health);
-					show_debug_message("Entity health=" + string(instance_find(entity, i).entity_health));
-				}
-			}
 		case "HEALTH":
 			entity_name = buffer_read(data_buffer, buffer_string);
 			entity_health = buffer_read(data_buffer, buffer_string);
@@ -133,6 +110,7 @@ function handle_packet(data_buffer){
 			break;
 		case "LOGOUT":
 			msg = buffer_read(data_buffer, buffer_string);
+			network.username = "";
 			show_debug_message(date_datetime_string(date_current_datetime()) + msg);
 			room_goto(rm_login);
 			break;
@@ -150,33 +128,6 @@ function handle_packet(data_buffer){
 			msg = buffer_read(data_buffer, buffer_string);
 			show_debug_message(msg);
 			txt_chat_log.chat_log += (msg + "\n");
-			break;
-		case "PURSUE":
-			origin_entity = buffer_read(data_buffer, buffer_string);
-			pos_x = buffer_read(data_buffer, buffer_string);
-			pos_x = (real(pos_x) + 1) * 32;
-			pos_y = buffer_read(data_buffer, buffer_string);
-			pos_y = (real(pos_y) + 1) * 32;
-			target_entity = buffer_read(data_buffer, buffer_string);
-			for(var i = 0; i < instance_number(entity); ++i;) {
-				if(instance_find(entity, i).entity_name == origin_entity){
-					origin_entity = instance_find(entity, i);
-					if(abs(instance_find(entity, i).x - pos_x) > 50){
-						instance_find(entity, i).x = pos_x;
-					}
-					if(abs(instance_find(entity, i).y - pos_y) > 50){
-						instance_find(entity, i).y = pos_y;
-					}
-					break;
-				}
-			}
-			for(var i = 0; i < instance_number(entity); ++i;) {
-				if(instance_find(entity, i).entity_name == target_entity){
-					target_entity = instance_find(entity, i);
-					break;
-				}
-			}
-			origin_entity.target_entity = target_entity;
 			break;
 		case "POS":
 			entity_name = buffer_read(data_buffer, buffer_string);
@@ -199,12 +150,10 @@ function handle_packet(data_buffer){
 					if(abs(instance_find(entity, i).y - pos_y) > 50){
 						instance_find(entity, i).y = pos_y;
 					}
-					instance_find(entity, i).target_entity = "";
 					instance_find(entity, i).target_x = target_x;
 					instance_find(entity, i).target_y = target_y;
 				}
 			}
-			
+			break;
 	}
-	//buffer_delete(data_buffer);
 }

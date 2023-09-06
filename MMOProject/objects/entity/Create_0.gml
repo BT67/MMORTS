@@ -13,3 +13,4 @@ dest_y = y;
 remainder = 0;
 attacking = false;
 is_visible = true;
+entity_index = 0;
