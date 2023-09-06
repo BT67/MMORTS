@@ -258,51 +258,9 @@ module.exports = packet = {
 
         //Send entity attacks to other clients
         async function attack(target_entity) {
-            maps[client.current_room].entities.forEach(function(entity){
-                if(entity.name === target_entity){
-                    target_entity = entity;
-                }
-            });
-            client.target_entity = target_entity.name;
-            var alive;
-            while (true) {
-                if (alive === false) {
-                    break;
-                }
-                if(client.target_entity !== target_entity.name){
-                    break;
-                }
-                dist = distance(client.pos_x, client.pos_y, target_entity.pos_x, target_entity.pos_y);
-                if(dist <= client.attack_range) {
-                    maps[client.current_room].clients.forEach(function (otherClient) {
-                        otherClient.socket.write(packet.build([
-                            "ATTACK", "attack", target_entity.name, client.username
-                        ], otherClient.id));
-                    });
-                    maps[client.current_room].entities.forEach(function (entity) {
-                        if (entity.name === target_entity.name && entity.alive) {
-                            entity.health -= 10;
-                            maps[client.current_room].clients.forEach(function (OtherClient) {
-                                OtherClient.socket.write(packet.build([
-                                    "HEALTH", entity.name, entity.health.toString()
-                                ], client.id));
-                            });
-                            if (entity.health < 0) {
-                                maps[client.current_room].clients.forEach(function (OtherClient) {
-                                    OtherClient.socket.write(packet.build(["DESTROY", target_entity.name], OtherClient.id));
-                                });
-                                entity.alive = false;
-                                alive = entity.alive;
-                                client.target_entity = null;
-                            }
-                        }
-                    });
-                } else {
-                    client.target_x = target_entity.pos_x;
-                    client.target_y = target_entity.pos_y;
-                }
-                await new Promise(resolve => setTimeout(resolve, config.attack_step));
-            }
+            client.target_x = client.pos_x;
+            client.target_y = client.pos_y;
+            client.target_entity = target_entity;
         }
 
         function chat(message) {
@@ -369,10 +327,9 @@ module.exports = packet = {
                 break;
             case "ATTACK":
                 data = PacketModels.attack.parse(datapacket);
-                if (checkAttack(data.target_entity)) {
-                    break;
+                if (!checkAttack(data.target_entity)) {
+                    attack(data.target_entity);
                 }
-                attack(data.target_entity);
                 break;
             case "LOGOUT":
                 logout(client.id);

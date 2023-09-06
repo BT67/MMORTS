@@ -1,22 +1,16 @@
 {
   "resourceType": "GMObject",
   "resourceVersion": "1.0",
-  "name": "mob",
-  "eventList": [
-    {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":8,"eventType":6,"isDnD":false,},
-    {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,},
-  ],
+  "name": "player_run_right",
+  "eventList": [],
   "managed": true,
   "overriddenProperties": [],
   "parent": {
     "name": "Entities",
     "path": "folders/Objects/Entities.yy",
   },
-  "parentObjectId": {
-    "name": "entity",
-    "path": "objects/entity/entity.yy",
-  },
-  "persistent": true,
+  "parentObjectId": null,
+  "persistent": false,
   "physicsAngularDamping": 0.1,
   "physicsDensity": 0.5,
   "physicsFriction": 0.2,
@@ -32,8 +26,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_mob",
-    "path": "sprites/spr_mob/spr_mob.yy",
+    "name": "spr_player_run_placeholder",
+    "path": "sprites/spr_player_run_placeholder/spr_player_run_placeholder.yy",
   },
   "spriteMaskId": null,
   "visible": true,

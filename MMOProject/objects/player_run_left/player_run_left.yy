@@ -1,12 +1,8 @@
 {
   "resourceType": "GMObject",
   "resourceVersion": "1.0",
-  "name": "player_death",
-  "eventList": [
-    {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":7,"eventType":7,"isDnD":false,},
-    {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,},
-    {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,},
-  ],
+  "name": "player_run_left",
+  "eventList": [],
   "managed": true,
   "overriddenProperties": [],
   "parent": {
@@ -14,7 +10,7 @@
     "path": "folders/Objects/Entities.yy",
   },
   "parentObjectId": null,
-  "persistent": true,
+  "persistent": false,
   "physicsAngularDamping": 0.1,
   "physicsDensity": 0.5,
   "physicsFriction": 0.2,
@@ -30,8 +26,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_player_death_placeholder",
-    "path": "sprites/spr_player_death_placeholder/spr_player_death_placeholder.yy",
+    "name": "spr_player_run_placeholder",
+    "path": "sprites/spr_player_run_placeholder/spr_player_run_placeholder.yy",
   },
   "spriteMaskId": null,
   "visible": true,

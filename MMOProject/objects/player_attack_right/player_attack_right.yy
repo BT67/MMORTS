@@ -1,7 +1,7 @@
 {
   "resourceType": "GMObject",
   "resourceVersion": "1.0",
-  "name": "player_run",
+  "name": "player_attack_right",
   "eventList": [
     {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":7,"eventType":7,"isDnD":false,},
   ],
@@ -28,8 +28,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_player_run_placeholder",
-    "path": "sprites/spr_player_run_placeholder/spr_player_run_placeholder.yy",
+    "name": "spr_player_attack_placeholder",
+    "path": "sprites/spr_player_attack_placeholder/spr_player_attack_placeholder.yy",
   },
   "spriteMaskId": null,
   "visible": true,

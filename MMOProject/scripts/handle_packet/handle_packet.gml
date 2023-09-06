@@ -111,25 +111,25 @@ function handle_packet(data_buffer){
 		case "ATTACK":
 			attack_type = buffer_read(data_buffer, buffer_string);
 			target_entity = buffer_read(data_buffer, buffer_string);
-			show_debug_message("target_entity=" + string(target_entity));
 			origin_entity = buffer_read(data_buffer, buffer_string);
-			show_debug_message("origin_entity=" + string(origin_entity));
 			origin_x = 0;
 			origin_y = 0;
-			for(var i = 0; i < instance_number(entity); ++i;) {
+			var i = 0;
+			for(i = 0; i < instance_number(entity); ++i;) {
 				if(instance_find(entity, i).entity_name == origin_entity){
 					origin_entity = instance_find(entity, i).entity_name;
-					
+					origin_entity_index = i;
 					origin_x = instance_find(entity, i).x;
 					origin_y = instance_find(entity, i).y;
 					break;
 				}
 			}
-			//var_attack = "";
-			//with(instance_create_layer(real(origin_x), real(origin_y), "Instances", attack)){
-			//	var_attack = other;
-			//}
-			//variable_instance_set(instance_find(attack, instance_number(attack) - 1), "target_entity", target_entity);
+			variable_instance_set(instance_find(entity, i), "is_visible", false);
+			var_attack = "";
+			with(instance_create_layer(real(origin_x), real(origin_y), "Instances", player_attack_left)){
+				var_attack = other;
+			}
+			variable_instance_set(instance_find(player_attack_left, instance_number(player_attack_left) - 1), "parent_index", i);
 			break;
 		case "LOGOUT":
 			msg = buffer_read(data_buffer, buffer_string);
