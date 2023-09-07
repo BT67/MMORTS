@@ -19,3 +19,4 @@ attack_anim = "";
 death_anim = "";
 animations_created = false;
 attack_sound = "";
+death_sound = "";

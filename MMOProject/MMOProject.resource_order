@@ -42,6 +42,9 @@
     {"name":"Goblin","order":3,"path":"folders/Sprites/Entities/Mob Sprites/Goblin.yy",},
     {"name":"Attack Sounds","order":1,"path":"folders/Sounds/Attack Sounds.yy",},
     {"name":"Death Sounds","order":2,"path":"folders/Sounds/Death Sounds.yy",},
+    {"name":"Mob Sounds","order":3,"path":"folders/Sounds/Mob Sounds.yy",},
+    {"name":"Goblin","order":1,"path":"folders/Sounds/Mob Sounds/Goblin.yy",},
+    {"name":"Player Sounds","order":4,"path":"folders/Sounds/Player Sounds.yy",},
   ],
   "ResourceOrderSettings": [
     {"name":"camera_controller","order":5,"path":"objects/camera_controller/camera_controller.yy",},
@@ -107,6 +110,7 @@
     {"name":"player_death","order":1,"path":"objects/player_death/player_death.yy",},
     {"name":"dungeon_floor_2_rows","order":4,"path":"sprites/dungeon_floor_2_rows/dungeon_floor_2_rows.yy",},
     {"name":"dungeon_wall_top_end_left","order":12,"path":"sprites/dungeon_wall_top_end_left/dungeon_wall_top_end_left.yy",},
+    {"name":"death_goblin","order":1,"path":"sounds/death_goblin/death_goblin.yy",},
     {"name":"rm_password_reset","order":6,"path":"rooms/rm_password_reset/rm_password_reset.yy",},
     {"name":"dungeon_wall_top_horizontal","order":8,"path":"sprites/dungeon_wall_top_horizontal/dungeon_wall_top_horizontal.yy",},
     {"name":"lbl_msg_register","order":5,"path":"objects/lbl_msg_register/lbl_msg_register.yy",},
