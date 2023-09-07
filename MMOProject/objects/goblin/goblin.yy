@@ -1,8 +1,10 @@
 {
   "resourceType": "GMObject",
   "resourceVersion": "1.0",
-  "name": "mob",
-  "eventList": [],
+  "name": "goblin",
+  "eventList": [
+    {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,},
+  ],
   "managed": true,
   "overriddenProperties": [],
   "parent": {
@@ -10,8 +12,8 @@
     "path": "folders/Objects/Entities.yy",
   },
   "parentObjectId": {
-    "name": "entity",
-    "path": "objects/entity/entity.yy",
+    "name": "mob",
+    "path": "objects/mob/mob.yy",
   },
   "persistent": true,
   "physicsAngularDamping": 0.1,
@@ -28,7 +30,10 @@
   "physicsStartAwake": true,
   "properties": [],
   "solid": false,
-  "spriteId": null,
+  "spriteId": {
+    "name": "spr_goblin_idle",
+    "path": "sprites/spr_goblin_idle/spr_goblin_idle.yy",
+  },
   "spriteMaskId": null,
   "visible": true,
 }

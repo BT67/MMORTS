@@ -1,19 +1,19 @@
 {
   "resourceType": "GMObject",
   "resourceVersion": "1.0",
-  "name": "mob",
+  "name": "goblin_move",
   "eventList": [],
   "managed": true,
   "overriddenProperties": [],
   "parent": {
-    "name": "Entities",
-    "path": "folders/Objects/Entities.yy",
+    "name": "Animations",
+    "path": "folders/Objects/Animations.yy",
   },
   "parentObjectId": {
-    "name": "entity",
-    "path": "objects/entity/entity.yy",
+    "name": "moving_animation",
+    "path": "objects/moving_animation/moving_animation.yy",
   },
-  "persistent": true,
+  "persistent": false,
   "physicsAngularDamping": 0.1,
   "physicsDensity": 0.5,
   "physicsFriction": 0.2,
@@ -28,7 +28,10 @@
   "physicsStartAwake": true,
   "properties": [],
   "solid": false,
-  "spriteId": null,
+  "spriteId": {
+    "name": "spr_goblin_run",
+    "path": "sprites/spr_goblin_run/spr_goblin_run.yy",
+  },
   "spriteMaskId": null,
   "visible": true,
 }

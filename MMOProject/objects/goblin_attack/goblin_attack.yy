@@ -1,17 +1,17 @@
 {
   "resourceType": "GMObject",
   "resourceVersion": "1.0",
-  "name": "mob",
+  "name": "goblin_attack",
   "eventList": [],
   "managed": true,
   "overriddenProperties": [],
   "parent": {
-    "name": "Entities",
-    "path": "folders/Objects/Entities.yy",
+    "name": "Animations",
+    "path": "folders/Objects/Animations.yy",
   },
   "parentObjectId": {
-    "name": "entity",
-    "path": "objects/entity/entity.yy",
+    "name": "attack_animation",
+    "path": "objects/attack_animation/attack_animation.yy",
   },
   "persistent": true,
   "physicsAngularDamping": 0.1,
@@ -28,7 +28,10 @@
   "physicsStartAwake": true,
   "properties": [],
   "solid": false,
-  "spriteId": null,
+  "spriteId": {
+    "name": "spr_goblin_attack",
+    "path": "sprites/spr_goblin_attack/spr_goblin_attack.yy",
+  },
   "spriteMaskId": null,
   "visible": true,
 }
