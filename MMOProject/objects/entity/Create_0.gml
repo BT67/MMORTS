@@ -18,3 +18,4 @@ move_anim = "";
 attack_anim = "";
 death_anim = "";
 animations_created = false;
+attack_sound = "";

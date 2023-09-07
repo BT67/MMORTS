@@ -40,6 +40,8 @@
     {"name":"Tile Sets","order":2,"path":"folders/Tile Sets.yy",},
     {"name":"Timelines","order":8,"path":"folders/Timelines.yy",},
     {"name":"Goblin","order":3,"path":"folders/Sprites/Entities/Mob Sprites/Goblin.yy",},
+    {"name":"Attack Sounds","order":1,"path":"folders/Sounds/Attack Sounds.yy",},
+    {"name":"Death Sounds","order":2,"path":"folders/Sounds/Death Sounds.yy",},
   ],
   "ResourceOrderSettings": [
     {"name":"camera_controller","order":5,"path":"objects/camera_controller/camera_controller.yy",},

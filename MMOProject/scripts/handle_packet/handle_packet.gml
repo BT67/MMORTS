@@ -104,6 +104,7 @@ function handle_packet(data_buffer){
 					origin_y = instance_find(entity, i).y;
 					variable_instance_set(instance_find(entity, i), "is_visible", false);
 					var obj = "";
+					audio_play_sound(asset_get_index(instance_find(entity, i).attack_sound), 10, false);
 					with(instance_create_layer(real(origin_x), real(origin_y), "Instances", asset_get_index(instance_find(entity, i).attack_anim))){
 						obj = other;
 					}
