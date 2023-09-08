@@ -23,6 +23,7 @@ function handle_packet(data_buffer){
 				show_debug_message(string(pos_x) + "," + string(pos_y));
 				player_health = buffer_read(data_buffer, buffer_string);
 				player_sprite = buffer_read(data_buffer, buffer_string);
+				audio_stop_all();
 				room_goto(asset_get_index(target_room));
 				var_player = "";
 				with(instance_create_layer(real(pos_x), real(pos_y), "Instances", player)){
@@ -82,6 +83,7 @@ function handle_packet(data_buffer){
 			instance_destroy(entity);
 			instance_destroy(attack);
 			target_room = buffer_read(data_buffer, buffer_string);
+			audio_stop_all();
 			room_goto(asset_get_index(target_room));
 			break;
 		case "ATTACK":

@@ -1,11 +1,12 @@
 //Connect to server
 
+
 saved_buffer = buffer_create(1, buffer_grow, 1);
 reading = 0;
 cut_buffer = buffer_create(1, buffer_grow, 1);
 buffer_size = 0;
 server_text = "";
-
+room_name = room_get_name(room);
 username = "";
 var_player = "";
 target_entity = "";

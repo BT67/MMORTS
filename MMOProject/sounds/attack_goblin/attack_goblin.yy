@@ -13,7 +13,7 @@
   "duration": 0.5,
   "parent": {
     "name": "Goblin",
-    "path": "folders/Sounds/Mob Sounds/Goblin.yy",
+    "path": "folders/Sounds/SFX/Mob Sounds/Goblin.yy",
   },
   "preload": false,
   "sampleRate": 44100,

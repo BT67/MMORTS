@@ -13,7 +13,7 @@
   "duration": 0.5,
   "parent": {
     "name": "Attack Sounds",
-    "path": "folders/Sounds/Attack Sounds.yy",
+    "path": "folders/Sounds/SFX/Attack Sounds.yy",
   },
   "preload": false,
   "sampleRate": 44100,
