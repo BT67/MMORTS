@@ -29,8 +29,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_goblin_attack",
-    "path": "sprites/spr_goblin_attack/spr_goblin_attack.yy",
+    "name": "spr_goblin_attack_right",
+    "path": "sprites/spr_goblin_attack_right/spr_goblin_attack_right.yy",
   },
   "spriteMaskId": null,
   "visible": true,

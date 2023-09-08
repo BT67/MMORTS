@@ -4,7 +4,7 @@ target_y = y;
 moving = false;
 focused = false;
 //Facing: 1=left. 0=right
-facing_left = 0;
+facing_left = false;
 target_entity = "";
 entity_max_health = 100;
 entity_health = 100;

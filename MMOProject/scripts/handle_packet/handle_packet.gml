@@ -128,10 +128,28 @@ function handle_packet(data_buffer){
 			break;
 		case "DESTROY":
 			entity_name = buffer_read(data_buffer, buffer_string);
-			//Destroy all child animations of the target object
-			for(var i = 0; i < instance_number(animation); ++i){
-				if(instance_find(animation,i).parent_entity == entity_name){
-					instance_destroy(instance_find(animation,i));
+			//Destroy all child animations of the target 
+			for(var i = 0; i < instance_number(idle_left_animation); ++i){
+				if(instance_find(idle_left_animation,i).parent_entity == entity_name){
+					instance_destroy(instance_find(idle_left_animation,i));
+					break;
+				}
+			}
+			for(var i = 0; i < instance_number(idle_right_animation); ++i){
+				if(instance_find(idle_right_animation,i).parent_entity == entity_name){
+					instance_destroy(instance_find(idle_right_animation,i));
+					break;
+				}
+			}
+			for(var i = 0; i < instance_number(move_left_animation); ++i){
+				if(instance_find(move_left_animation,i).parent_entity == entity_name){
+					instance_destroy(instance_find(move_left_animation,i));
+					break;
+				}
+			}
+			for(var i = 0; i < instance_number(move_right_animation); ++i){
+				if(instance_find(move_right_animation,i).parent_entity == entity_name){
+					instance_destroy(instance_find(move_right_animation,i));
 				}
 			}
 			for(var i = 0; i < instance_number(entity); ++i;) {
@@ -179,6 +197,12 @@ function handle_packet(data_buffer){
 			}
 			if(cont){
 				if(instance_find(entity,i).facing_left == true){
+					for(var k = 0; k < instance_number(move_right_animation); ++k){
+						if(instance_find(move_right_animation, k).parent_entity == entity_name){
+							variable_instance_set(instance_find(move_right_animation, k), "is_visible", false);
+							break;
+						}
+					}	
 					for(var k = 0; k < instance_number(move_left_animation); ++k){
 						if(instance_find(move_left_animation, k).parent_entity == entity_name){
 							variable_instance_set(instance_find(move_left_animation, k), "is_visible", true);
@@ -186,12 +210,18 @@ function handle_packet(data_buffer){
 						}
 					}	
 				} else {
+					for(var k = 0; k < instance_number(move_left_animation); ++k){
+						if(instance_find(move_left_animation, k).parent_entity == entity_name){
+							variable_instance_set(instance_find(move_left_animation, k), "is_visible", false);
+							break;
+						}
+					}	
 					for(var k = 0; k < instance_number(move_right_animation); ++k){
 						if(instance_find(move_right_animation, k).parent_entity == entity_name){
 							variable_instance_set(instance_find(move_right_animation, k), "is_visible", true);
 							break;
 						}
-					}	
+					}
 				}
 			}
 			break;

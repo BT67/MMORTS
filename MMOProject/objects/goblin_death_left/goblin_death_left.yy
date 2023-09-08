@@ -29,8 +29,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_goblin_death",
-    "path": "sprites/spr_goblin_death/spr_goblin_death.yy",
+    "name": "spr_goblin_death_left",
+    "path": "sprites/spr_goblin_death_left/spr_goblin_death_left.yy",
   },
   "spriteMaskId": null,
   "visible": true,

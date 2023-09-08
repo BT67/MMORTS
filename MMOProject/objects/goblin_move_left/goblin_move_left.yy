@@ -29,8 +29,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_goblin_run",
-    "path": "sprites/spr_goblin_run/spr_goblin_run.yy",
+    "name": "spr_goblin_move_left",
+    "path": "sprites/spr_goblin_move_left/spr_goblin_move_left.yy",
   },
   "spriteMaskId": null,
   "visible": true,

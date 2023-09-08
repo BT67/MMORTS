@@ -10,8 +10,8 @@
     "path": "folders/Objects/Animations/Goblin.yy",
   },
   "parentObjectId": {
-    "name": "idle_animation",
-    "path": "objects/idle_animation/idle_animation.yy",
+    "name": "idle_right_animation",
+    "path": "objects/idle_right_animation/idle_right_animation.yy",
   },
   "persistent": false,
   "physicsAngularDamping": 0.1,
@@ -29,8 +29,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_goblin_idle",
-    "path": "sprites/spr_goblin_idle/spr_goblin_idle.yy",
+    "name": "spr_goblin_idle_right",
+    "path": "sprites/spr_goblin_idle_right/spr_goblin_idle_right.yy",
   },
   "spriteMaskId": null,
   "visible": true,
