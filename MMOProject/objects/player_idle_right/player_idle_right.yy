@@ -6,8 +6,8 @@
   "managed": true,
   "overriddenProperties": [],
   "parent": {
-    "name": "Animations",
-    "path": "folders/Objects/Animations.yy",
+    "name": "Player",
+    "path": "folders/Objects/Animations/Player.yy",
   },
   "parentObjectId": {
     "name": "idle_animation",
@@ -29,8 +29,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_player_idle_placeholder",
-    "path": "sprites/spr_player_idle_placeholder/spr_player_idle_placeholder.yy",
+    "name": "spr_player_idle_right",
+    "path": "sprites/spr_player_idle_right/spr_player_idle_right.yy",
   },
   "spriteMaskId": null,
   "visible": true,

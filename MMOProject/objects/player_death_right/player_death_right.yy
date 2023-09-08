@@ -6,8 +6,8 @@
   "managed": true,
   "overriddenProperties": [],
   "parent": {
-    "name": "Animations",
-    "path": "folders/Objects/Animations.yy",
+    "name": "Player",
+    "path": "folders/Objects/Animations/Player.yy",
   },
   "parentObjectId": {
     "name": "death_animation",
@@ -29,8 +29,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_player_death_placeholder",
-    "path": "sprites/spr_player_death_placeholder/spr_player_death_placeholder.yy",
+    "name": "spr_player_death_right",
+    "path": "sprites/spr_player_death_right/spr_player_death_right.yy",
   },
   "spriteMaskId": null,
   "visible": true,

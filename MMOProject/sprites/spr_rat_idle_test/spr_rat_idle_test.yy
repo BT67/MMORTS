@@ -25,8 +25,8 @@
   "nineSlice": null,
   "origin": 0,
   "parent": {
-    "name": "Mob Sprites",
-    "path": "folders/Sprites/Entities/Mob Sprites.yy",
+    "name": "Work",
+    "path": "folders/Sprites/Work.yy",
   },
   "preMultiplyAlpha": false,
   "sequence": {

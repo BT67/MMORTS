@@ -48,8 +48,8 @@
   },
   "origin": 0,
   "parent": {
-    "name": "Player Sprites",
-    "path": "folders/Sprites/Entities/Player Sprites.yy",
+    "name": "Work",
+    "path": "folders/Sprites/Work.yy",
   },
   "preMultiplyAlpha": false,
   "sequence": {

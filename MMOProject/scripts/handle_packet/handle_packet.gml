@@ -129,27 +129,10 @@ function handle_packet(data_buffer){
 		case "DESTROY":
 			entity_name = buffer_read(data_buffer, buffer_string);
 			//Destroy all child animations of the target 
-			for(var i = 0; i < instance_number(idle_left_animation); ++i){
-				if(instance_find(idle_left_animation,i).parent_entity == entity_name){
-					instance_destroy(instance_find(idle_left_animation,i));
+			for(var i = 0; i < instance_number(animation); ++i){
+				if(instance_find(animation,i).parent_entity == entity_name){
+					instance_destroy(instance_find(animation,i));
 					break;
-				}
-			}
-			for(var i = 0; i < instance_number(idle_right_animation); ++i){
-				if(instance_find(idle_right_animation,i).parent_entity == entity_name){
-					instance_destroy(instance_find(idle_right_animation,i));
-					break;
-				}
-			}
-			for(var i = 0; i < instance_number(move_left_animation); ++i){
-				if(instance_find(move_left_animation,i).parent_entity == entity_name){
-					instance_destroy(instance_find(move_left_animation,i));
-					break;
-				}
-			}
-			for(var i = 0; i < instance_number(move_right_animation); ++i){
-				if(instance_find(move_right_animation,i).parent_entity == entity_name){
-					instance_destroy(instance_find(move_right_animation,i));
 				}
 			}
 			for(var i = 0; i < instance_number(entity); ++i;) {
@@ -176,7 +159,6 @@ function handle_packet(data_buffer){
 			target_y = (real(target_y) + 1) * 32;
 			for(var i = 0; i < instance_number(entity); ++i;) {
 				if(instance_find(entity, i).entity_name == entity_name){
-					variable_instance_set(instance_find(entity, i), "is_visible", false);
 					if(abs(instance_find(entity, i).x - pos_x) > 50){
 						instance_find(entity, i).x = pos_x;
 					}
@@ -186,42 +168,6 @@ function handle_packet(data_buffer){
 					instance_find(entity, i).target_x = target_x;
 					instance_find(entity, i).target_y = target_y;
 					break;
-				}
-			}
-			var cont = true;
-			for(var j = 0; j < instance_number(attack_animation); ++j){
-				if(instance_find(attack_animation,j).parent_entity == entity_name){
-					cont = false;
-					break;
-				}
-			}
-			if(cont){
-				if(instance_find(entity,i).facing_left == true){
-					for(var k = 0; k < instance_number(move_right_animation); ++k){
-						if(instance_find(move_right_animation, k).parent_entity == entity_name){
-							variable_instance_set(instance_find(move_right_animation, k), "is_visible", false);
-							break;
-						}
-					}	
-					for(var k = 0; k < instance_number(move_left_animation); ++k){
-						if(instance_find(move_left_animation, k).parent_entity == entity_name){
-							variable_instance_set(instance_find(move_left_animation, k), "is_visible", true);
-							break;
-						}
-					}	
-				} else {
-					for(var k = 0; k < instance_number(move_left_animation); ++k){
-						if(instance_find(move_left_animation, k).parent_entity == entity_name){
-							variable_instance_set(instance_find(move_left_animation, k), "is_visible", false);
-							break;
-						}
-					}	
-					for(var k = 0; k < instance_number(move_right_animation); ++k){
-						if(instance_find(move_right_animation, k).parent_entity == entity_name){
-							variable_instance_set(instance_find(move_right_animation, k), "is_visible", true);
-							break;
-						}
-					}
 				}
 			}
 			break;

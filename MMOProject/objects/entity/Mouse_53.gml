@@ -5,4 +5,3 @@ if(mouse_x < x) ||
 	{
 	focused = false;
 }
-show_debug_message("unfocused " + string(entity_name));

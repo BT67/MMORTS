@@ -6,8 +6,8 @@
   "managed": true,
   "overriddenProperties": [],
   "parent": {
-    "name": "Animations",
-    "path": "folders/Objects/Animations.yy",
+    "name": "Player",
+    "path": "folders/Objects/Animations/Player.yy",
   },
   "parentObjectId": {
     "name": "attack_animation",
@@ -29,8 +29,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_player_attack_placeholder",
-    "path": "sprites/spr_player_attack_placeholder/spr_player_attack_placeholder.yy",
+    "name": "spr_player_attack_right",
+    "path": "sprites/spr_player_attack_right/spr_player_attack_right.yy",
   },
   "spriteMaskId": null,
   "visible": true,

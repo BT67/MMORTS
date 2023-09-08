@@ -6,8 +6,8 @@
   "managed": true,
   "overriddenProperties": [],
   "parent": {
-    "name": "Animations",
-    "path": "folders/Objects/Animations.yy",
+    "name": "Player",
+    "path": "folders/Objects/Animations/Player.yy",
   },
   "parentObjectId": {
     "name": "move_right_animation",
@@ -29,8 +29,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_player_run_placeholder",
-    "path": "sprites/spr_player_run_placeholder/spr_player_run_placeholder.yy",
+    "name": "spr_player_move_right",
+    "path": "sprites/spr_player_move_right/spr_player_move_right.yy",
   },
   "spriteMaskId": null,
   "visible": true,
