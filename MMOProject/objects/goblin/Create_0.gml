@@ -1,6 +1,11 @@
 event_inherited();
-move_anim = "goblin_move";
-attack_anim = "goblin_attack";
-death_anim = "goblin_death";
+idle_right = "goblin_idle_right";
+move_right = "goblin_move_right";
+attack_right = "goblin_attack_right";
+death_right = "goblin_death_right";
+idle_left = "goblin_idle_left";
+move_left = "goblin_move_left";
+attack_left = "goblin_attack_left";
+death_left = "goblin_death_left";
 attack_sound = "attack_sword_1";
 death_sound = "death_goblin";

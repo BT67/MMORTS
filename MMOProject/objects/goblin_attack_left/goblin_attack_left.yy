@@ -1,20 +1,17 @@
 {
   "resourceType": "GMObject",
   "resourceVersion": "1.0",
-  "name": "player",
-  "eventList": [
-    {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":57,"eventType":6,"isDnD":false,},
-    {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,},
-  ],
+  "name": "goblin_attack_left",
+  "eventList": [],
   "managed": true,
   "overriddenProperties": [],
   "parent": {
-    "name": "Entities",
-    "path": "folders/Objects/Entities.yy",
+    "name": "Goblin",
+    "path": "folders/Objects/Animations/Goblin.yy",
   },
   "parentObjectId": {
-    "name": "entity",
-    "path": "objects/entity/entity.yy",
+    "name": "attack_animation",
+    "path": "objects/attack_animation/attack_animation.yy",
   },
   "persistent": true,
   "physicsAngularDamping": 0.1,
@@ -32,8 +29,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "default_sprite",
-    "path": "sprites/default_sprite/default_sprite.yy",
+    "name": "spr_goblin_attack",
+    "path": "sprites/spr_goblin_attack/spr_goblin_attack.yy",
   },
   "spriteMaskId": null,
   "visible": true,

@@ -1,7 +1,7 @@
 {
   "resourceType": "GMObject",
   "resourceVersion": "1.0",
-  "name": "goblin_attack",
+  "name": "player_move_right",
   "eventList": [],
   "managed": true,
   "overriddenProperties": [],
@@ -10,10 +10,10 @@
     "path": "folders/Objects/Animations.yy",
   },
   "parentObjectId": {
-    "name": "attack_animation",
-    "path": "objects/attack_animation/attack_animation.yy",
+    "name": "move_right_animation",
+    "path": "objects/move_right_animation/move_right_animation.yy",
   },
-  "persistent": true,
+  "persistent": false,
   "physicsAngularDamping": 0.1,
   "physicsDensity": 0.5,
   "physicsFriction": 0.2,
@@ -29,8 +29,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_goblin_attack",
-    "path": "sprites/spr_goblin_attack/spr_goblin_attack.yy",
+    "name": "spr_player_run_placeholder",
+    "path": "sprites/spr_player_run_placeholder/spr_player_run_placeholder.yy",
   },
   "spriteMaskId": null,
   "visible": true,

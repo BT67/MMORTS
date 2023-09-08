@@ -92,10 +92,9 @@ function handle_packet(data_buffer){
 			origin_entity = buffer_read(data_buffer, buffer_string);
 			origin_x = 0;
 			origin_y = 0;
-			for(var i = 0; i < instance_number(moving_animation); ++i){
-				if(instance_find(moving_animation,i).parent_entity == origin_entity){
-					variable_instance_set(instance_find(moving_animation, i), "is_visible", false);
-					break;
+			for(var i = 0; i < instance_number(move_animation); ++i){
+				if(instance_find(move_animation,i).parent_entity == origin_entity){
+					variable_instance_set(instance_find(move_animation, i), "is_visible", false);
 				}
 			}
 			for(var i = 0; i < instance_number(entity); ++i;) {
@@ -107,8 +106,14 @@ function handle_packet(data_buffer){
 					variable_instance_set(instance_find(entity, i), "is_visible", false);
 					var obj = "";
 					audio_play_sound(asset_get_index(instance_find(entity, i).attack_sound), 10, false);
-					with(instance_create_layer(real(origin_x), real(origin_y), "Instances", asset_get_index(instance_find(entity, i).attack_anim))){
-						obj = other;
+					if(instance_find(entity, i).facing_left == true){
+						with(instance_create_layer(real(origin_x), real(origin_y), "Instances", asset_get_index(instance_find(entity, i).attack_left))){
+							obj = other;
+						}
+					} else {
+						with(instance_create_layer(real(origin_x), real(origin_y), "Instances", asset_get_index(instance_find(entity, i).attack_right))){
+							obj = other;
+						}
 					}
 					variable_instance_set(instance_find(attack_animation, instance_number(attack_animation) - 1), "parent_entity", origin_entity);
 					break;
@@ -173,11 +178,20 @@ function handle_packet(data_buffer){
 				}
 			}
 			if(cont){
-				for(var i = 0; i < instance_number(moving_animation); ++i){
-					if(instance_find(moving_animation, i).parent_entity == entity_name){
-						variable_instance_set(instance_find(moving_animation, i), "is_visible", true);
-						break;
-					}
+				if(instance_find(entity,i).facing_left == true){
+					for(var k = 0; k < instance_number(move_left_animation); ++k){
+						if(instance_find(move_left_animation, k).parent_entity == entity_name){
+							variable_instance_set(instance_find(move_left_animation, k), "is_visible", true);
+							break;
+						}
+					}	
+				} else {
+					for(var k = 0; k < instance_number(move_right_animation); ++k){
+						if(instance_find(move_right_animation, k).parent_entity == entity_name){
+							variable_instance_set(instance_find(move_right_animation, k), "is_visible", true);
+							break;
+						}
+					}	
 				}
 			}
 			break;

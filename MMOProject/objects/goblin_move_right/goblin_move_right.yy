@@ -1,17 +1,17 @@
 {
   "resourceType": "GMObject",
   "resourceVersion": "1.0",
-  "name": "moving_animation",
+  "name": "goblin_move_right",
   "eventList": [],
   "managed": true,
   "overriddenProperties": [],
   "parent": {
-    "name": "Animations",
-    "path": "folders/Objects/Animations.yy",
+    "name": "Goblin",
+    "path": "folders/Objects/Animations/Goblin.yy",
   },
   "parentObjectId": {
-    "name": "animation",
-    "path": "objects/animation/animation.yy",
+    "name": "move_right_animation",
+    "path": "objects/move_right_animation/move_right_animation.yy",
   },
   "persistent": false,
   "physicsAngularDamping": 0.1,
@@ -28,7 +28,10 @@
   "physicsStartAwake": true,
   "properties": [],
   "solid": false,
-  "spriteId": null,
+  "spriteId": {
+    "name": "spr_goblin_run",
+    "path": "sprites/spr_goblin_run/spr_goblin_run.yy",
+  },
   "spriteMaskId": null,
   "visible": true,
 }

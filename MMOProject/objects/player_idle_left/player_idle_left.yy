@@ -1,17 +1,17 @@
 {
   "resourceType": "GMObject",
   "resourceVersion": "1.0",
-  "name": "player_move",
+  "name": "player_idle_left",
   "eventList": [],
   "managed": true,
   "overriddenProperties": [],
   "parent": {
-    "name": "Animations",
-    "path": "folders/Objects/Animations.yy",
+    "name": "Player",
+    "path": "folders/Objects/Animations/Player.yy",
   },
   "parentObjectId": {
-    "name": "moving_animation",
-    "path": "objects/moving_animation/moving_animation.yy",
+    "name": "idle_animation",
+    "path": "objects/idle_animation/idle_animation.yy",
   },
   "persistent": false,
   "physicsAngularDamping": 0.1,
@@ -29,8 +29,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_player_run_placeholder",
-    "path": "sprites/spr_player_run_placeholder/spr_player_run_placeholder.yy",
+    "name": "spr_player_idle_placeholder",
+    "path": "sprites/spr_player_idle_placeholder/spr_player_idle_placeholder.yy",
   },
   "spriteMaskId": null,
   "visible": true,

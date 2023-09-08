@@ -1,21 +1,17 @@
 {
   "resourceType": "GMObject",
   "resourceVersion": "1.0",
-  "name": "goblin_death",
-  "eventList": [
-    {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":7,"eventType":7,"isDnD":false,},
-    {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,},
-    {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,},
-  ],
+  "name": "goblin_death_left",
+  "eventList": [],
   "managed": true,
   "overriddenProperties": [],
   "parent": {
-    "name": "Animations",
-    "path": "folders/Objects/Animations.yy",
+    "name": "Goblin",
+    "path": "folders/Objects/Animations/Goblin.yy",
   },
   "parentObjectId": {
-    "name": "animation",
-    "path": "objects/animation/animation.yy",
+    "name": "death_animation",
+    "path": "objects/death_animation/death_animation.yy",
   },
   "persistent": true,
   "physicsAngularDamping": 0.1,

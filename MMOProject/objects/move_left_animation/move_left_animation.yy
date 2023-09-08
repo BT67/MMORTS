@@ -1,7 +1,7 @@
 {
   "resourceType": "GMObject",
   "resourceVersion": "1.0",
-  "name": "player_attack",
+  "name": "move_left_animation",
   "eventList": [],
   "managed": true,
   "overriddenProperties": [],
@@ -10,10 +10,10 @@
     "path": "folders/Objects/Animations.yy",
   },
   "parentObjectId": {
-    "name": "attack_animation",
-    "path": "objects/attack_animation/attack_animation.yy",
+    "name": "move_animation",
+    "path": "objects/move_animation/move_animation.yy",
   },
-  "persistent": true,
+  "persistent": false,
   "physicsAngularDamping": 0.1,
   "physicsDensity": 0.5,
   "physicsFriction": 0.2,
@@ -28,10 +28,7 @@
   "physicsStartAwake": true,
   "properties": [],
   "solid": false,
-  "spriteId": {
-    "name": "spr_player_attack_placeholder",
-    "path": "sprites/spr_player_attack_placeholder/spr_player_attack_placeholder.yy",
-  },
+  "spriteId": null,
   "spriteMaskId": null,
   "visible": true,
 }
