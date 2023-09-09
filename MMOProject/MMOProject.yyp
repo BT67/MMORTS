@@ -207,6 +207,7 @@
     {"id":{"name":"mob","path":"objects/mob/mob.yy",},},
     {"id":{"name":"dungeon_wall_top_corner_left_down","path":"sprites/dungeon_wall_top_corner_left_down/dungeon_wall_top_corner_left_down.yy",},},
     {"id":{"name":"btn_register_init","path":"objects/btn_register_init/btn_register_init.yy",},},
+    {"id":{"name":"btn_chat_send_hud","path":"objects/btn_chat_send_hud/btn_chat_send_hud.yy",},},
     {"id":{"name":"idle_animation","path":"objects/idle_animation/idle_animation.yy",},},
     {"id":{"name":"lbl_email_register","path":"objects/lbl_email_register/lbl_email_register.yy",},},
     {"id":{"name":"rm_register_success","path":"rooms/rm_register_success/rm_register_success.yy",},},
