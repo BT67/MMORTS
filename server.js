@@ -43,6 +43,15 @@ map_files.forEach(function (mapFile) {
     maps[map.room] = map;
 });
 
+//Init walls in zone1
+for(var i = 0; i < 10; i++){
+    wall = {
+        x: 11,
+        y: 1 + i
+    }
+    maps["zone1"].walls.push(wall);
+}
+
 maps["zone1"].grid = initMapGrid(maps["zone1"]);
 maps["zone2"].grid = initMapGrid(maps["zone2"]);
 
@@ -674,6 +683,9 @@ function initMapGrid(map) {
             grid[i][k] = "empty";
         }
     }
+    map.walls.forEach(function(wall){
+        grid[wall.x][wall.y] = "wall";
+    });
     return grid;
 }
 

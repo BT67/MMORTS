@@ -24,7 +24,7 @@
   "physicsShapePoints": [],
   "physicsStartAwake": true,
   "properties": [],
-  "solid": true,
+  "solid": false,
   "spriteId": {
     "name": "dungeon_wall_top_column",
     "path": "sprites/dungeon_wall_top_column/dungeon_wall_top_column.yy",
