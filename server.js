@@ -44,10 +44,12 @@ map_files.forEach(function (mapFile) {
 });
 
 //Init walls in zone1
-for(var i = 0; i < 10; i++){
+//NOTE: when loading walls into the map grid, grid in gamemaker is not zero-indexed
+//In the server, a wall with position 11,1 is loaded in at position 13,3
+for(var i = 0; i < 11; ++i){
     wall = {
         x: 11,
-        y: 1 + i
+        y: i
     }
     maps["zone1"].walls.push(wall);
 }
