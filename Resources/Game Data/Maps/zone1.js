@@ -8,8 +8,8 @@ exports.doors = [];
 exports.walls = [];
 exports.grid_size = 32;
 exports.grid = [];
-exports.grid_width = 80;
-exports.grid_height = 40;
+exports.grid_width = 38; //gamemaker grid_width = 40
+exports.grid_height = 19; //gamemaker grid_height = 21
 
 
 
