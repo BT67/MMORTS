@@ -6,6 +6,23 @@ function playAudio(audio){
 	}
 }
 
+refresh_timer += 1;
+
+if(refresh_timer % 3000 == 0){
+	var refresh_packet = buffer_create(1, buffer_grow, 1);
+	buffer_write(refresh_packet, buffer_string, "REFRESH");
+	network_write(network.socket, refresh_packet);
+}
+
+if(refresh_timer >= refresh_timeout){
+	show_debug_message("Connection Lost");
+	instance_destroy(entity);
+	instance_destroy(animation);
+	instance_destroy(wall);
+	room_goto(rm_connection_lost);
+	refresh_timer = 0;
+}
+
 room_name = room_get_name(room);
 
 switch(room_name){

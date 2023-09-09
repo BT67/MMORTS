@@ -8,6 +8,10 @@ function handle_packet(data_buffer){
 			room_goto(rm_init);
 			show_debug_message(date_datetime_string(date_current_datetime()) + " Connection with server established");
 			break;
+		case "REFRESH":
+		show_debug_message(string(network.refresh_timer));
+			network.refresh_timer = 0;
+			break;
 		case "LOGIN":
 			status = buffer_read(data_buffer, buffer_string);
 			msg = buffer_read(data_buffer, buffer_string);

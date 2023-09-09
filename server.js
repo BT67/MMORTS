@@ -217,6 +217,8 @@ net.createServer(function (socket) {
     thisClient.respawn_timer = thisClient.respawn_period;
     thisClient.attack_period = 3;
     thisClient.attack_timer = thisClient.attack_period;
+    thisClient.refresh_timer = 0;
+    thisClient.refresh_timeout = 300;
     clientIdNo += 1;
     //TODO create clientId allocation system
     thisClient.initiate();

@@ -15,11 +15,21 @@ module.exports = function () {
 
     var client = this;
 
-    this.initiate = function () {
+    this.initiate = async function () {
         //send the connection handshake packet to the client
         client.socket.write(packet.build(["HANDSHAKE", now().toString()]));
         console.log(timeNow() + config.msg_client_connected + client.id);
         id = client.id;
+        //Begin refresh packet loop:
+        var refresh_timer = 0;
+        while(true) {
+            refresh_timer += 1;
+            if (refresh_timer >= config.refresh_period) {
+                client.socket.write(packet.build(["REFRESH"], client.id));
+                refresh_timer = 0;
+            }
+            await new Promise(resolve => setTimeout(resolve, config.step));
+        }
     };
     this.data = function (data) {
         console.log(timeNow() + config.msg_client_data + client.id + "," + data.toString());
@@ -90,3 +100,4 @@ function sendDestroyPackets(clientId) {
         });
     });
 }
+

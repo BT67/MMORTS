@@ -10,6 +10,8 @@ var StringOptions = {
 module.exports = PacketModels = {
     header: new Parser().skip(1)
         .string("command", StringOptions),
+    refresh: new Parser().skip(1)
+        .string("command", StringOptions),
     login: new Parser().skip(1)
         .string("command", StringOptions)
         .string("username", StringOptions)
