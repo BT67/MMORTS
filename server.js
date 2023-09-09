@@ -305,10 +305,12 @@ async function updateEntities() {
                                                             client.pos_y = maps[map].start_y;
                                                             client.target_x = client.pos_x;
                                                             client.target_y = client.pos_y;
-                                                            maps[map].clients.forEach(function (otherClient) {
-                                                                //Send player death packet to all clients in the room
-                                                                otherClient.socket.write(packet.build(["DESTROY", client.username], otherClient.id));
-                                                            });
+
+                                                            // maps[map].clients.forEach(function (otherClient) {
+                                                            //     //Send player death packet to all clients in the room
+                                                            //     otherClient.socket.write(packet.build(["DESTROY", client.username], otherClient.id));
+                                                            // });
+                                                            send_destroy_packet(client.username, map);
                                                             entity.in_combat = false;
                                                             entity.target_entity = null;
                                                             entity.target_x = entity.origin_x;
@@ -423,10 +425,11 @@ async function updateEntities() {
                                     maps[map].clients = maps[map].clients.filter(item => item !== client);
                                     client.current_room = door.room_to;
                                     maps[door.room_to].clients.push(client);
-                                    maps[map].clients.forEach(function (otherClient) {
-                                        //Send player destroy packet to all clients in the old room
-                                        otherClient.socket.write(packet.build(["DESTROY", client.username], otherClient.id));
-                                    });
+                                    //Send player destroy packet to all clients in the old room
+                                    send_destroy_packet(client.username, map);
+                                    // maps[map].clients.forEach(function (otherClient) {
+                                    //     otherClient.socket.write(packet.build(["DESTROY", client.username], otherClient.id));
+                                    // });
                                     //Send move room packet to target client:
                                     params = [];
                                     params.push("ROOM");
@@ -491,15 +494,16 @@ async function updateEntities() {
                                         maps[map].entities.forEach(function (entity) {
                                             if (entity.name === client.target_entity && entity.alive) {
                                                 entity.health -= 10;
-                                                maps[client.current_room].clients.forEach(function (OtherClient) {
+                                                maps[map].clients.forEach(function (OtherClient) {
                                                     OtherClient.socket.write(packet.build([
                                                         "HEALTH", entity.name, entity.health.toString()
                                                     ], client.id));
                                                 });
                                                 if (entity.health < 0) {
-                                                    maps[client.current_room].clients.forEach(function (OtherClient) {
-                                                        OtherClient.socket.write(packet.build(["DESTROY", target_entity.name], OtherClient.id));
-                                                    });
+                                                    send_destroy_packet(target_entity.name, map);
+                                                    // maps[client.current_room].clients.forEach(function (OtherClient) {
+                                                    //     OtherClient.socket.write(packet.build(["DESTROY", target_entity.name], OtherClient.id));
+                                                    // });
                                                     entity.alive = false;
                                                     alive = entity.alive;
                                                     client.target_entity = null;
@@ -763,6 +767,14 @@ function createPath(map, x1, y1, x2, y2) {
     }
     grid_copy = [];
     return final_path;
+}
+
+async function send_destroy_packet(entity_name, map){
+    await new Promise(resolve => setTimeout(resolve, config.step));
+    maps[map].clients.forEach(function (client) {
+        //Send player death packet to all clients in the room
+        client.socket.write(packet.build(["DESTROY", entity_name], client.id));
+    });
 }
 
 
