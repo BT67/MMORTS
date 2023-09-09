@@ -313,6 +313,13 @@ async function updateEntities() {
                                                             entity.target_entity = null;
                                                             entity.target_x = entity.origin_x;
                                                             entity.target_y = entity.origin_y;
+                                                        } else if(client.target_entity === null &&
+                                                            client.target_x === client.pos_x &&
+                                                            client.target_y === client.pos_y){
+                                                            //If client is not already in combat and is not currently moving,
+                                                            //target the mob that just attacked them:
+                                                            client.in_combat = true;
+                                                            client.target_entity = entity.name;
                                                         }
                                                         entity.attack_timer = 0;
                                                     }
@@ -464,13 +471,13 @@ async function updateEntities() {
                                 }
                             }
                         })
-                        var target_entity = null;
-                        maps[map].entities.forEach(function (entity) {
-                            if (entity.name === client.target_entity) {
-                                target_entity = entity;
-                            }
-                        });
-                        if (target_entity !== null) {
+                        if (client.target_entity !== null) {
+                            var target_entity = null;
+                            maps[map].entities.forEach(function (entity) {
+                                if (entity.name === client.target_entity) {
+                                    target_entity = entity;
+                                }
+                            });
                             if (target_entity.alive) {
                                 dist = distance(client.pos_x, client.pos_y, target_entity.pos_x, target_entity.pos_y);
                                 if (dist <= client.attack_range) {
