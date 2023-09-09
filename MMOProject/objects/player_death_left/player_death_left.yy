@@ -29,8 +29,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_player_death_right",
-    "path": "sprites/spr_player_death_right/spr_player_death_right.yy",
+    "name": "spr_player_death_left",
+    "path": "sprites/spr_player_death_left/spr_player_death_left.yy",
   },
   "spriteMaskId": null,
   "visible": true,

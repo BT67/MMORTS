@@ -29,8 +29,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_player_move_right",
-    "path": "sprites/spr_player_move_right/spr_player_move_right.yy",
+    "name": "spr_player_move_left",
+    "path": "sprites/spr_player_move_left/spr_player_move_left.yy",
   },
   "spriteMaskId": null,
   "visible": true,

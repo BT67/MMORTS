@@ -29,8 +29,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_player_attack_right",
-    "path": "sprites/spr_player_attack_right/spr_player_attack_right.yy",
+    "name": "spr_player_attack_left",
+    "path": "sprites/spr_player_attack_left/spr_player_attack_left.yy",
   },
   "spriteMaskId": null,
   "visible": true,

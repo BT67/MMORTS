@@ -29,8 +29,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_player_idle_right",
-    "path": "sprites/spr_player_idle_right/spr_player_idle_right.yy",
+    "name": "spr_player_idle_left",
+    "path": "sprites/spr_player_idle_left/spr_player_idle_left.yy",
   },
   "spriteMaskId": null,
   "visible": true,
