@@ -1,5 +1,5 @@
-#macro view_width 640
-#macro view_height 360
+#macro view_width 900
+#macro view_height 506
 #macro view_scale 1
 #macro view_smooth 0.1
 

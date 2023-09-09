@@ -11,18 +11,20 @@ const connection = new Client({
 var query;
 var values;
 var id;
+var refresh_cont;
 module.exports = function () {
 
     var client = this;
 
     this.initiate = async function () {
+        client.refresh_cont = true;
         //send the connection handshake packet to the client
         client.socket.write(packet.build(["HANDSHAKE", now().toString()]));
         console.log(timeNow() + config.msg_client_connected + client.id);
         id = client.id;
         //Begin refresh packet loop:
         var refresh_timer = 0;
-        while(true) {
+        while(client.refresh_cont) {
             refresh_timer += 1;
             if (refresh_timer >= config.refresh_period) {
                 client.socket.write(packet.build(["REFRESH"], client.id));
@@ -38,6 +40,7 @@ module.exports = function () {
     //Log the user out if client is unexpectedly closed or crashes:
     //TODO update database to logout when client error causes disconnect
     this.error = function () {
+        client.refresh_cont = false;
         console.log(timeNow() + config.err_msg_client_error + id);
         //maps[client.current_room].clients[client.username];
         if(client.current_room !== null){
@@ -47,6 +50,7 @@ module.exports = function () {
     }
     //TODO Error when client fails to login but DB registers login, when try to log in again, access is denied
     this.end = function () {
+        client.refresh_cont = false;
         console.log(timeNow() + config.err_msg_client_error + id);
         //maps[client.current_room].clients[client.username];
         if(client.current_room != null){

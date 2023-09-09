@@ -20,6 +20,9 @@ if(refresh_timer >= refresh_timeout){
 	instance_destroy(animation);
 	instance_destroy(wall);
 	room_goto(rm_connection_lost);
+	username = "";
+	var_player = "";
+	target_entity = "";  
 	refresh_timer = 0;
 }
 
