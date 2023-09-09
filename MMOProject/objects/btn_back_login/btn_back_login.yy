@@ -9,8 +9,8 @@
   "managed": true,
   "overriddenProperties": [],
   "parent": {
-    "name": "group1",
-    "path": "folders/Objects/group1.yy",
+    "name": "Login",
+    "path": "folders/Objects/Login.yy",
   },
   "parentObjectId": {
     "name": "ui_button_base",

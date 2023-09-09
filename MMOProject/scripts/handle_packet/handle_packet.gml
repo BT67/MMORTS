@@ -86,6 +86,7 @@ function handle_packet(data_buffer){
 		case "ROOM":
 			instance_destroy(entity);
 			instance_destroy(attack);
+			instance_destroy(animation);
 			target_room = buffer_read(data_buffer, buffer_string);
 			audio_stop_all();
 			room_goto(asset_get_index(target_room));

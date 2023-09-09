@@ -59,5 +59,4 @@ if(view_pos_x < 0){
 }
 
 camera_set_view_pos(camera, view_pos_x, view_pos_y);
-show_debug_message(string(camera_height));
 camera_set_view_size(camera, camera_width, camera_height);

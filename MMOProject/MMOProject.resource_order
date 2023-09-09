@@ -9,6 +9,7 @@
     {"name":"Goblin","order":20,"path":"folders/Objects/Animations/Goblin.yy",},
     {"name":"Player","order":21,"path":"folders/Objects/Animations/Player.yy",},
     {"name":"Attacks","order":12,"path":"folders/Objects/Attacks.yy",},
+    {"name":"Connection Lost","order":19,"path":"folders/Objects/Connection Lost.yy",},
     {"name":"Dialogues","order":16,"path":"folders/Objects/Dialogues.yy",},
     {"name":"Doors","order":17,"path":"folders/Objects/Doors.yy",},
     {"name":"Entities","order":10,"path":"folders/Objects/Entities.yy",},
@@ -49,7 +50,6 @@
     {"name":"Work","order":7,"path":"folders/Sprites/Work.yy",},
     {"name":"Tile Sets","order":2,"path":"folders/Tile Sets.yy",},
     {"name":"Timelines","order":8,"path":"folders/Timelines.yy",},
-    {"name":"Connection Lost","order":19,"path":"folders/Objects/Connection Lost.yy",},
   ],
   "ResourceOrderSettings": [
     {"name":"camera_controller","order":5,"path":"objects/camera_controller/camera_controller.yy",},
