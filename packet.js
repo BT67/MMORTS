@@ -261,18 +261,6 @@ module.exports = packet = {
             client.target_x = client.pos_x;
             client.target_y = client.pos_y;
             client.target_entity = target_entity;
-            maps[client.current_room].entities.forEach(function(entity){
-                if(entity.name === target_entity){
-                    if (entity.target_entity === null) {
-                        //If target_entity is not already in combat, target the client that just attacked them:
-                        entity.in_combat = true;
-                        entity.target_entity = client.username;
-                        entity.target_x = client.pos_x;
-                        entity.target_y = client.pos_y;
-                        return;
-                    }
-                }
-            });
         }
 
         function chat(message) {

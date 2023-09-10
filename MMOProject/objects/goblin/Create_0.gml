@@ -7,5 +7,5 @@ idle_left = "spr_goblin_idle_left";
 move_left = "spr_goblin_move_left";
 attack_left = "goblin_attack_left";
 death_left = "goblin_death_left";
-attack_sound = "attack_sword_1";
+attack_sound = "attack_goblin";
 death_sound = "death_goblin";

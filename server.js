@@ -115,14 +115,14 @@ this_entity.target_y = this_entity.pos_y;
 this_entity.origin_x = this_entity.pos_x;
 this_entity.origin_y = this_entity.pos_y;
 this_entity.target_entity = null;
-this_entity.roam_range = 10;
-this_entity.view_range = 5;
-this_entity.attack_range = 1;
+this_entity.roam_range = 20;
+this_entity.view_range = 10;
+this_entity.attack_range = 1.5;
 this_entity.in_combat = false;
 this_entity.aggressive = false;
 this_entity.move_speed = 1;
 this_entity.sprite = "sprite";
-this_entity.respawn_period = 50;
+this_entity.respawn_period = 100;
 this_entity.respawn_timer = this_entity.respawn_period;
 this_entity.path = [];
 this_entity.attack_period = 5;
@@ -133,7 +133,7 @@ maps["zone1"].entities.push(this_entity);
 
 this_entity = new entity_inst();
 this_entity.alive = true;
-this_entity.max_health = 100;
+this_entity.max_health = 200;
 this_entity.health = this_entity.max_health;
 this_entity.sprite = "";
 this_entity.type = "goblin";
@@ -147,7 +147,7 @@ this_entity.origin_y = this_entity.pos_y;
 this_entity.target_entity = null;
 this_entity.roam_range = 10;
 this_entity.view_range = 5;
-this_entity.attack_range = 1;
+this_entity.attack_range = 1.5;
 this_entity.in_combat = false;
 this_entity.aggressive = true;
 this_entity.move_speed = 1;
@@ -204,7 +204,7 @@ net.createServer(function (socket) {
     thisClient.pos_x = 0;
     thisClient.pos_y = 0;
     thisClient.view_range = 5;
-    thisClient.attack_range = 1;
+    thisClient.attack_range = 1.5;
     thisClient.target_x = thisClient.pos_x;
     thisClient.target_y = thisClient.pos_y;
     thisClient.target_entity = null;
@@ -298,7 +298,7 @@ async function updateEntities() {
                                                     //If target is within attack range, attack the target
                                                     if (dist <= entity.attack_range) {
                                                         //attack the target
-                                                        if (entity.attack_timer >= entity.attack_period) {
+                                                        if(entity.attack_timer >= entity.attack_period) {
                                                             maps[map].clients.forEach(function (otherClient) {
                                                                 otherClient.socket.write(packet.build([
                                                                     "ATTACK", "attack", client.username, entity.name
@@ -490,11 +490,11 @@ async function updateEntities() {
                                 if (client.target_entity !== null) {
                                     var target_entity = null;
                                     maps[map].entities.forEach(function (entity) {
-                                        if (entity.name === client.target_entity) {
+                                        if(entity.name === client.target_entity) {
                                             target_entity = entity;
                                         }
                                     });
-                                    if (target_entity.alive) {
+                                    if(target_entity.alive) {
                                         dist = distance(client.pos_x, client.pos_y, target_entity.pos_x, target_entity.pos_y);
                                         if (dist <= client.attack_range) {
                                             if (client.attack_timer >= client.attack_period) {
@@ -512,11 +512,15 @@ async function updateEntities() {
                                                                 "HEALTH", entity.name, entity.health.toString()
                                                             ], client.id));
                                                         });
+                                                        if (entity.target_entity === null) {
+                                                            //If target_entity is not already in combat, target the client that just attacked them:
+                                                            entity.in_combat = true;
+                                                            entity.target_entity = client.username;
+                                                            entity.target_x = client.pos_x;
+                                                            entity.target_y = client.pos_y;
+                                                        }
                                                         if (entity.health < 0) {
                                                             send_destroy_packet(target_entity.name, map);
-                                                            // maps[client.current_room].clients.forEach(function (OtherClient) {
-                                                            //     OtherClient.socket.write(packet.build(["DESTROY", target_entity.name], OtherClient.id));
-                                                            // });
                                                             entity.alive = false;
                                                             alive = entity.alive;
                                                             client.target_entity = null;

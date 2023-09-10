@@ -52,6 +52,7 @@
     {"name":"Timelines","order":8,"path":"folders/Timelines.yy",},
     {"name":"Rat","order":4,"path":"folders/Sprites/Entities/Mob Sprites/Rat.yy",},
     {"name":"Rat","order":24,"path":"folders/Objects/Animations/Rat.yy",},
+    {"name":"Rat","order":2,"path":"folders/Sounds/SFX/Mob Sounds/Rat.yy",},
   ],
   "ResourceOrderSettings": [
     {"name":"camera_controller","order":5,"path":"objects/camera_controller/camera_controller.yy",},
@@ -165,6 +166,7 @@
     {"name":"btn_password_reset_login","order":7,"path":"objects/btn_password_reset_login/btn_password_reset_login.yy",},
     {"name":"btn_quit_connection_lost","order":2,"path":"objects/btn_quit_connection_lost/btn_quit_connection_lost.yy",},
     {"name":"dungeon_wall_top_corner_right_up","order":16,"path":"sprites/dungeon_wall_top_corner_right_up/dungeon_wall_top_corner_right_up.yy",},
+    {"name":"death_rat","order":1,"path":"sounds/death_rat/death_rat.yy",},
     {"name":"ui_textbox_base","order":2,"path":"objects/ui_textbox_base/ui_textbox_base.yy",},
     {"name":"goblin_idle_right","order":5,"path":"objects/goblin_idle_right/goblin_idle_right.yy",},
     {"name":"mob","order":3,"path":"objects/mob/mob.yy",},
