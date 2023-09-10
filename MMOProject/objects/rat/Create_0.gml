@@ -1,0 +1,11 @@
+event_inherited();
+idle_right = "spr_rat_idle_right";
+move_right = "spr_rat_move_right";
+attack_right = "rat_attack_right";
+death_right = "rat_death_right";
+idle_left = "spr_rat_idle_left";
+move_left = "spr_rat_move_left";
+attack_left = "rat_attack_left";
+death_left = "rat_death_left";
+attack_sound = "attack_sword_1";
+death_sound = "death_goblin";

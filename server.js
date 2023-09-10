@@ -46,7 +46,7 @@ map_files.forEach(function (mapFile) {
 //Init walls in zone1
 //NOTE: when loading walls into the map grid, grid in gamemaker is not zero-indexed
 //In the server, a wall with position 11,1 is loaded in at position 13,3
-for(var i = 0; i < 11; ++i){
+for (var i = 0; i < 11; ++i) {
     wall = {
         x: 11,
         y: i
@@ -101,39 +101,40 @@ var this_entity = new entity_inst();
 // maps["zone1"].entities.push(this_entity);
 //
 //
-// this_entity = new entity_inst();
-// this_entity.alive = true;
-// this_entity.health = 100;
-// this_entity.sprite = "";
-// this_entity.type = "mob";
-// this_entity.name = "mob2";
-// this_entity.pos_x = 15;
-// this_entity.pos_y = 21;
-// this_entity.target_x = this_entity.pos_x;
-// this_entity.target_y = this_entity.pos_y;
-// this_entity.origin_x = this_entity.pos_x;
-// this_entity.origin_y = this_entity.pos_y;
-// this_entity.target_entity = null;
-// this_entity.roam_range = 10;
-// this_entity.view_range = 5;
-// this_entity.attack_range = 3;
-// this_entity.in_combat = false;
-// this_entity.aggressive = true;
-// this_entity.move_speed = 1;
-// this_entity.sprite = "sprite";
-// this_entity.max_health = 100;
-// this_entity.respawn_period = 100;
-// this_entity.respawn_timer = this_entity.respawn_period;
-// this_entity.path = [];
-// this_entity.attack_period = 5;
-// this_entity.attack_timer = this_entity.attack_period;
-// this_entity.patrol_path = [{x: 15, y: 21},{x: 10, y: 15}];
-// this_entity.patrol_point = 0;
-// maps["zone1"].entities.push(this_entity);
+this_entity = new entity_inst();
+this_entity.alive = true;
+this_entity.max_health = 30;
+this_entity.health = this_entity.max_health;
+this_entity.sprite = "";
+this_entity.type = "rat";
+this_entity.name = "rat1";
+this_entity.pos_x = 15;
+this_entity.pos_y = 10;
+this_entity.target_x = this_entity.pos_x;
+this_entity.target_y = this_entity.pos_y;
+this_entity.origin_x = this_entity.pos_x;
+this_entity.origin_y = this_entity.pos_y;
+this_entity.target_entity = null;
+this_entity.roam_range = 10;
+this_entity.view_range = 5;
+this_entity.attack_range = 1;
+this_entity.in_combat = false;
+this_entity.aggressive = false;
+this_entity.move_speed = 1;
+this_entity.sprite = "sprite";
+this_entity.respawn_period = 50;
+this_entity.respawn_timer = this_entity.respawn_period;
+this_entity.path = [];
+this_entity.attack_period = 5;
+this_entity.attack_timer = this_entity.attack_period;
+this_entity.patrol_path = [{x: 15, y: 10}, {x: 20, y: 15}];
+this_entity.patrol_point = 0;
+maps["zone1"].entities.push(this_entity);
 
 this_entity = new entity_inst();
 this_entity.alive = true;
-this_entity.health = 100;
+this_entity.max_health = 100;
+this_entity.health = this_entity.max_health;
 this_entity.sprite = "";
 this_entity.type = "goblin";
 this_entity.name = "goblin1";
@@ -146,12 +147,11 @@ this_entity.origin_y = this_entity.pos_y;
 this_entity.target_entity = null;
 this_entity.roam_range = 10;
 this_entity.view_range = 5;
-this_entity.attack_range = 3;
+this_entity.attack_range = 1;
 this_entity.in_combat = false;
 this_entity.aggressive = true;
 this_entity.move_speed = 1;
 this_entity.sprite = "sprite";
-this_entity.max_health = 100;
 this_entity.respawn_period = 100;
 this_entity.respawn_timer = this_entity.respawn_period;
 this_entity.path = [];
@@ -204,7 +204,7 @@ net.createServer(function (socket) {
     thisClient.pos_x = 0;
     thisClient.pos_y = 0;
     thisClient.view_range = 5;
-    thisClient.attack_range = 2;
+    thisClient.attack_range = 1;
     thisClient.target_x = thisClient.pos_x;
     thisClient.target_y = thisClient.pos_y;
     thisClient.target_entity = null;
@@ -236,11 +236,10 @@ async function updateEntities() {
     mapList = Object.keys(maps);
     while (true) {
         mapList.forEach(function (map) {
-            if (maps[map].clients.length > 0) {
-                maps[map].entities.forEach(function (entity) {
-                    if (entity.alive) {
-                        entity.attack_timer += 1;
-                        if (entity.aggressive) {
+                if (maps[map].clients.length > 0) {
+                    maps[map].entities.forEach(function (entity) {
+                        if (entity.alive) {
+                            entity.attack_timer += 1;
                             if (entity.target_entity === null) {
                                 //Follow patrol path:
                                 if (entity.patrol_path !== []) {
@@ -257,19 +256,21 @@ async function updateEntities() {
                                         entity.target_y = entity.patrol_path[entity.patrol_point].y;
                                     }
                                 }
-                                //Check if any clients are within mob's view range
-                                maps[map].clients.forEach(function (client) {
-                                    if (client.alive) {
-                                        dist = distance(client.pos_x, client.pos_y, entity.pos_x, entity.pos_y);
-                                        if (dist < entity.view_range) {
-                                            console.log(timeNow() + "Mob aggro triggered");
-                                            entity.in_combat = true;
-                                            entity.target_entity = client.username;
-                                            entity.target_x = client.pos_x;
-                                            entity.target_y = client.pos_y;
+                                if (entity.aggressive) {
+                                    //Check if any clients are within mob's view range
+                                    maps[map].clients.forEach(function (client) {
+                                        if (client.alive) {
+                                            dist = distance(client.pos_x, client.pos_y, entity.pos_x, entity.pos_y);
+                                            if (dist < entity.view_range) {
+                                                console.log(timeNow() + "Mob aggro triggered");
+                                                entity.in_combat = true;
+                                                entity.target_entity = client.username;
+                                                entity.target_x = client.pos_x;
+                                                entity.target_y = client.pos_y;
+                                            }
                                         }
-                                    }
-                                });
+                                    });
+                                }
                             } else {
                                 //If entity has a target
                                 dist = distance(entity.pos_x, entity.pos_y, entity.origin_x, entity.origin_y);
@@ -337,249 +338,250 @@ async function updateEntities() {
                                                     }
                                                 }
                                             }
-                                        } catch(error) {
+                                        } catch (error) {
 
                                         }
                                     });
                                 }
                             }
-                        }
-                        if (entity.target_x !== entity.pos_x || entity.target_y !== entity.pos_y) {
-                            entity.path = createPath(map, entity.pos_x, entity.pos_y, entity.target_x, entity.target_y);
-                            if (entity.target_entity !== null) {
-                                if (entity.path.length === 1) {
-                                    entity.path = [];
-                                } else {
-                                    entity.path = entity.path.slice(0, -1);
-                                }
-                            }
-                        }
-                        if (entity.path.length > 0) {
-                            prev_pos_x = entity.pos_x;
-                            prev_pos_y = entity.pos_y;
-                            moveTowardsTarget(map, entity);
-                            maps[map].clients.forEach(function (client) {
-                                client.socket.write(packet.build([
-                                    "POS", entity.name, prev_pos_x.toString(), prev_pos_y.toString(), entity.pos_x.toString(), entity.pos_y.toString()
-                                ], client.id));
-                            });
-                        }
-                    } else if (!entity.alive) {
-                        entity.respawn_timer -= 10;
-                        if (entity.respawn_timer <= 0) {
-                            entity.alive = true;
-                            entity.health = entity.max_health;
-                            entity.respawn_timer = entity.respawn_period;
-                            entity.pos_x = entity.origin_x;
-                            entity.pos_y = entity.origin_y;
-                            entity.target_x = entity.origin_x;
-                            entity.target_y = entity.origin_y;
-                            entity.target_entity = null;
-                            maps[map].clients.forEach(function (client) {
-                                params = [];
-                                params.push("SPAWN");
-                                params.push(entity.name);
-                                params.push(entity.type);
-                                params.push(entity.pos_x.toString());
-                                params.push(entity.pos_y.toString());
-                                params.push(entity.health);
-                                client.socket.write(packet.build(params, client.id));
-                            });
-                        }
-                    }
-                });
-                //Update client pos
-                maps[map].clients.forEach(function (client) {
-                    try {
-                        if (client.alive) {
-                            client.attack_timer += 1;
-                            if (client.target_x !== client.pos_x || client.target_y !== client.pos_y) {
-                                client.path = createPath(map, client.pos_x, client.pos_y, client.target_x, client.target_y);
-                                if (client.target_entity !== null) {
-                                    client.path = client.path.slice(0, -1);
-                                    if (client.path.length === 1) {
-                                        client.path = [];
+                            if (entity.target_x !== entity.pos_x || entity.target_y !== entity.pos_y) {
+                                entity.path = createPath(map, entity.pos_x, entity.pos_y, entity.target_x, entity.target_y);
+                                if (entity.target_entity !== null) {
+                                    if (entity.path.length === 1) {
+                                        entity.path = [];
                                     } else {
-                                        client.path = client.path.slice(0, -1);
+                                        entity.path = entity.path.slice(0, -1);
                                     }
                                 }
                             }
-                            if (client.path.length > 0) {
-                                prev_pos_x = client.pos_x;
-                                prev_pos_y = client.pos_y;
-                                moveTowardsTarget(map, client);
-                                maps[map].clients.forEach(function (otherClient) {
-                                    params = [];
-                                    params.push("POS");
-                                    params.push(client.username);
-                                    params.push(prev_pos_x.toString());
-                                    params.push(prev_pos_y.toString());
-                                    params.push(client.pos_x.toString());
-                                    params.push(client.pos_y.toString());
-                                    otherClient.socket.write(packet.build(params, otherClient.id));
-                                });
-                            }
-                            //Check if client is in same grid as a door:
-                            maps[map].doors.forEach(function (door) {
-                                if (client.pos_x === door.pos_x && client.pos_y === door.pos_y) {
-                                    //Update client current_room in DB:
-                                    sql_error = false;
-                                    query = "UPDATE public.users SET current_room = '" + door.room_to +
-                                        "' WHERE current_client = " + client.id + " AND online_status = true;";
-                                    console.log(timeNow() + query);
-                                    try {
-                                        connection.query(query);
-                                    } catch (error) {
-                                        console.log(timeNow() + config.err_msg_login + client.id);
-                                        console.log(error.stack);
-                                        sql_error = true;
-                                    }
-                                    if (!sql_error) {
-                                        maps[map].clients = maps[map].clients.filter(item => item !== client);
-                                        client.current_room = door.room_to;
-                                        maps[door.room_to].clients.push(client);
-                                        //Send player destroy packet to all clients in the old room
-                                        send_destroy_packet(client.username, map);
-                                        // maps[map].clients.forEach(function (otherClient) {
-                                        //     otherClient.socket.write(packet.build(["DESTROY", client.username], otherClient.id));
-                                        // });
-                                        //Send move room packet to target client:
-                                        params = [];
-                                        params.push("ROOM");
-                                        params.push(door.room_to);
-                                        client.socket.write(packet.build(params, client.id));
-                                        //Send target client spawn packets for all other entities and clients in the new room:
-                                        maps[door.room_to].entities.forEach(function (entity) {
-                                            if (entity.alive) {
-                                                params = [];
-                                                params.push("SPAWN");
-                                                params.push(entity.name);
-                                                params.push(entity.type);
-                                                params.push(entity.pos_x.toString());
-                                                params.push(entity.pos_y.toString());
-                                                params.push(entity.health);
-                                                client.socket.write(packet.build(params, client.id));
-                                            }
-                                        });
-                                        maps[door.room_to].clients.forEach(function (otherClient) {
-                                            if (otherClient.alive) {
-                                                params = [];
-                                                params.push("SPAWN");
-                                                params.push(otherClient.username);
-                                                params.push("player");
-                                                params.push(otherClient.pos_x.toString());
-                                                params.push(otherClient.pos_y.toString());
-                                                params.push(otherClient.health);
-                                                client.socket.write(packet.build(params, client.id));
-                                            }
-                                        });
-                                        maps[door.room_to].clients.forEach(function (otherClient) {
-                                            //Send player spawn packet to all clients in the new room
-                                            params = [];
-                                            params.push("SPAWN");
-                                            params.push(client.username);
-                                            params.push("player");
-                                            params.push(client.pos_x.toString());
-                                            params.push(client.pos_y.toString());
-                                            params.push(client.health);
-                                            otherClient.socket.write(packet.build(params, otherClient.id));
-                                        });
-                                    }
-                                }
-                            })
-                            if (client.target_entity !== null) {
-                                var target_entity = null;
-                                maps[map].entities.forEach(function (entity) {
-                                    if (entity.name === client.target_entity) {
-                                        target_entity = entity;
-                                    }
-                                });
-                                if (target_entity.alive) {
-                                    dist = distance(client.pos_x, client.pos_y, target_entity.pos_x, target_entity.pos_y);
-                                    if (dist <= client.attack_range) {
-                                        if (client.attack_timer >= client.attack_period) {
-                                            maps[map].clients.forEach(function (otherClient) {
-                                                otherClient.socket.write(packet.build([
-                                                    "ATTACK", "attack", target_entity.name, client.username
-                                                ], otherClient.id));
-                                            });
-                                            client.attack_timer = 0;
-                                            maps[map].entities.forEach(function (entity) {
-                                                if (entity.name === client.target_entity && entity.alive) {
-                                                    entity.health -= 10;
-                                                    maps[map].clients.forEach(function (OtherClient) {
-                                                        OtherClient.socket.write(packet.build([
-                                                            "HEALTH", entity.name, entity.health.toString()
-                                                        ], client.id));
-                                                    });
-                                                    if (entity.health < 0) {
-                                                        send_destroy_packet(target_entity.name, map);
-                                                        // maps[client.current_room].clients.forEach(function (OtherClient) {
-                                                        //     OtherClient.socket.write(packet.build(["DESTROY", target_entity.name], OtherClient.id));
-                                                        // });
-                                                        entity.alive = false;
-                                                        alive = entity.alive;
-                                                        client.target_entity = null;
-                                                    }
-                                                }
-                                            });
-                                        }
-                                    } else {
-                                        client.target_x = target_entity.pos_x;
-                                        client.target_y = target_entity.pos_y;
-                                    }
-                                }
-                            }
-                        } else {
-                            //If client is not alive, update client spawn timer:
-                            client.respawn_timer -= 1;
-                            if (client.respawn_timer <= 0) {
-                                client.alive = true;
-                                client.respawn_timer = client.respawn_period;
-                                maps[map].clients.forEach(function (otherClient) {
-                                    params = [];
-                                    params.push("SPAWN");
-                                    params.push(client.username);
-                                    params.push("player");
-                                    params.push(client.pos_x.toString());
-                                    params.push(client.pos_y.toString());
-                                    params.push(client.health);
-                                    otherClient.socket.write(packet.build(params, otherClient.id));
-                                });
-                            }
-                        }
-                    } catch(error){
-
-                    }
-                });
-            }
-            //At end of each step, check if any mobs occupy the same square as any players, move mobs out of the square
-            //If no square available to move to, stay in place
-            maps[map].entities.forEach(function (entity) {
-                if (entity.alive) {
-                    maps[map].clients.forEach(function (client) {
-                        if (client.pos_x === entity.pos_x && client.pos_y === entity.pos_y) {
-                            check_surrounding(maps[map].grid, entity);
                             if (entity.path.length > 0) {
                                 prev_pos_x = entity.pos_x;
                                 prev_pos_y = entity.pos_y;
                                 moveTowardsTarget(map, entity);
-                                maps[map].clients.forEach(function (otherClient) {
+                                maps[map].clients.forEach(function (client) {
+                                    client.socket.write(packet.build([
+                                        "POS", entity.name, prev_pos_x.toString(), prev_pos_y.toString(), entity.pos_x.toString(), entity.pos_y.toString()
+                                    ], client.id));
+                                });
+                            }
+                        } else if (!entity.alive) {
+                            entity.respawn_timer -= 10;
+                            if (entity.respawn_timer <= 0) {
+                                entity.alive = true;
+                                entity.health = entity.max_health;
+                                entity.respawn_timer = entity.respawn_period;
+                                entity.pos_x = entity.origin_x;
+                                entity.pos_y = entity.origin_y;
+                                entity.target_x = entity.origin_x;
+                                entity.target_y = entity.origin_y;
+                                entity.target_entity = null;
+                                maps[map].clients.forEach(function (client) {
                                     params = [];
-                                    params.push("POS");
+                                    params.push("SPAWN");
                                     params.push(entity.name);
-                                    params.push(prev_pos_x.toString());
-                                    params.push(prev_pos_y.toString());
+                                    params.push(entity.type);
                                     params.push(entity.pos_x.toString());
                                     params.push(entity.pos_y.toString());
-                                    otherClient.socket.write(packet.build(params, otherClient.id));
+                                    params.push(entity.health);
+                                    client.socket.write(packet.build(params, client.id));
                                 });
                             }
                         }
                     });
+                    //Update client pos
+                    maps[map].clients.forEach(function (client) {
+                        try {
+                            if (client.alive) {
+                                client.attack_timer += 1;
+                                if (client.target_x !== client.pos_x || client.target_y !== client.pos_y) {
+                                    client.path = createPath(map, client.pos_x, client.pos_y, client.target_x, client.target_y);
+                                    if (client.target_entity !== null) {
+                                        client.path = client.path.slice(0, -1);
+                                        if (client.path.length === 1) {
+                                            client.path = [];
+                                        } else {
+                                            client.path = client.path.slice(0, -1);
+                                        }
+                                    }
+                                }
+                                if (client.path.length > 0) {
+                                    prev_pos_x = client.pos_x;
+                                    prev_pos_y = client.pos_y;
+                                    moveTowardsTarget(map, client);
+                                    maps[map].clients.forEach(function (otherClient) {
+                                        params = [];
+                                        params.push("POS");
+                                        params.push(client.username);
+                                        params.push(prev_pos_x.toString());
+                                        params.push(prev_pos_y.toString());
+                                        params.push(client.pos_x.toString());
+                                        params.push(client.pos_y.toString());
+                                        otherClient.socket.write(packet.build(params, otherClient.id));
+                                    });
+                                }
+                                //Check if client is in same grid as a door:
+                                maps[map].doors.forEach(function (door) {
+                                    if (client.pos_x === door.pos_x && client.pos_y === door.pos_y) {
+                                        //Update client current_room in DB:
+                                        sql_error = false;
+                                        query = "UPDATE public.users SET current_room = '" + door.room_to +
+                                            "' WHERE current_client = " + client.id + " AND online_status = true;";
+                                        console.log(timeNow() + query);
+                                        try {
+                                            connection.query(query);
+                                        } catch (error) {
+                                            console.log(timeNow() + config.err_msg_login + client.id);
+                                            console.log(error.stack);
+                                            sql_error = true;
+                                        }
+                                        if (!sql_error) {
+                                            maps[map].clients = maps[map].clients.filter(item => item !== client);
+                                            client.current_room = door.room_to;
+                                            maps[door.room_to].clients.push(client);
+                                            //Send player destroy packet to all clients in the old room
+                                            send_destroy_packet(client.username, map);
+                                            // maps[map].clients.forEach(function (otherClient) {
+                                            //     otherClient.socket.write(packet.build(["DESTROY", client.username], otherClient.id));
+                                            // });
+                                            //Send move room packet to target client:
+                                            params = [];
+                                            params.push("ROOM");
+                                            params.push(door.room_to);
+                                            client.socket.write(packet.build(params, client.id));
+                                            //Send target client spawn packets for all other entities and clients in the new room:
+                                            maps[door.room_to].entities.forEach(function (entity) {
+                                                if (entity.alive) {
+                                                    params = [];
+                                                    params.push("SPAWN");
+                                                    params.push(entity.name);
+                                                    params.push(entity.type);
+                                                    params.push(entity.pos_x.toString());
+                                                    params.push(entity.pos_y.toString());
+                                                    params.push(entity.health);
+                                                    client.socket.write(packet.build(params, client.id));
+                                                }
+                                            });
+                                            maps[door.room_to].clients.forEach(function (otherClient) {
+                                                if (otherClient.alive) {
+                                                    params = [];
+                                                    params.push("SPAWN");
+                                                    params.push(otherClient.username);
+                                                    params.push("player");
+                                                    params.push(otherClient.pos_x.toString());
+                                                    params.push(otherClient.pos_y.toString());
+                                                    params.push(otherClient.health);
+                                                    client.socket.write(packet.build(params, client.id));
+                                                }
+                                            });
+                                            maps[door.room_to].clients.forEach(function (otherClient) {
+                                                //Send player spawn packet to all clients in the new room
+                                                params = [];
+                                                params.push("SPAWN");
+                                                params.push(client.username);
+                                                params.push("player");
+                                                params.push(client.pos_x.toString());
+                                                params.push(client.pos_y.toString());
+                                                params.push(client.health);
+                                                otherClient.socket.write(packet.build(params, otherClient.id));
+                                            });
+                                        }
+                                    }
+                                })
+                                if (client.target_entity !== null) {
+                                    var target_entity = null;
+                                    maps[map].entities.forEach(function (entity) {
+                                        if (entity.name === client.target_entity) {
+                                            target_entity = entity;
+                                        }
+                                    });
+                                    if (target_entity.alive) {
+                                        dist = distance(client.pos_x, client.pos_y, target_entity.pos_x, target_entity.pos_y);
+                                        if (dist <= client.attack_range) {
+                                            if (client.attack_timer >= client.attack_period) {
+                                                maps[map].clients.forEach(function (otherClient) {
+                                                    otherClient.socket.write(packet.build([
+                                                        "ATTACK", "attack", target_entity.name, client.username
+                                                    ], otherClient.id));
+                                                });
+                                                client.attack_timer = 0;
+                                                maps[map].entities.forEach(function (entity) {
+                                                    if (entity.name === client.target_entity && entity.alive) {
+                                                        entity.health -= 10;
+                                                        maps[map].clients.forEach(function (OtherClient) {
+                                                            OtherClient.socket.write(packet.build([
+                                                                "HEALTH", entity.name, entity.health.toString()
+                                                            ], client.id));
+                                                        });
+                                                        if (entity.health < 0) {
+                                                            send_destroy_packet(target_entity.name, map);
+                                                            // maps[client.current_room].clients.forEach(function (OtherClient) {
+                                                            //     OtherClient.socket.write(packet.build(["DESTROY", target_entity.name], OtherClient.id));
+                                                            // });
+                                                            entity.alive = false;
+                                                            alive = entity.alive;
+                                                            client.target_entity = null;
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        } else {
+                                            client.target_x = target_entity.pos_x;
+                                            client.target_y = target_entity.pos_y;
+                                        }
+                                    }
+                                }
+                            } else {
+                                //If client is not alive, update client spawn timer:
+                                client.respawn_timer -= 1;
+                                if (client.respawn_timer <= 0) {
+                                    client.alive = true;
+                                    client.respawn_timer = client.respawn_period;
+                                    maps[map].clients.forEach(function (otherClient) {
+                                        params = [];
+                                        params.push("SPAWN");
+                                        params.push(client.username);
+                                        params.push("player");
+                                        params.push(client.pos_x.toString());
+                                        params.push(client.pos_y.toString());
+                                        params.push(client.health);
+                                        otherClient.socket.write(packet.build(params, otherClient.id));
+                                    });
+                                }
+                            }
+                        } catch (error) {
+
+                        }
+                    });
                 }
-            });
-        });
+                //At end of each step, check if any mobs occupy the same square as any players, move mobs out of the square
+                //If no square available to move to, stay in place
+                maps[map].entities.forEach(function (entity) {
+                    if (entity.alive) {
+                        maps[map].clients.forEach(function (client) {
+                            if (client.pos_x === entity.pos_x && client.pos_y === entity.pos_y) {
+                                check_surrounding(maps[map].grid, entity);
+                                if (entity.path.length > 0) {
+                                    prev_pos_x = entity.pos_x;
+                                    prev_pos_y = entity.pos_y;
+                                    moveTowardsTarget(map, entity);
+                                    maps[map].clients.forEach(function (otherClient) {
+                                        params = [];
+                                        params.push("POS");
+                                        params.push(entity.name);
+                                        params.push(prev_pos_x.toString());
+                                        params.push(prev_pos_y.toString());
+                                        params.push(entity.pos_x.toString());
+                                        params.push(entity.pos_y.toString());
+                                        otherClient.socket.write(packet.build(params, otherClient.id));
+                                    });
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        )
+        ;
         await new Promise(resolve => setTimeout(resolve, config.step));
     }
 }
@@ -690,7 +692,7 @@ function initMapGrid(map) {
             grid[i][k] = "empty";
         }
     }
-    map.walls.forEach(function(wall){
+    map.walls.forEach(function (wall) {
         grid[wall.x][wall.y] = "wall";
     });
     return grid;
@@ -788,7 +790,7 @@ function createPath(map, x1, y1, x2, y2) {
     return final_path;
 }
 
-async function send_destroy_packet(entity_name, map){
+async function send_destroy_packet(entity_name, map) {
     await new Promise(resolve => setTimeout(resolve, config.step));
     maps[map].clients.forEach(function (client) {
         //Send player death packet to all clients in the room
