@@ -4,6 +4,7 @@ const {Client} = require("pg");
 const nodemailer = require('nodemailer');
 const generator = require('generate-password');
 const {generate} = require("generate-password");
+const winston = require('winston');
 const connection = new Client({
     host: '127.0.0.1',
     port: '5432',
@@ -19,7 +20,15 @@ connection.connect((error) => {
 });
 var zeroBuffer = Buffer.from("00", "hex");
 
+const chat_logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.json(),
+    defaultMeta: { service: 'user-service' },
+    transports: [new winston.transports.File({ filename: 'chat.log' })],
+});
+
 module.exports = packet = {
+
     //params is an array of javascript objects to be turned into buffers to send data to gamemaker
     build: function (params, clientId) {
         if (clientId == null) {
@@ -264,10 +273,15 @@ module.exports = packet = {
         }
 
         function chat(message) {
+            if(message.length > config.chat_max_length){
+                message = message.substring(0,36);
+            }
             var dateTime = new Date();
+            message = dateTime.getHours() + ":" + dateTime.getMinutes() + " " + client.username + ": " + message
+            chat_logger.info(message);
             maps[client.current_room].clients.forEach(function (otherclient) {
                 client.socket.write(packet.build([
-                    "CHAT", dateTime.getHours() + ":" + dateTime.getMinutes() + " " + client.username + ": " + message
+                    "CHAT", message
                 ], otherclient.id));
             });
         }

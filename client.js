@@ -11,7 +11,7 @@ const connection = new Client({
 var query;
 var values;
 var id;
-var refresh_cont;
+var refresh_cont; //do not delete
 module.exports = function () {
 
     var client = this;

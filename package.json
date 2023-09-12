@@ -11,7 +11,8 @@
     "q": "*",
     "underscore": "*",
     "nodemailer": "*",
-    "generate-password": "*"
+    "generate-password": "*",
+    "winston": "*"
   },
   "author": "Jean-Luc Gallo",
   "license": "ISC"

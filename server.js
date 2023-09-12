@@ -15,7 +15,6 @@ const {Client} = require("pg");
 5. Init server and listen to the internet
  */
 
-var timeStamp = new Date();
 console.log(timeNow() + "Startup sequence initiated");
 
 //Load init files
