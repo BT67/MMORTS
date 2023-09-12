@@ -156,6 +156,17 @@ module.exports = packet = {
                     }
                 });
 
+                function spawnWalls(client){
+                    maps[current_room].walls.forEach(function(wall){
+                        params = [];
+                        params.push("WALL");
+                        params.push(wall.type);
+                        params.push(wall.pos_x.toString());
+                        params.push(wall.pos_y.toString());
+                        client.socket.write(packet.build(params, client.id));
+                    });
+                }
+
                 function spawnEntities(client) {
                     maps[current_room].entities.forEach(function (entity) {
                         if (entity.alive) {
@@ -186,6 +197,7 @@ module.exports = packet = {
                     });
                 }
 
+                spawnWalls(client);
                 spawnEntities(client);
                 spawnClients(client);
 

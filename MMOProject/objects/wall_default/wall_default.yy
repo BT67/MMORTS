@@ -1,7 +1,7 @@
 {
   "resourceType": "GMObject",
   "resourceVersion": "1.0",
-  "name": "wall",
+  "name": "wall_default",
   "eventList": [],
   "managed": true,
   "overriddenProperties": [],
@@ -9,7 +9,10 @@
     "name": "Walls",
     "path": "folders/Objects/Walls.yy",
   },
-  "parentObjectId": null,
+  "parentObjectId": {
+    "name": "wall",
+    "path": "objects/wall/wall.yy",
+  },
   "persistent": true,
   "physicsAngularDamping": 0.1,
   "physicsDensity": 0.5,
@@ -25,7 +28,10 @@
   "physicsStartAwake": true,
   "properties": [],
   "solid": false,
-  "spriteId": null,
+  "spriteId": {
+    "name": "dungeon_wall_top_column",
+    "path": "sprites/dungeon_wall_top_column/dungeon_wall_top_column.yy",
+  },
   "spriteMaskId": null,
   "visible": true,
 }

@@ -47,8 +47,9 @@ map_files.forEach(function (mapFile) {
 //In the server, a wall with position 11,1 is loaded in at position 13,3
 for (var i = 0; i < 11; ++i) {
     wall = {
-        x: 11,
-        y: i
+        type: "wall_default",
+        pos_x: 11,
+        pos_y: i
     }
     maps["zone1"].walls.push(wall);
 }
@@ -696,7 +697,7 @@ function initMapGrid(map) {
         }
     }
     map.walls.forEach(function (wall) {
-        grid[wall.x][wall.y] = "wall";
+        grid[wall.pos_x][wall.pos_y] = "wall";
     });
     return grid;
 }

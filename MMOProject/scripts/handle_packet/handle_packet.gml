@@ -55,6 +55,20 @@ function handle_packet(data_buffer){
 				}
 			}
 			break;
+		case "WALL":
+			wall_type = buffer_read(data_buffer, buffer_string);
+			show_debug_message(string(wall_type));
+			pos_x = buffer_read(data_buffer, buffer_string);
+			pos_x = (real(pos_x) + 1) * 32;
+			show_debug_message(string(pos_x));
+			pos_y = buffer_read(data_buffer, buffer_string);
+			pos_y = (real(pos_y) + 1) * 32;
+			show_debug_message(string(pos_y));
+			var_wall = "";
+			with(instance_create_layer(real(pos_x), real(pos_y), "Instances", asset_get_index(wall_type))){
+				var_wall = other;
+			}
+			break;
 		case "SPAWN":
 			entity_name = buffer_read(data_buffer, buffer_string);
 			show_debug_message(string(entity_name));
@@ -87,6 +101,7 @@ function handle_packet(data_buffer){
 			instance_destroy(entity);
 			instance_destroy(attack);
 			instance_destroy(animation);
+			instance_destroy(wall_default);
 			target_room = buffer_read(data_buffer, buffer_string);
 			audio_stop_all();
 			room_goto(asset_get_index(target_room));
