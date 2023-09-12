@@ -11,7 +11,8 @@ if(focused){
 		keyboard_key != vk_up &&
 		keyboard_key != vk_down &&
 		keyboard_key != vk_left &&
-		keyboard_key != vk_right){
+		keyboard_key != vk_right &&
+		string_length(text) < max_char_length){
 			text += keyboard_lastchar;	
 	}
 }

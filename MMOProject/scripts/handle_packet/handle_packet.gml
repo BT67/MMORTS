@@ -149,8 +149,7 @@ function handle_packet(data_buffer){
 			break;
 		case "CHAT":
 			msg = buffer_read(data_buffer, buffer_string);
-			show_debug_message(msg);
-			txt_chat_log.chat_log += (msg + "\n");
+			array_push(txt_chat_log.chat_log, msg);
 			break;
 		case "POS":
 			entity_name = buffer_read(data_buffer, buffer_string);
