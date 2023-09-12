@@ -276,9 +276,13 @@ module.exports = packet = {
             if(message.length > config.chat_max_length){
                 message = message.substring(0,36);
             }
-            var dateTime = new Date();
-            message = dateTime.getHours() + ":" + dateTime.getMinutes() + " " + client.username + ": " + message
-            chat_logger.info(message);
+            var chat_log_json = {
+                "time": timeNow(),
+                "user": client.username,
+                "message": message
+            }
+            message = client.username + ": " + message;
+            chat_logger.info(chat_log_json);
             maps[client.current_room].clients.forEach(function (otherclient) {
                 client.socket.write(packet.build([
                     "CHAT", message

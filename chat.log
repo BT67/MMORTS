@@ -1,4 +1,1 @@
-{"level":"info","message":"message 1","service":"user-service"}
-{"level":"info","message":"message 2","service":"user-service"}
-{"level":"info","message":"9:24 test: test message 1","service":"user-service"}
-{"level":"info","message":"9:24 test: test message 2","service":"user-service"}
+{"level":"info","message":"test message","service":"user-service","time":"[2023-09-12T23:10:13.673Z] ","user":"test"}
