@@ -14,8 +14,6 @@
     {"name":"inst_20D2C149","path":"rooms/zone1/zone1.yy",},
     {"name":"inst_5D185ED","path":"rooms/zone1/zone1.yy",},
     {"name":"inst_7C76CCB3","path":"rooms/zone1/zone1.yy",},
-    {"name":"inst_40A5D07E","path":"rooms/zone1/zone1.yy",},
-    {"name":"inst_6ADA32F9","path":"rooms/zone1/zone1.yy",},
     {"name":"inst_7619E8BD","path":"rooms/zone1/zone1.yy",},
   ],
   "isDnd": false,
@@ -28,8 +26,6 @@
         {"resourceType":"GMRInstance","resourceVersion":"1.0","name":"inst_20D2C149","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"objectId":{"name":"txt_chat_log","path":"objects/txt_chat_log/txt_chat_log.yy",},"properties":[],"rotation":0.0,"scaleX":15.0,"scaleY":4.0,"x":0.0,"y":512.0,},
         {"resourceType":"GMRInstance","resourceVersion":"1.0","name":"inst_5D185ED","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"objectId":{"name":"camera_controller","path":"objects/camera_controller/camera_controller.yy",},"properties":[],"rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":16.0,"y":80.0,},
         {"resourceType":"GMRInstance","resourceVersion":"1.0","name":"inst_7C76CCB3","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"objectId":{"name":"hud_health","path":"objects/hud_health/hud_health.yy",},"properties":[],"rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":384.0,"y":64.0,},
-        {"resourceType":"GMRInstance","resourceVersion":"1.0","name":"inst_40A5D07E","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"objectId":{"name":"door","path":"objects/door/door.yy",},"properties":[],"rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":128.0,"y":224.0,},
-        {"resourceType":"GMRInstance","resourceVersion":"1.0","name":"inst_6ADA32F9","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"objectId":{"name":"wall_default","path":"objects/wall_default/wall_default.yy",},"properties":[],"rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":384.0,"y":640.0,},
         {"resourceType":"GMRInstance","resourceVersion":"1.0","name":"inst_7619E8BD","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"objectId":{"name":"btn_chat_send_hud","path":"objects/btn_chat_send_hud/btn_chat_send_hud.yy",},"properties":[],"rotation":0.0,"scaleX":3.0,"scaleY":1.0,"x":384.0,"y":640.0,},
       ],"layers":[],"properties":[],"userdefinedDepth":false,"visible":true,},
     {"resourceType":"GMRTileLayer","resourceVersion":"1.1","name":"Tiles_1","depth":100,"effectEnabled":true,"effectType":null,"gridX":32,"gridY":32,"hierarchyFrozen":false,"inheritLayerDepth":false,"inheritLayerSettings":false,"inheritSubLayers":true,"inheritVisibility":true,"layers":[],"properties":[],"tiles":{"SerialiseHeight":22,"SerialiseWidth":40,"TileCompressedData":[

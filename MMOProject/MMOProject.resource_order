@@ -134,6 +134,7 @@
     {"name":"dungeon_wall_top_column","order":9,"path":"sprites/dungeon_wall_top_column/dungeon_wall_top_column.yy",},
     {"name":"lbl_username_register","order":4,"path":"objects/lbl_username_register/lbl_username_register.yy",},
     {"name":"dungeon_wall_top_end_down","order":7,"path":"sprites/dungeon_wall_top_end_down/dungeon_wall_top_end_down.yy",},
+    {"name":"door","order":1,"path":"objects/door/door.yy",},
     {"name":"lbl_password_register","order":3,"path":"objects/lbl_password_register/lbl_password_register.yy",},
     {"name":"lbl_email_reset","order":3,"path":"objects/lbl_email_reset/lbl_email_reset.yy",},
     {"name":"dungeon_wall_top_corner_right_down","order":14,"path":"sprites/dungeon_wall_top_corner_right_down/dungeon_wall_top_corner_right_down.yy",},

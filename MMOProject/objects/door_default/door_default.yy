@@ -1,7 +1,7 @@
 {
   "resourceType": "GMObject",
   "resourceVersion": "1.0",
-  "name": "door",
+  "name": "door_default",
   "eventList": [],
   "managed": true,
   "overriddenProperties": [],
@@ -9,7 +9,10 @@
     "name": "Doors",
     "path": "folders/Objects/Doors.yy",
   },
-  "parentObjectId": null,
+  "parentObjectId": {
+    "name": "door",
+    "path": "objects/door/door.yy",
+  },
   "persistent": false,
   "physicsAngularDamping": 0.1,
   "physicsDensity": 0.5,
@@ -25,7 +28,10 @@
   "physicsStartAwake": true,
   "properties": [],
   "solid": false,
-  "spriteId": null,
+  "spriteId": {
+    "name": "spr_door",
+    "path": "sprites/spr_door/spr_door.yy",
+  },
   "spriteMaskId": null,
   "visible": true,
 }

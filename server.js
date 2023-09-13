@@ -54,18 +54,18 @@ for (var i = 0; i < 11; ++i) {
     maps["zone1"].walls.push(wall);
 }
 
+//Init doors in map
+door = {
+    type: "door_default",
+    pos_x: 2,
+    pos_y: 7,
+    room_to: "zone2",
+    name: "zone1-door1"
+}
+maps["zone1"].doors.push(door);
+
 maps["zone1"].grid = initMapGrid(maps["zone1"]);
 maps["zone2"].grid = initMapGrid(maps["zone2"]);
-
-
-//Load doors to each map:
-var door_inst = new require("./Models/door.js");
-var this_door = new door_inst();
-this_door.room_to = "zone2";
-this_door.pos_x = 2;
-this_door.pos_y = 7;
-this_door.name = "zone1-door1";
-maps["zone1"].doors.push(this_door);
 
 //Load mobs into each map:
 var entity_inst = new require("./Models/entity.js");

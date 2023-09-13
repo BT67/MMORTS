@@ -69,6 +69,20 @@ function handle_packet(data_buffer){
 				var_wall = other;
 			}
 			break;
+		case "DOOR":
+			door_type = buffer_read(data_buffer, buffer_string);
+			show_debug_message(string(door_type));
+			pos_x = buffer_read(data_buffer, buffer_string);
+			pos_x = (real(pos_x) + 1) * 32;
+			show_debug_message(string(pos_x));
+			pos_y = buffer_read(data_buffer, buffer_string);
+			pos_y = (real(pos_y) + 1) * 32;
+			show_debug_message(string(pos_y));
+			var_door = "";
+			with(instance_create_layer(real(pos_x), real(pos_y), "Instances", asset_get_index(door_type))){
+				var_door = other;
+			}
+			break;	
 		case "SPAWN":
 			entity_name = buffer_read(data_buffer, buffer_string);
 			show_debug_message(string(entity_name));
