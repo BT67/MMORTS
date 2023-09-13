@@ -70,6 +70,7 @@ maps["zone2"].grid = initMapGrid(maps["zone2"]);
 //Load mobs into each map:
 var entity_inst = new require("./Models/entity.js");
 const {grid_height, grid_width} = require("./Resources/Game Data/Maps/zone1");
+const {origin_x} = require("./Models/entity");
 var this_entity = new entity_inst();
 // this_entity.alive = true;
 // this_entity.health = 100;
@@ -298,7 +299,7 @@ async function updateEntities() {
                                                     //If target is within attack range, attack the target
                                                     if (dist <= entity.attack_range) {
                                                         //attack the target
-                                                        if(entity.attack_timer >= entity.attack_period) {
+                                                        if (entity.attack_timer >= entity.attack_period) {
                                                             maps[map].clients.forEach(function (otherClient) {
                                                                 otherClient.socket.write(packet.build([
                                                                     "ATTACK", "attack", client.username, entity.name
@@ -490,11 +491,11 @@ async function updateEntities() {
                                 if (client.target_entity !== null) {
                                     var target_entity = null;
                                     maps[map].entities.forEach(function (entity) {
-                                        if(entity.name === client.target_entity) {
+                                        if (entity.name === client.target_entity) {
                                             target_entity = entity;
                                         }
                                     });
-                                    if(target_entity.alive) {
+                                    if (target_entity.alive) {
                                         dist = distance(client.pos_x, client.pos_y, target_entity.pos_x, target_entity.pos_y);
                                         if (dist <= client.attack_range) {
                                             if (client.attack_timer >= client.attack_period) {
@@ -800,6 +801,177 @@ async function send_destroy_packet(entity_name, map) {
         //Send player death packet to all clients in the room
         client.socket.write(packet.build(["DESTROY", entity_name], client.id));
     });
+}
+
+
+//When generating new room for the player, set height and width of new room object BEFORE entering
+function generateDungeon(dungeon_size, dungeon_difficulty) {
+
+    var room_min_width = 0;
+    var room_max_width = 0;
+    var room_min_height = 0;
+    var room_max_height = 0;
+    var ROOM_MIN_SIZE = 25;
+    var ROOM_MAX_SIZE = 100;
+
+    var new_map_width = 0;
+    var new_map_height = 0;
+    var num_rooms = 0;
+
+    //Init new map object:
+    var new_map = {
+        name: "new_map",
+        room: "new_map",
+        start_x: 0,
+        start_y: 0,
+        clients: [],
+        entities: [],
+        doors: [],
+        walls: [],
+        grid: [],
+        rooms: [],
+        grid_width: new_map_width,
+        grid_height: new_map_height
+
+    }
+
+    switch (dungeon_size) {
+        case "SMALL":
+            num_rooms = 8;
+            new_map_width = 40;
+            new_map_height = 20;
+            room_min_width = 3;
+            room_max_width = 10;
+            room_min_height = 3;
+            room_max_height = 10;
+            break;
+        case "MEDIUM":
+            num_rooms = 16;
+            new_map_width = 60;
+            new_map_height = 30;
+            break;
+        case "LARGE":
+            num_rooms = 32
+            new_map_width = 80;
+            new_map_height = 40;
+            break;
+        case "HUGE":
+            num_rooms = 50
+            new_map_width = 100;
+            new_map_height = 50;
+            break;
+    }
+
+    //Init room grid:
+    new_map.grid = initMapGrid(new_map);
+
+    //Init origin points for each room
+    //origin_x, origin_y for room refers to the top-left floor tile of the room
+    for (var i = 0; i < num_rooms; ++i) {
+        new_room = {
+            origin_x: 0,
+            origin_y: 0,
+            width: 0,
+            height: 0
+        };
+
+        var room_origin_valid = false;
+        var room_dimensions_valid = false;
+        var tries = 0;
+
+        new_room.origin_x = randomInt(2, new_map.grid_width - 1);
+        new_room.origin_y = randomInt(2, new_map.grid_height - 1);
+
+        //Check origin
+        for (var j = 0; j < new_map.rooms.length; ++j) {
+            room_origin_valid = true;
+            if (distance(new_room.origin_x, new_room.origin_y, new_map.rooms[i].origin_x, new_map.rooms[i].origin_y) < 7.1){
+                room_origin_valid = false;
+                new_room.origin_x = randomInt(2, new_map.grid_width - 1);
+                new_room.origin_y = randomInt(2, new_map.grid_height - 1);
+                j = 0;
+                tries++;
+                if(tries > 50){
+                    j = new_map.rooms.length;
+                }
+            }
+        }
+
+        new_room.width = randomInt(2, room_max_width - 1);
+        new_room.height = randomInt(2, room_max_height - 1);
+
+        if(room_origin_valid){
+            //Check dimensions:
+            for (var j = 0; j < new_map.rooms.length; ++j) {
+                room_dimensions_valid = true;
+                if (distance(new_room.origin_x, new_room.origin_y, new_map.rooms[i].origin_x, new_map.rooms[i].origin_y) < 7.1){
+                    room_origin_valid = false;
+                    new_room.origin_x = randomInt(2, new_map.grid_width - 1);
+                    new_room.origin_y = randomInt(2, new_map.grid_height - 1);
+                    j = 0;
+                    tries++;
+                    if(tries > 50){
+                        j = new_map.rooms.length;
+                    }
+                }
+            }
+        }
+
+        if (room_origin_valid && room_dimensions_valid) {
+            new_map.rooms.push(new_roomroom);
+        }
+    }
+
+    //Adjust dimensions of rooms:
+    new_map.rooms.forEach(function (room) {
+
+        var room_width_valid = true;
+        var room_height_valid = true;
+        var tries = 0;
+
+        new_room.width = randomInt(room_min_width, room_max_width - 1);
+
+        //Check room width
+        for (var j = 0; j < new_map.rooms.length; ++j) {
+            if (Math.abs(new_room.origin_x + new_room.width === new_map.rooms[j].origin_x)) {
+                room_origin_x_valid = false;
+                tries++;
+                if (tries > 50) {
+                    break;
+                }
+                new_room.width = randomInt(2, new_map.grid_width - 1);
+                j = 0;
+            }
+        }
+
+        new_room.height = randomInt(room_min_height, room_max_height - 1);
+
+        //Check room height
+        for (var j = 0; j < new_map.rooms.length; ++j) {
+            if (Math.abs(new_map.rooms[j].origin_y - new_room.origin_y) < room_min_height + 1) {
+                room_origin_y_valid = false;
+                tries++;
+                if (tries > 50) {
+                    break;
+                }
+                new_room.height = randomInt(2, new_map.grid_height - 1);
+                j = 0;
+            }
+        }
+
+        if (!room_width_valid || !room_height_valid) {
+            new_map.rooms.push(room);
+            new_map.rooms = new_map.rooms.filter(item => item !== room);
+        }
+    });
+
+}
+
+//maximum is exclusive, minimum is inclusive
+function randomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min) + min);
 }
 
 
