@@ -25,6 +25,7 @@ var common_conf = {
     start_x: 0,
     start_y: 0,
     step: 520,
+
     err_msg_client_error: "Error: Unexpected client error, clientId=",
     err_msg_db: "Error: Database connection lost",
     err_msg_login: "Error: Unable to login",
@@ -44,6 +45,7 @@ var common_conf = {
     err_msg_password_reset_error: "Unable to reset password for clientId=",
     msg_client_disconnect: "Client disconnected, clientId=",
     msg_logout_success: "Successfully logged out",
+    err_msg_unable_to_login: "Unable to login",
     msg_enter_room: "Player entered room=",
     msg_clients_in_room: "Clients in room=",
     msg_client_enter_room: "Client entering room=",

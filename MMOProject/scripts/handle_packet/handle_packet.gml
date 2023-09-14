@@ -28,7 +28,11 @@ function handle_packet(data_buffer){
 				player_health = buffer_read(data_buffer, buffer_string);
 				player_sprite = buffer_read(data_buffer, buffer_string);
 				audio_stop_all();
-				room_goto(asset_get_index(target_room));
+				try {
+					room_goto(asset_get_index(target_room));
+				} catch(error){
+					return;
+				}
 				var_player = "";
 				with(instance_create_layer(real(pos_x), real(pos_y), "Instances", player)){
 					var_player = other;

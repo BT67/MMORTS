@@ -133,11 +133,17 @@ module.exports = packet = {
                     console.log(timeNow() + config.err_msg_db);
                     return;
                 }
+                try {
+                    maps[current_room].clients.push(client);
+                } catch(error){
+                    client.socket.write(packet.build(["LOGIN", "FALSE", config.err_msg_unable_to_login]));
+                    console.log(config.err_msg_client_enter_room + current_room);
+                    return;
+                }
                 client.socket.write(packet.build([
                     "LOGIN", "TRUE", config.msg_login_success, username, current_room, pos_x.toString(), pos_y.toString(), health, sprite
                 ], client.id));
                 //Send spawn player packet to other clients in the room who are online
-                maps[current_room].clients.push(client)
                 client.current_room = current_room;
                 console.log(timeNow() + config.msg_enter_room + current_room + ", clientId=" + client.id);
                 clients_str = "";
