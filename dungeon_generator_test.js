@@ -1,5 +1,4 @@
 function generateDungeon(dungeon_size, dungeon_difficulty) {
-
     var room_min_width = 0;
     var room_max_width = 0;
     var room_min_height = 0;
@@ -11,7 +10,6 @@ function generateDungeon(dungeon_size, dungeon_difficulty) {
     var new_map_width = 0;
     var new_map_height = 0;
     var num_rooms = 0;
-
     switch (dungeon_size) {
         case "SMALL":
             num_rooms = 8;
@@ -27,12 +25,12 @@ function generateDungeon(dungeon_size, dungeon_difficulty) {
             connection_max_height = 3;
             break;
         case "MEDIUM":
-            num_rooms = 8;
-            new_map_width = 80;
-            new_map_height = 40;
-            room_min_width = 8;
+            num_rooms = 16;
+            new_map_width = 100;
+            new_map_height = 50;
+            room_min_width = 5;
             room_max_width = 15;
-            room_min_height = 8;
+            room_min_height = 5;
             room_max_height = 15;
             connection_min_width = 3;
             connection_max_width = 3;
@@ -40,12 +38,12 @@ function generateDungeon(dungeon_size, dungeon_difficulty) {
             connection_max_height = 3;
             break;
         case "LARGE":
-            num_rooms = 8;
-            new_map_width = 80;
-            new_map_height = 40;
-            room_min_width = 8;
+            num_rooms = 30;
+            new_map_width = 120;
+            new_map_height = 60;
+            room_min_width = 5;
             room_max_width = 15;
-            room_min_height = 8;
+            room_min_height = 5;
             room_max_height = 15;
             connection_min_width = 3;
             connection_max_width = 3;
@@ -66,7 +64,6 @@ function generateDungeon(dungeon_size, dungeon_difficulty) {
             connection_max_height = 3;
             break;
     }
-
     //Init new map object:
     var new_map = {
         name: "new_map",
@@ -84,14 +81,10 @@ function generateDungeon(dungeon_size, dungeon_difficulty) {
         grid_height: new_map_height,
         ascii_grid: []
     }
-
     //Init room grid:
     new_map.grid = initMapGrid(new_map);
     new_map.ascii_grid = initMapGrid(new_map);
-
-    var connections = [];
     var num_connections = [];
-
     //Init origin points for each room
     //origin_x, origin_y for room refers to the top-left floor tile of the room
     var i = 0;
@@ -101,7 +94,6 @@ function generateDungeon(dungeon_size, dungeon_difficulty) {
         var new_room_origin_y = 0;
         var new_room_width = randomInt(room_min_width, room_max_width + 1);
         var new_room_height = randomInt(room_min_height, room_max_height + 1);
-
         if (new_map.rooms.length < 1) {
             var start = Math.random();
             if (0 < start <= 0.25) {
@@ -149,7 +141,7 @@ function generateDungeon(dungeon_size, dungeon_difficulty) {
                 connection_width = connection_min_width;
                 if (new_room_origin_x < prev_room_origin_x) {
                     connection_origin_x = prev_room_origin_x;
-                } else if(new_room_origin_x >= prev_room_origin_x) {
+                } else if (new_room_origin_x >= prev_room_origin_x) {
                     connection_origin_x = new_room_origin_x;
                 }
             } else {
@@ -181,7 +173,6 @@ function generateDungeon(dungeon_size, dungeon_difficulty) {
                 }
             }
         }
-
         connection = {
             name: "hallway" + num_connections.toString(),
             origin_x: connection_origin_x,
@@ -189,7 +180,6 @@ function generateDungeon(dungeon_size, dungeon_difficulty) {
             width: connection_width,
             height: connection_height
         }
-
         new_room = {
             name: "room" + i.toString(),
             origin_x: new_room_origin_x,
@@ -197,9 +187,7 @@ function generateDungeon(dungeon_size, dungeon_difficulty) {
             width: new_room_width,
             height: new_room_height
         };
-
         var valid_room = true;
-
         if (
             new_room_origin_x < 1 ||
             new_room_origin_x + new_room_width >= new_map.grid_width ||
@@ -210,7 +198,6 @@ function generateDungeon(dungeon_size, dungeon_difficulty) {
         ) {
             valid_room = false;
         }
-
         new_map.rooms.forEach(function (room) {
             if (
                 room.origin_x - 2 < new_room_origin_x &&
@@ -228,26 +215,23 @@ function generateDungeon(dungeon_size, dungeon_difficulty) {
                 valid_room = false;
             }
         });
-
         if (valid_room) {
             new_map.rooms.push(new_room);
             if (new_map.rooms.length > 0) {
                 new_map.connections.push(connection);
                 num_connections++;
             }
-            outputASCIIgrid(new_map);
             i++;
         } else {
             tries++;
         }
-
         if (tries > 50) {
             i++
             tries = 0;
         }
-
     }
-
+    outputASCIIgrid(new_map);
+    return new_map;
 }
 
 function outputASCIIgrid(map) {
@@ -286,7 +270,6 @@ function outputASCIIgrid(map) {
             }
         }
     });
-
     //Output dungeon layout to ASCII:
     for (var i = 0; i < map.grid_height; ++i) {
         var line = "";
@@ -295,17 +278,12 @@ function outputASCIIgrid(map) {
         }
         console.log(line);
     }
-    console.log("");
 }
 
 function randomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min) + min);
-}
-
-function distance(x1, y1, x2, y2) {
-    return parseInt(Math.pow(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2), 0.5));
 }
 
 function initMapGrid(map) {
@@ -319,4 +297,4 @@ function initMapGrid(map) {
     return grid;
 }
 
-generateDungeon("SMALL", "EASY");
+generateDungeon("MEDIUM", "EASY");

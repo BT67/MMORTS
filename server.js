@@ -59,7 +59,7 @@ door = {
     type: "door_default",
     pos_x: 2,
     pos_y: 7,
-    room_to: "zone2",
+    room_to: "random",
     name: "zone1-door1"
 }
 maps["zone1"].doors.push(door);
@@ -70,7 +70,6 @@ maps["zone2"].grid = initMapGrid(maps["zone2"]);
 //Load mobs into each map:
 var entity_inst = new require("./Models/entity.js");
 const {grid_height, grid_width} = require("./Resources/Game Data/Maps/zone1");
-const {origin_x} = require("./Models/entity");
 var this_entity = new entity_inst();
 // this_entity.alive = true;
 // this_entity.health = 100;
