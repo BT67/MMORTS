@@ -7,6 +7,8 @@ if (hovering && mouse_check_button_released(mb_left)){
 	instance_destroy(entity);
 	instance_destroy(attack);
 	instance_destroy(animation);
+	instance_destroy(wall);
+	instance_destroy(door);
 	room_goto(rm_login);
 }
 	

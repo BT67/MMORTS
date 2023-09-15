@@ -1,5 +1,5 @@
-exports.name = "zone2";
-exports.room = "zone2";
+exports.name = "rm_random";
+exports.room = "rm_random";
 exports.start_x = 2;
 exports.start_y = 2;
 exports.clients = [];

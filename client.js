@@ -44,7 +44,12 @@ module.exports = function () {
         console.log(timeNow() + config.err_msg_client_error + id);
         //maps[client.current_room].clients[client.username];
         if(client.current_room !== null){
-            maps[client.current_room].clients = maps[client.current_room].clients.filter(item => item !== client);
+            try {
+                maps[client.current_room].clients = maps[client.current_room].clients.filter(item => item !== client);
+            } catch(error){
+                console.log(timeNow() + config.err_msg_leaving_room + id);
+                console.log(error.stack);
+            }
         }
         sendDestroyPackets(id);
     }

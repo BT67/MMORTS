@@ -46,6 +46,7 @@ var common_conf = {
     msg_client_disconnect: "Client disconnected, clientId=",
     msg_logout_success: "Successfully logged out",
     err_msg_unable_to_login: "Unable to login",
+    err_msg_leaving_room: "Error occurred while leaving room=",
     msg_enter_room: "Player entered room=",
     msg_clients_in_room: "Clients in room=",
     msg_client_enter_room: "Client entering room=",

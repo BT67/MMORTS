@@ -86,6 +86,18 @@ function handle_packet(data_buffer){
 			with(instance_create_layer(real(pos_x), real(pos_y), "Instances", asset_get_index(door_type))){
 				var_door = other;
 			}
+			break;
+		case "SETROOM":
+			target_room = buffer_read(data_buffer, buffer_string);
+			show_debug_message(string(target_room));
+			new_width = buffer_read(data_buffer, buffer_string);
+			new_width = (real(new_width) + 2 ) * 32;
+			show_debug_message(string(new_width));
+			new_height = buffer_read(data_buffer, buffer_string);
+			new_height = (real(new_height) + 2 ) * 32;
+			show_debug_message(string(new_height));
+			room_set_width(asset_get_index(target_room), new_width);
+			room_set_width(asset_get_index(target_room), new_height);
 			break;	
 		case "SPAWN":
 			entity_name = buffer_read(data_buffer, buffer_string);

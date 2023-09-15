@@ -123,7 +123,7 @@
     {"name":"btn_back_login","order":8,"path":"objects/btn_back_login/btn_back_login.yy",},
     {"name":"spr_player_new","order":7,"path":"sprites/spr_player_new/spr_player_new.yy",},
     {"name":"dungeon_wall_top_vertical","order":5,"path":"sprites/dungeon_wall_top_vertical/dungeon_wall_top_vertical.yy",},
-    {"name":"zone2","order":1,"path":"rooms/zone2/zone2.yy",},
+    {"name":"rm_random","order":1,"path":"rooms/rm_random/rm_random.yy",},
     {"name":"lbl_msg_connection_lost","order":1,"path":"objects/lbl_msg_connection_lost/lbl_msg_connection_lost.yy",},
     {"name":"dungeon_all_2","order":3,"path":"sprites/dungeon_all_2/dungeon_all_2.yy",},
     {"name":"spr_goblin_idle_left","order":6,"path":"sprites/spr_goblin_idle_left/spr_goblin_idle_left.yy",},

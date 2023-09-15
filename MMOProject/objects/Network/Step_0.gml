@@ -18,7 +18,8 @@ if(refresh_timer >= refresh_timeout){
 	show_debug_message("Connection Lost");
 	instance_destroy(entity);
 	instance_destroy(animation);
-	instance_destroy(wall_default);
+	instance_destroy(wall);
+	instance_destroy(door);
 	room_goto(rm_connection_lost);
 	username = "";
 	var_player = "";

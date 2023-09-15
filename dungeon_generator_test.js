@@ -286,6 +286,78 @@ function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
 }
 
+function createWalls(map){
+    //To generate wall objects, iterate over every square in the ASCII grid
+    //Any "|" square adjacent to a "_" room square becomes a wall object
+    for (var i = 0; i < map.ascii_grid.length; i++) {
+        for (var k = 0; k < map.ascii_grid[i].length; k++) {
+            if(map.ascii_grid[i][k] === "|"){
+                var wall_x = i;
+                var wall_y = k;
+                var wall_type = "wall_default";
+                var is_wall = false;
+                //Check up
+                if(k >= 1) {
+                    if(map.ascii_grid[i][k - 1] === "_"){
+                        is_wall = true;
+                    }
+                }
+                //Check down
+                if(k + 1 < map.height){
+                    if(map.ascii_grid[i][k + 1] === "_"){
+                        is_wall = true;
+                    }
+                }
+                //Check left
+                if(i >= 1){
+                    if(map.ascii_grid[i - 1][k] === "_"){
+                        is_wall = true;
+                    }
+                }
+                //Check right
+                if(i + 1 < map.width){
+                    if(map.ascii_grid[i + 1][k] === "_"){
+                        is_wall = true;
+                    }
+                }
+                //Check up-left
+                if(i >= 1 && k >= 1){
+                    if(map.ascii_grid[i - 1][k - 1] === "_"){
+                        is_wall = true;
+                    }
+                }
+                //Check up-right
+                if(i + 1 < map.width && k >= 1){
+                    if(map.ascii_grid[i + 1][k - 1] === "_"){
+                        is_wall = true;
+                    }
+                }
+                //Check down-left
+                if(i >= 1 && k + 1 < map.height){
+                    if(map.ascii_grid[i + 1][k - 1] === "_"){
+                        is_wall = true;
+                    }
+                }
+                //Check down-right
+                if(i + 1 < map.width && k + 1 < map.height){
+                    if(map.ascii_grid[i + 1][k + 1] === "_"){
+                        is_wall = true;
+                    }
+                }
+                if(is_wall){
+                    wall = {
+                        x: wall_x,
+                        y: wall_y,
+                        type: wall_type
+                    }
+                    map.walls.push(wall);
+                }
+            }
+        }
+    }
+    return map;
+}
+
 function initMapGrid(map) {
     var grid = [];
     for (var i = 0; i < map.grid_width; i++) {
