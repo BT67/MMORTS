@@ -137,7 +137,7 @@ this_entity.attack_period = 5;
 this_entity.attack_timer = this_entity.attack_period;
 this_entity.patrol_path = [{x: 15, y: 10}, {x: 20, y: 15}];
 this_entity.patrol_point = 0;
-maps["zone1"].entities.push(this_entity);
+//maps["zone1"].entities.push(this_entity);
 
 this_entity = new entity_inst();
 this_entity.alive = true;
@@ -167,7 +167,7 @@ this_entity.attack_period = 5;
 this_entity.attack_timer = this_entity.attack_period;
 this_entity.patrol_path = [{x: 20, y: 2}, {x: 25, y: 10}];
 this_entity.patrol_point = 0;
-maps["zone1"].entities.push(this_entity);
+//maps["zone1"].entities.push(this_entity);
 
 //Initialise the database:
 var query_str = "";
@@ -401,8 +401,15 @@ async function updateEntities() {
                     if (client.alive) {
                         client.attack_timer += 1;
                         if (client.target_x !== client.pos_x || client.target_y !== client.pos_y) {
+                            //Client is not creating a path in new room
+                            console.log("client pos != client target pos");
+                            console.log("client_x=" + client.pos_x.toString());
+                            console.log("client_y=" + client.pos_y.toString());
+                            console.log("target_x=" + client.target_x.toString());
+                            console.log("target_y=" + client.target_y.toString());
                             client.path = createPath(map, client.pos_x, client.pos_y, client.target_x, client.target_y);
                             if (client.target_entity !== null) {
+                                console.log("client target entity=" + client.target_entity.toString());
                                 client.path = client.path.slice(0, -1);
                                 if (client.path.length === 1) {
                                     client.path = [];
@@ -411,6 +418,7 @@ async function updateEntities() {
                                 }
                             }
                         }
+                        console.log("client path length=" + client.path.length.toString());
                         if (client.path.length > 0) {
                             prev_pos_x = client.pos_x;
                             prev_pos_y = client.pos_y;
@@ -427,7 +435,7 @@ async function updateEntities() {
                             });
                         }
                         //Check if client is in same grid as a door:
-                        maps[map].doors.forEach(async function (door) {
+                        maps[map].doors.forEach(function (door) {
                             if (client.pos_x === door.pos_x && client.pos_y === door.pos_y) {
                                 maps[map].clients = maps[map].clients.filter(item => item !== client);
                                 //Update client current_room in DB:
@@ -444,9 +452,12 @@ async function updateEntities() {
                                 }
                                 if (!sql_error) {
                                     client.current_room = door.room_to;
-                                    maps[client.current_room].clients.push(client);
                                     client.pos_x = maps[client.current_room].start_x;
                                     client.pos_y = maps[client.current_room].start_y;
+                                    client.target_x = client.pos_x;
+                                    client.target_y = client.pos_y;
+                                    client.target_entity = null;
+                                    maps[client.current_room].clients.push(client);
                                     //Send move room packet to target client:
                                     client.socket.write(packet.build([
                                         "ROOM",
@@ -454,10 +465,10 @@ async function updateEntities() {
                                         maps[client.current_room].grid_width.toString(),
                                         maps[client.current_room].grid_height.toString()
                                     ], client.id));
-                                    await spawnWalls(client);
-                                    await spawnDoors(client);
-                                    await spawnEntities(client);
-                                    await spawnClients(client);
+                                    spawnWalls(client);
+                                    spawnDoors(client);
+                                    spawnEntities(client);
+                                    spawnClients(client);
                                     //Send player destroy packet to all clients in the old room
                                     send_destroy_packet(client.username, map);
                                     //TODO send spawn packets for new client to all other clients already in the room
@@ -681,7 +692,7 @@ function createPath(map, x1, y1, x2, y2) {
         return [];
     }
     var grid_copy = [];
-    for (var i = 0; i < maps[map].grid.length; i++) {
+    for (var i = 0; i < maps[map].grid.length; ++i) {
         grid_copy[i] = maps[map].grid[i].slice();
     }
 
@@ -728,9 +739,9 @@ function createPath(map, x1, y1, x2, y2) {
         new_path.push(new_point);
         new_point.path = new_path;
         if (new_point.x < 0 ||
-            new_point.x >= grid_width ||
+            new_point.x >= maps[map].grid_width ||
             new_point.y < 0 ||
-            new_point.y >= grid_height
+            new_point.y >= maps[map].grid_height
         ) {
             new_point.status = "invalid";
         } else if (grid_copy.at(new_point.x).at(new_point.y) !== "empty") {
@@ -783,18 +794,7 @@ function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
 }
 
-// function spawnWalls(client) {
-//     maps[client.current_room].walls.forEach(function (wall) {
-//         params = [];
-//         params.push("WALL");
-//         params.push(wall.type);
-//         params.push(wall.pos_x.toString());
-//         params.push(wall.pos_y.toString());
-//         client.socket.write(packet.build(params, client.id));
-//     });
-// }
-
-async function spawnWalls(client){
+function spawnWalls(client){
     var packet_count = 1;
     for(var i = 0; i < maps[client.current_room].walls.length; ++i){
         params = [];

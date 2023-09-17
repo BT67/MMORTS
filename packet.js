@@ -393,7 +393,7 @@ function initMapGrid(map) {
     return grid;
 }
 
-async function spawnWalls(client){
+function spawnWalls(client){
     var packet_count = 0;
     for(var i = 0; i < maps[client.current_room].walls.length; ++i){
         params = [];
