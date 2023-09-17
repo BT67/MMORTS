@@ -70,10 +70,14 @@ function handle_packet(data_buffer){
 			pos_y = buffer_read(data_buffer, buffer_string);
 			pos_y = (real(pos_y) + 1) * 32;
 			show_debug_message(string(pos_y));
+			wall_num = buffer_read(data_buffer, buffer_string);
+			wall_num = real(wall_num);
+			show_debug_message("wallcount=" + string(wall_num));
 			var_wall = "";
 			with(instance_create_layer(real(pos_x), real(pos_y), "Instances", asset_get_index(wall_type))){
 				var_wall = other;
 			}
+			show_debug_message("wallcount=" + string(instance_number(asset_get_index(wall_type))));
 			break;
 		case "DOOR":
 			door_type = buffer_read(data_buffer, buffer_string);

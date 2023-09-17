@@ -393,15 +393,19 @@ function initMapGrid(map) {
     return grid;
 }
 
-function spawnWalls(client){
-    maps[client.current_room].walls.forEach(function(wall){
+async function spawnWalls(client){
+    var packet_count = 0;
+    for(var i = 0; i < maps[client.current_room].walls.length; ++i){
         params = [];
         params.push("WALL");
-        params.push(wall.type);
-        params.push(wall.pos_x.toString());
-        params.push(wall.pos_y.toString());
+        params.push(maps[client.current_room].walls[i].type);
+        params.push(maps[client.current_room].walls[i].pos_x.toString());
+        params.push(maps[client.current_room].walls[i].pos_y.toString());
+        params.push(i.toString());
         client.socket.write(packet.build(params, client.id));
-    });
+        packet_count++;
+        console.log("wall packet count=" + packet_count.toString());
+    }
 }
 
 function spawnDoors(client){

@@ -73,6 +73,7 @@ new_map.name = "rm_random";
 new_map.room = "rm_random";
 new_map.grid_size = 32;
 maps["rm_random"] = new_map;
+maps["rm_random"].grid = initMapGrid(maps["rm_random"]);
 
 //Load mobs into each map:
 var entity_inst = new require("./Models/entity.js");
@@ -395,7 +396,7 @@ async function updateEntities() {
                 }
             });
             //Update client pos
-            maps[map].clients.forEach(function (client) {
+            maps[map].clients.forEach(async function (client) {
                 try {
                     if (client.alive) {
                         client.attack_timer += 1;
@@ -426,7 +427,7 @@ async function updateEntities() {
                             });
                         }
                         //Check if client is in same grid as a door:
-                        maps[map].doors.forEach(function (door) {
+                        maps[map].doors.forEach(async function (door) {
                             if (client.pos_x === door.pos_x && client.pos_y === door.pos_y) {
                                 maps[map].clients = maps[map].clients.filter(item => item !== client);
                                 //Update client current_room in DB:
@@ -453,10 +454,10 @@ async function updateEntities() {
                                         maps[client.current_room].grid_width.toString(),
                                         maps[client.current_room].grid_height.toString()
                                     ], client.id));
-                                    spawnWalls(client);
-                                    spawnDoors(client);
-                                    spawnEntities(client);
-                                    spawnClients(client);
+                                    await spawnWalls(client);
+                                    await spawnDoors(client);
+                                    await spawnEntities(client);
+                                    await spawnClients(client);
                                     //Send player destroy packet to all clients in the old room
                                     send_destroy_packet(client.username, map);
                                     //TODO send spawn packets for new client to all other clients already in the room
@@ -782,15 +783,30 @@ function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
 }
 
-function spawnWalls(client) {
-    maps[client.current_room].walls.forEach(function (wall) {
+// function spawnWalls(client) {
+//     maps[client.current_room].walls.forEach(function (wall) {
+//         params = [];
+//         params.push("WALL");
+//         params.push(wall.type);
+//         params.push(wall.pos_x.toString());
+//         params.push(wall.pos_y.toString());
+//         client.socket.write(packet.build(params, client.id));
+//     });
+// }
+
+async function spawnWalls(client){
+    var packet_count = 1;
+    for(var i = 0; i < maps[client.current_room].walls.length; ++i){
         params = [];
         params.push("WALL");
-        params.push(wall.type);
-        params.push(wall.pos_x.toString());
-        params.push(wall.pos_y.toString());
+        params.push(maps[client.current_room].walls[i].type);
+        params.push(maps[client.current_room].walls[i].pos_x.toString());
+        params.push(maps[client.current_room].walls[i].pos_y.toString());
+        params.push(i.toString());
         client.socket.write(packet.build(params, client.id));
-    });
+        packet_count++;
+        console.log("wall packet count=" + packet_count.toString());
+    }
 }
 
 function spawnDoors(client) {
@@ -835,11 +851,9 @@ function spawnClients(client) {
 function createWalls(map) {
     //To generate wall objects, iterate over every square in the ASCII grid
     //Any "|" square adjacent to a "_" room square becomes a wall object
-    for (var i = 0; i < map.ascii_grid.length; i++) {
-        for (var k = 0; k < map.ascii_grid[i].length; k++) {
+    for (var i = 0; i < map.grid_width; ++i) {
+        for (var k = 0; k < map.grid_height; ++k) {
             if (map.ascii_grid[i][k] === "|") {
-                var wall_x = i;
-                var wall_y = k;
                 var wall_type = "wall_default";
                 var is_wall = false;
                 //Check up
@@ -849,7 +863,7 @@ function createWalls(map) {
                     }
                 }
                 //Check down
-                if (k + 1 < map.height) {
+                if (k + 1 < map.grid_width) {
                     if (map.ascii_grid[i][k + 1] === "_") {
                         is_wall = true;
                     }
@@ -861,7 +875,7 @@ function createWalls(map) {
                     }
                 }
                 //Check right
-                if (i + 1 < map.width) {
+                if (i + 1 < map.grid_height) {
                     if (map.ascii_grid[i + 1][k] === "_") {
                         is_wall = true;
                     }
@@ -873,27 +887,27 @@ function createWalls(map) {
                     }
                 }
                 //Check up-right
-                if (i + 1 < map.width && k >= 1) {
+                if (i + 1 < map.grid_width && k >= 1) {
                     if (map.ascii_grid[i + 1][k - 1] === "_") {
                         is_wall = true;
                     }
                 }
                 //Check down-left
-                if (i >= 1 && k + 1 < map.height) {
-                    if (map.ascii_grid[i + 1][k - 1] === "_") {
+                if (i >= 1 && k + 1 < map.grid_height) {
+                    if (map.ascii_grid[i - 1][k + 1] === "_") {
                         is_wall = true;
                     }
                 }
                 //Check down-right
-                if (i + 1 < map.width && k + 1 < map.height) {
+                if (i + 1 < map.grid_width && k + 1 < map.grid_height) {
                     if (map.ascii_grid[i + 1][k + 1] === "_") {
                         is_wall = true;
                     }
                 }
                 if (is_wall) {
                     wall = {
-                        pos_x: wall_x,
-                        pos_y: wall_y,
+                        pos_x: i,
+                        pos_y: k,
                         type: wall_type
                     }
                     map.walls.push(wall);
@@ -901,9 +915,12 @@ function createWalls(map) {
             }
         }
     }
+    var wall_count = 0;
     map.walls.forEach(function (wall) {
         map.grid[wall.pos_x][wall.pos_y] = "wall";
+        wall_count++;
     });
+    console.log("wall_count=" + wall_count.toString());
     return map;
 }
 
