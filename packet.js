@@ -404,7 +404,6 @@ function spawnWalls(client){
         params.push(i.toString());
         client.socket.write(packet.build(params, client.id));
         packet_count++;
-        console.log("wall packet count=" + packet_count.toString());
     }
 }
 

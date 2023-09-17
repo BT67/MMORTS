@@ -1,4 +1,4 @@
-view_pos_x = camera_get_view_x(camera);
+ view_pos_x = camera_get_view_x(camera);
 view_pos_y = camera_get_view_y(camera);
 
 if(keyboard_check(vk_up)){

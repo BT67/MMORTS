@@ -146,15 +146,15 @@ this_entity.health = this_entity.max_health;
 this_entity.sprite = "";
 this_entity.type = "goblin";
 this_entity.name = "goblin1";
-this_entity.pos_x = 20;
-this_entity.pos_y = 2;
+this_entity.pos_x = 15;
+this_entity.pos_y = 5;
 this_entity.target_x = this_entity.pos_x;
 this_entity.target_y = this_entity.pos_y;
 this_entity.origin_x = this_entity.pos_x;
 this_entity.origin_y = this_entity.pos_y;
 this_entity.target_entity = null;
 this_entity.roam_range = 10;
-this_entity.view_range = 5;
+this_entity.view_range = 10;
 this_entity.attack_range = 1.5;
 this_entity.in_combat = false;
 this_entity.aggressive = true;
@@ -165,9 +165,10 @@ this_entity.respawn_timer = this_entity.respawn_period;
 this_entity.path = [];
 this_entity.attack_period = 5;
 this_entity.attack_timer = this_entity.attack_period;
-this_entity.patrol_path = [{x: 20, y: 2}, {x: 25, y: 10}];
+//this_entity.patrol_path = [{x: 20, y: 2}, {x: 25, y: 10}];
+this_entity.patrol_path = [];
 this_entity.patrol_point = 0;
-//maps["zone1"].entities.push(this_entity);
+maps["zone1"].entities.push(this_entity);
 
 //Initialise the database:
 var query_str = "";
@@ -249,7 +250,7 @@ async function updateEntities() {
                     entity.attack_timer += 1;
                     if (entity.target_entity === null) {
                         //Follow patrol path:
-                        if (entity.patrol_path !== []) {
+                        if (entity.patrol_path.length > 0) {
                             if (
                                 (entity.patrol_path[entity.patrol_point].x === entity.pos_x &&
                                     entity.patrol_path[entity.patrol_point].y === entity.pos_y) ||
@@ -269,11 +270,16 @@ async function updateEntities() {
                                 if (client.alive) {
                                     dist = distance(client.pos_x, client.pos_y, entity.pos_x, entity.pos_y);
                                     if (dist < entity.view_range) {
-                                        console.log(timeNow() + "Mob aggro triggered");
-                                        entity.in_combat = true;
-                                        entity.target_entity = client.username;
-                                        entity.target_x = client.pos_x;
-                                        entity.target_y = client.pos_y;
+                                        //If client is within mob view range, check LOS:
+                                        var seen = checklos(map, entity.pos_x, entity.pos_y, client.pos_x, client.pos_y);
+                                        if (seen){
+                                            console.log(timeNow() + "Mob aggro triggered");
+                                            entity.in_combat = true;
+                                            entity.target_entity = client.username;
+                                            entity.target_x = client.pos_x;
+                                            entity.target_y = client.pos_y;
+                                            entity.path = [];
+                                        }
                                     }
                                 }
                             });
@@ -402,14 +408,8 @@ async function updateEntities() {
                         client.attack_timer += 1;
                         if (client.target_x !== client.pos_x || client.target_y !== client.pos_y) {
                             //Client is not creating a path in new room
-                            console.log("client pos != client target pos");
-                            console.log("client_x=" + client.pos_x.toString());
-                            console.log("client_y=" + client.pos_y.toString());
-                            console.log("target_x=" + client.target_x.toString());
-                            console.log("target_y=" + client.target_y.toString());
                             client.path = createPath(map, client.pos_x, client.pos_y, client.target_x, client.target_y);
                             if (client.target_entity !== null) {
-                                console.log("client target entity=" + client.target_entity.toString());
                                 client.path = client.path.slice(0, -1);
                                 if (client.path.length === 1) {
                                     client.path = [];
@@ -418,7 +418,6 @@ async function updateEntities() {
                                 }
                             }
                         }
-                        console.log("client path length=" + client.path.length.toString());
                         if (client.path.length > 0) {
                             prev_pos_x = client.pos_x;
                             prev_pos_y = client.pos_y;
@@ -779,6 +778,112 @@ function createPath(map, x1, y1, x2, y2) {
     return final_path;
 }
 
+function checklos(map, x1, y1, x2, y2) {
+    if (x1 === x2 && y1 === y2) {
+        return [];
+    }
+    var grid_copy = [];
+    for (var i = 0; i < maps[map].grid.length; ++i) {
+        var new_line = [];
+        for(var k = 0; k < maps[map].grid[i].length; ++k){
+            new_line.push("empty");
+        }
+        grid_copy.push(new_line);
+    }
+
+    function check_point(current_point, direction, grid_copy) {
+        var new_path = current_point.path.slice();
+        var pos_x = current_point.x;
+        var pos_y = current_point.y;
+        switch (direction) {
+            case "up":
+                pos_y -= 1;
+                break;
+            case "down":
+                pos_y += 1;
+                break;
+            case "left":
+                pos_x -= 1;
+                break;
+            case "right":
+                pos_x += 1;
+                break;
+            case "up-left":
+                pos_x -= 1;
+                pos_y -= 1;
+                break;
+            case "up-right":
+                pos_x += 1;
+                pos_y -= 1;
+                break;
+            case "down-left":
+                pos_x -= 1;
+                pos_y += 1;
+                break;
+            case "down-right":
+                pos_x += 1;
+                pos_y += 1;
+                break;
+        }
+        var new_point = {
+            x: pos_x,
+            y: pos_y,
+            path: new_path,
+            status: "unknown"
+        }
+        new_path.push(new_point);
+        new_point.path = new_path;
+        if (new_point.x < 0 ||
+            new_point.x >= maps[map].grid_width ||
+            new_point.y < 0 ||
+            new_point.y >= maps[map].grid_height
+        ) {
+            new_point.status = "invalid";
+        } else if (grid_copy.at(new_point.x).at(new_point.y) !== "empty") {
+            new_point.status = "blocked";
+        } else if (new_point.x === x2 && new_point.y === y2) {
+            new_point.status = "end";
+        } else {
+            new_point.status = "valid";
+            grid_copy[new_point.x][new_point.y] = "checked";
+        }
+        return new_point;
+    }
+    var start_point = {x: x1, y: y1, path: [], status: "start"};
+    var points = [start_point]; //Init array of points, beginning with the start point
+    var final_path = [];
+    final = false;
+    while (points.length > 0) {
+        var current_point = points.shift(); //remove and return the first point from the array
+        var new_point;
+        var directions = ["up", "down", "left", "right", "up-left", "up-right", "down-left", "down-right"];
+        directions.forEach(function (direction) {
+            new_point = check_point(current_point, direction, grid_copy);
+            if (new_point.status === "end") {
+                if (!final) {
+                    final_path = new_point.path;
+                    final = true;
+                }
+            } else if (new_point.status === "valid") {
+                points.push(new_point);
+            }
+        });
+    }
+    grid_copy = [];
+    if(final_path.length === 0){
+        return false;
+    } else {
+        //Check if there are any walls on the path
+        for(var i = 0; i < final_path.length; ++i){
+            var point = final_path[i];
+            if(maps[map].grid[point.x][point.y] === "wall"){
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 async function send_destroy_packet(entity_name, map) {
     await new Promise(resolve => setTimeout(resolve, config.step));
     maps[map].clients.forEach(function (client) {
@@ -805,7 +910,6 @@ function spawnWalls(client){
         params.push(i.toString());
         client.socket.write(packet.build(params, client.id));
         packet_count++;
-        console.log("wall packet count=" + packet_count.toString());
     }
 }
 
@@ -920,7 +1024,6 @@ function createWalls(map) {
         map.grid[wall.pos_x][wall.pos_y] = "wall";
         wall_count++;
     });
-    console.log("wall_count=" + wall_count.toString());
     return map;
 }
 
