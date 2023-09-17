@@ -30,6 +30,8 @@ function handle_packet(data_buffer){
 				audio_stop_all();
 				try {
 					room_goto(asset_get_index(target_room));
+					network.map_width = room_width;
+					network.map_height = room_height;
 				} catch(error){
 					return;
 				}
@@ -86,18 +88,6 @@ function handle_packet(data_buffer){
 			with(instance_create_layer(real(pos_x), real(pos_y), "Instances", asset_get_index(door_type))){
 				var_door = other;
 			}
-			break;
-		case "SETROOM":
-			target_room = buffer_read(data_buffer, buffer_string);
-			show_debug_message(string(target_room));
-			new_width = buffer_read(data_buffer, buffer_string);
-			new_width = (real(new_width) + 2 ) * 32;
-			show_debug_message(string(new_width));
-			new_height = buffer_read(data_buffer, buffer_string);
-			new_height = (real(new_height) + 2 ) * 32;
-			show_debug_message(string(new_height));
-			room_set_width(asset_get_index(target_room), new_width);
-			room_set_width(asset_get_index(target_room), new_height);
 			break;	
 		case "SPAWN":
 			entity_name = buffer_read(data_buffer, buffer_string);
@@ -135,7 +125,17 @@ function handle_packet(data_buffer){
 			instance_destroy(door);
 			target_room = buffer_read(data_buffer, buffer_string);
 			audio_stop_all();
+			new_width = buffer_read(data_buffer, buffer_string);
+			new_width = (real(new_width) + 2 ) * 32;
+			new_height = buffer_read(data_buffer, buffer_string);
+			new_height = (real(new_height) + 2 ) * 32;
 			room_goto(asset_get_index(target_room));
+			room_width = new_width;
+			room_height = new_height;
+			network.map_width = room_width;
+			network.map_height = room_height;
+			show_debug_message(string(room_width));
+			show_debug_message(string(room_height));
 			break;
 		case "ATTACK":
 			attack_type = buffer_read(data_buffer, buffer_string);

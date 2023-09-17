@@ -48,14 +48,18 @@ if(wheel != 0){
 
 if(view_pos_y < -26){
 	view_pos_y = -26;
-} else if(view_pos_y + view_height >= room_height + 118){
-	view_pos_y = room_height - view_height + 118;
+} else if(view_pos_y + view_height >= network.map_height + 118){
+	show_debug_message("room height=" + string(network.map_height));
+	show_debug_message("camera=" + string(view_pos_y + view_height));
+	view_pos_y = network.map_height - view_height + 118;
 }
 
 if(view_pos_x < 0){
 	view_pos_x = 0;
-} else if(view_pos_x + view_width >= room_width){
-	view_pos_x = room_width - view_width;
+} else if(view_pos_x + view_width >= network.map_width){
+	show_debug_message("room width=" + string(network.map_width));
+	show_debug_message("camera=" + string(view_pos_x + view_width));
+	view_pos_x = network.map_width - view_width;
 }
 
 camera_set_view_pos(camera, view_pos_x, view_pos_y);

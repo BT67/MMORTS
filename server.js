@@ -443,15 +443,15 @@ async function updateEntities() {
                                 }
                                 if (!sql_error) {
                                     client.current_room = door.room_to;
-                                    client.socket.write(packet.build([
-                                        "SETROOM", client.current_room, maps[client.current_room].grid_width.toString(), maps[client.current_room].grid_height.toString()
-                                    ], client.id));
                                     maps[client.current_room].clients.push(client);
                                     client.pos_x = maps[client.current_room].start_x;
                                     client.pos_y = maps[client.current_room].start_y;
                                     //Send move room packet to target client:
                                     client.socket.write(packet.build([
-                                        "ROOM", door.room_to
+                                        "ROOM",
+                                        door.room_to,
+                                        maps[client.current_room].grid_width.toString(),
+                                        maps[client.current_room].grid_height.toString()
                                     ], client.id));
                                     spawnWalls(client);
                                     spawnDoors(client);
@@ -821,16 +821,14 @@ function spawnEntities(client) {
 
 function spawnClients(client) {
     maps[client.current_room].clients.forEach(function (otherClient) {
-        if (otherClient.username !== client.username) {
-            params = [];
-            params.push("SPAWN");
-            params.push(otherClient.username);
-            params.push("player");
-            params.push(otherClient.pos_x.toString());
-            params.push(otherClient.pos_y.toString());
-            params.push(otherClient.health);
-            client.socket.write(packet.build(params, client.id));
-        }
+        params = [];
+        params.push("SPAWN");
+        params.push(otherClient.username);
+        params.push("player");
+        params.push(otherClient.pos_x.toString());
+        params.push(otherClient.pos_y.toString());
+        params.push(otherClient.health);
+        client.socket.write(packet.build(params, client.id));
     });
 }
 
