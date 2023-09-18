@@ -40,9 +40,9 @@ module.exports = function () {
     //Log the user out if client is unexpectedly closed or crashes:
     //TODO update database to logout when client error causes disconnect
     this.error = function () {
+        clients = clients.filter(item => item !== client);
         client.refresh_cont = false;
         console.log(timeNow() + config.err_msg_client_error + id);
-        //maps[client.current_room].clients[client.username];
         if(client.current_room !== null){
             try {
                 maps[client.current_room].clients = maps[client.current_room].clients.filter(item => item !== client);
@@ -55,6 +55,7 @@ module.exports = function () {
     }
     //TODO Error when client fails to login but DB registers login, when try to log in again, access is denied
     this.end = function () {
+        clients = clients.filter(item => item !== client);
         client.refresh_cont = false;
         console.log(timeNow() + config.err_msg_client_error + id);
         //maps[client.current_room].clients[client.username];

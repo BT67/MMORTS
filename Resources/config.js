@@ -25,7 +25,7 @@ var common_conf = {
     start_x: 0,
     start_y: 0,
     step: 520,
-
+    max_clients: 3,
     err_msg_client_error: "Error: Unexpected client error, clientId=",
     err_msg_db: "Error: Database connection lost",
     err_msg_login: "Error: Unable to login",

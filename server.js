@@ -1,6 +1,6 @@
 //Import libraries, file system
-var fs = require("fs");
-var net = require("net");
+const fs = require("fs");
+const net = require("net");
 require("./packet.js");
 require((__dirname + '/Resources/config.js'));
 
@@ -25,17 +25,16 @@ init_files.forEach(function (initFile) {
 });
 
 //Load game models
-var model_files = fs.readdirSync(__dirname + "/Models");
+const model_files = fs.readdirSync(__dirname + "/Models");
 model_files.forEach(function (modelFile) {
     console.log(timeNow() + "Loading model file: " + modelFile);
     require(__dirname + "/Models/" + modelFile);
 });
 
-var clientIdNo = 0;
-
 //Load game map data
 maps = {};
-var map_files = fs.readdirSync(config.data_paths.maps);
+clients = [];
+const map_files = fs.readdirSync(config.data_paths.maps);
 map_files.forEach(function (mapFile) {
     console.log(timeNow() + "Loading map file: " + mapFile);
     var map = require(config.data_paths.maps + mapFile);
@@ -45,8 +44,8 @@ map_files.forEach(function (mapFile) {
 //Init walls in zone1
 //NOTE: when loading walls into the map grid, grid in gamemaker is not zero-indexed
 //In the server, a wall with position 11,1 is loaded in at position 13,3
-for (var i = 0; i < 11; ++i) {
-    wall = {
+for (let i = 0; i < 11; ++i) {
+    var wall = {
         type: "wall_default",
         pos_x: 11,
         pos_y: i
@@ -76,9 +75,8 @@ maps["rm_random"] = new_map;
 maps["rm_random"].grid = initMapGrid(maps["rm_random"]);
 
 //Load mobs into each map:
-var entity_inst = new require("./Models/entity.js");
-const {grid_height, grid_width} = require("./Resources/Game Data/Maps/zone1");
-var this_entity = new entity_inst();
+const entity_inst = new require("./Models/entity.js");
+this_entity = new entity_inst();
 // this_entity.alive = true;
 // this_entity.health = 100;
 // this_entity.sprite = "";
@@ -171,7 +169,6 @@ this_entity.patrol_point = 0;
 maps["zone1"].entities.push(this_entity);
 
 //Initialise the database:
-var query_str = "";
 const connection = new Client({
     host: '127.0.0.1',
     port: '5432',
@@ -201,39 +198,65 @@ connection.query(query_str, function (err) {
     }
 });
 
+var clientIdNo = 0;
+
 //Initialise the server
 net.createServer(function (socket) {
-    var c_inst = new require("./client.js");
-    var thisClient = new c_inst();
-    thisClient.socket = socket;
-    thisClient.id = clientIdNo;
-    thisClient.loggedin = 0;
-    thisClient.username = "";
-    thisClient.current_room = null;
-    thisClient.pos_x = 0;
-    thisClient.pos_y = 0;
-    thisClient.view_range = 5;
-    thisClient.attack_range = 1.5;
-    thisClient.target_x = thisClient.pos_x;
-    thisClient.target_y = thisClient.pos_y;
-    thisClient.target_entity = null;
-    thisClient.move_speed = 1;
-    thisClient.max_health = 100;
-    thisClient.health = thisClient.max_health;
-    thisClient.path = [];
-    thisClient.alive = true;
-    thisClient.respawn_period = 10;
-    thisClient.respawn_timer = thisClient.respawn_period;
-    thisClient.attack_period = 3;
-    thisClient.attack_timer = thisClient.attack_period;
-    thisClient.refresh_timer = 0;
-    thisClient.refresh_timeout = 300;
-    clientIdNo += 1;
-    //TODO create clientId allocation system
-    thisClient.initiate();
-    socket.on("error", thisClient.error);
-    socket.on("end", thisClient.end);
-    socket.on("data", thisClient.data);
+    const c_inst = new require("./client.js");
+    thisClient = new c_inst();
+    var server_full = false;
+    //Check existing clients and assign unique client id:
+    if(clients.length > 0) {
+        for (var i = 0; i < clients.length; ++i) {
+            if (clients[i].id === clientIdNo) {
+                server_full = true;
+                clientIdNo += 1;
+            } else {
+                thisClient.id = clientIdNo;
+                server_full = false;
+                clientIdNo += 1;
+            }
+            if (clientIdNo > config.max_clients) {
+                clientIdNo = 0;
+            }
+        }
+    } else {
+        thisClient.id = clientIdNo;
+        clientIdNo += 1;
+        if (clientIdNo > config.max_clients) {
+            clientIdNo = 0;
+        }
+    }
+    if(!server_full) {
+        thisClient.socket = socket;
+        thisClient.loggedin = 0;
+        thisClient.username = "";
+        thisClient.current_room = null;
+        thisClient.pos_x = 0;
+        thisClient.pos_y = 0;
+        thisClient.view_range = 5;
+        thisClient.attack_range = 1.5;
+        thisClient.target_x = thisClient.pos_x;
+        thisClient.target_y = thisClient.pos_y;
+        thisClient.target_entity = null;
+        thisClient.move_speed = 1;
+        thisClient.max_health = 100;
+        thisClient.health = thisClient.max_health;
+        thisClient.path = [];
+        thisClient.alive = true;
+        thisClient.respawn_period = 10;
+        thisClient.respawn_timer = thisClient.respawn_period;
+        thisClient.attack_period = 3;
+        thisClient.attack_timer = thisClient.attack_period;
+        thisClient.refresh_timer = 0;
+        thisClient.refresh_timeout = 300;
+        //TODO create clientId allocation system
+        thisClient.initiate();
+        clients.push(thisClient);
+        socket.on("error", thisClient.error);
+        socket.on("end", thisClient.end);
+        socket.on("data", thisClient.data);
+    }
 }).listen(config.port);
 
 console.log(timeNow() + config.msg_server_init + config.ip + ":" + config.port + "/" + config.environment)
@@ -784,7 +807,7 @@ function checklos(map, x1, y1, x2, y2) {
     }
     var grid_copy = [];
     for (var i = 0; i < maps[map].grid.length; ++i) {
-        var new_line = [];
+        new_line = [];
         for(var k = 0; k < maps[map].grid[i].length; ++k){
             new_line.push("empty");
         }
@@ -1319,10 +1342,10 @@ function outputASCIIgrid(map) {
 }
 
 function initASCIIGrid(map) {
-    var grid = [];
-    for (var i = 0; i < map.grid_width; i++) {
+    let grid = [];
+    for (let i = 0; i < map.grid_width; i++) {
         grid.push([])
-        for (var k = 0; k < map.grid_height; k++) {
+        for (let k = 0; k < map.grid_height; k++) {
             grid[i][k] = "|";
         }
     }
