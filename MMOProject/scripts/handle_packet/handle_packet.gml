@@ -61,6 +61,21 @@ function handle_packet(data_buffer){
 				}
 			}
 			break;
+		case "FLOOR":
+			floor_type = buffer_read(data_buffer, buffer_string);
+			show_debug_message(string(floor_type));
+			pos_x = buffer_read(data_buffer, buffer_string);
+			show_debug_message(string(pos_x));
+			pos_y = buffer_read(data_buffer, buffer_string);
+			show_debug_message(string(pos_y));
+			var layer_id = layer_get_id("Tiles_1");
+			var tilemap_id = layer_tilemap_get_id(layer_id);
+			var tilemap = tilemap_get(tilemap_id, 0, 1); 
+			tilemap_set(tilemap_id, tilemap, pos_x, pos_y);
+			break;	
+		case "FLOOREND":
+			variable_instance_set(camera_controller, "floor_end", true);
+			break;	
 		case "WALL":
 			wall_type = buffer_read(data_buffer, buffer_string);
 			show_debug_message(string(wall_type));
@@ -72,12 +87,10 @@ function handle_packet(data_buffer){
 			show_debug_message(string(pos_y));
 			wall_num = buffer_read(data_buffer, buffer_string);
 			wall_num = real(wall_num);
-			show_debug_message("wallcount=" + string(wall_num));
 			var_wall = "";
 			with(instance_create_layer(real(pos_x), real(pos_y), "Instances", asset_get_index(wall_type))){
 				var_wall = other;
 			}
-			show_debug_message("wallcount=" + string(instance_number(asset_get_index(wall_type))));
 			break;
 		case "DOOR":
 			door_type = buffer_read(data_buffer, buffer_string);

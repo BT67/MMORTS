@@ -206,7 +206,7 @@ net.createServer(function (socket) {
     thisClient = new c_inst();
     var server_full = false;
     //Check existing clients and assign unique client id:
-    if(clients.length > 0) {
+    if (clients.length > 0) {
         for (var i = 0; i < clients.length; ++i) {
             if (clients[i].id === clientIdNo) {
                 server_full = true;
@@ -227,7 +227,7 @@ net.createServer(function (socket) {
             clientIdNo = 0;
         }
     }
-    if(!server_full) {
+    if (!server_full) {
         thisClient.socket = socket;
         thisClient.loggedin = 0;
         thisClient.username = "";
@@ -295,7 +295,7 @@ async function updateEntities() {
                                     if (dist < entity.view_range) {
                                         //If client is within mob view range, check LOS:
                                         var seen = checklos(map, entity.pos_x, entity.pos_y, client.pos_x, client.pos_y);
-                                        if (seen){
+                                        if (seen) {
                                             console.log(timeNow() + "Mob aggro triggered");
                                             entity.in_combat = true;
                                             entity.target_entity = client.username;
@@ -487,6 +487,8 @@ async function updateEntities() {
                                         maps[client.current_room].grid_width.toString(),
                                         maps[client.current_room].grid_height.toString()
                                     ], client.id));
+                                    drawFloors(client);
+                                    client.socket.write(packet.build(["FLOOREND"], client.id));
                                     spawnWalls(client);
                                     spawnDoors(client);
                                     spawnEntities(client);
@@ -808,7 +810,7 @@ function checklos(map, x1, y1, x2, y2) {
     var grid_copy = [];
     for (var i = 0; i < maps[map].grid.length; ++i) {
         new_line = [];
-        for(var k = 0; k < maps[map].grid[i].length; ++k){
+        for (var k = 0; k < maps[map].grid[i].length; ++k) {
             new_line.push("empty");
         }
         grid_copy.push(new_line);
@@ -872,6 +874,7 @@ function checklos(map, x1, y1, x2, y2) {
         }
         return new_point;
     }
+
     var start_point = {x: x1, y: y1, path: [], status: "start"};
     var points = [start_point]; //Init array of points, beginning with the start point
     var final_path = [];
@@ -893,13 +896,13 @@ function checklos(map, x1, y1, x2, y2) {
         });
     }
     grid_copy = [];
-    if(final_path.length === 0){
+    if (final_path.length === 0) {
         return false;
     } else {
         //Check if there are any walls on the path
-        for(var i = 0; i < final_path.length; ++i){
+        for (var i = 0; i < final_path.length; ++i) {
             var point = final_path[i];
-            if(maps[map].grid[point.x][point.y] === "wall"){
+            if (maps[map].grid[point.x][point.y] === "wall") {
                 return false;
             }
         }
@@ -922,9 +925,38 @@ function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
 }
 
-function spawnWalls(client){
+function drawFloors(client) {
+    maps[client.current_room].rooms.forEach(function (room) {
+        for (var h = 0; h < room.width + 1; ++h) {
+            for (var v = 0; v < room.height + 1; ++v) {
+                params = [];
+                params.push("FLOOR");
+                params.push(room.floor_type);
+                params.push((room.origin_x + h).toString());
+                params.push((room.origin_y + v).toString());
+                client.socket.write(packet.build(params, client.id));
+                //await new Promise(resolve => setTimeout(resolve, 80));
+            }
+        }
+    });
+    maps[client.current_room].connections.forEach(function (connection) {
+        for (var h = 0; h < connection.width + 1; ++h) {
+            for (var v = 0; v < connection.height + 1; ++v) {
+                params = [];
+                params.push("FLOOR");
+                params.push(connection.floor_type);
+                params.push((connection.origin_x + h).toString());
+                params.push((connection.origin_y + v).toString());
+                client.socket.write(packet.build(params, client.id));
+                //await new Promise(resolve => setTimeout(resolve, 80));
+            }
+        }
+    });
+}
+
+function spawnWalls(client) {
     var packet_count = 1;
-    for(var i = 0; i < maps[client.current_room].walls.length; ++i){
+    for (var i = 0; i < maps[client.current_room].walls.length; ++i) {
         params = [];
         params.push("WALL");
         params.push(maps[client.current_room].walls[i].type);
@@ -1146,6 +1178,7 @@ function generateDungeon(dungeon_size, dungeon_difficulty) {
         var new_room_origin_y = 0;
         var new_room_width = randomInt(room_min_width, room_max_width + 1);
         var new_room_height = randomInt(room_min_height, room_max_height + 1);
+        var new_room_floor_type = "floor_default";
         if (new_map.rooms.length < 1) {
             var start = Math.random();
             if (0 < start <= 0.25) {
@@ -1239,14 +1272,16 @@ function generateDungeon(dungeon_size, dungeon_difficulty) {
             origin_x: connection_origin_x,
             origin_y: connection_origin_y,
             width: connection_width,
-            height: connection_height
+            height: connection_height,
+            floor_type: new_room_floor_type
         }
         new_room = {
             name: "room" + i.toString(),
             origin_x: new_room_origin_x,
             origin_y: new_room_origin_y,
             width: new_room_width,
-            height: new_room_height
+            height: new_room_height,
+            floor_type: new_room_floor_type
         };
         var valid_room = true;
         if (

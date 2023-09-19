@@ -1,7 +1,7 @@
 {
   "resourceType": "GMTileSet",
   "resourceVersion": "1.0",
-  "name": "dungeon2",
+  "name": "default_tileset",
   "autoTileSets": [],
   "macroPageTiles": {
     "SerialiseHeight": 8,

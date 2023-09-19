@@ -58,7 +58,7 @@
     {"name":"camera_controller","order":5,"path":"objects/camera_controller/camera_controller.yy",},
     {"name":"spr_princess_new","order":9,"path":"sprites/spr_princess_new/spr_princess_new.yy",},
     {"name":"txt_chat_log","order":4,"path":"objects/txt_chat_log/txt_chat_log.yy",},
-    {"name":"dungeon2","order":1,"path":"tilesets/dungeon2/dungeon2.yy",},
+    {"name":"default_tileset","order":1,"path":"tilesets/default_tileset/default_tileset.yy",},
     {"name":"txt_chat_input","order":3,"path":"objects/txt_chat_input/txt_chat_input.yy",},
     {"name":"rat_idle_right","order":5,"path":"objects/rat_idle_right/rat_idle_right.yy",},
     {"name":"rat_idle_left","order":4,"path":"objects/rat_idle_left/rat_idle_left.yy",},
