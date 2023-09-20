@@ -17,9 +17,11 @@ if(refresh_timer % 3000 == 0){
 if(refresh_timer >= refresh_timeout){
 	show_debug_message("Connection Lost");
 	instance_destroy(entity);
+	instance_destroy(attack);
 	instance_destroy(animation);
 	instance_destroy(wall);
 	instance_destroy(door);
+	audio_stop_all();
 	room_goto(rm_connection_lost);
 	username = "";
 	var_player = "";
@@ -48,9 +50,12 @@ switch(room_name){
 	case "zone1":
 		playAudio(zone1_amb);
 		break;
-	case "zone2":
+	case "rm_random":
 		playAudio(zone2_amb);
 		break;
+	case "rm_connection_lost":
+		audio_stop_all();
+		break;	
 }
 
 

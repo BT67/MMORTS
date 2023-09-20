@@ -152,8 +152,9 @@ function handle_packet(data_buffer){
 			instance_destroy(animation);
 			instance_destroy(wall);
 			instance_destroy(door);
-			target_room = buffer_read(data_buffer, buffer_string);
 			audio_stop_all();
+			target_room = buffer_read(data_buffer, buffer_string);
+
 			new_width = buffer_read(data_buffer, buffer_string);
 			new_width = (real(new_width) + 2 ) * 32;
 			new_height = buffer_read(data_buffer, buffer_string);
