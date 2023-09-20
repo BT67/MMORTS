@@ -38,30 +38,14 @@ module.exports = function () {
         packet.parse(client, data);
     };
     //Log the user out if client is unexpectedly closed or crashes:
-    //TODO update database to logout when client error causes disconnect
     this.error = function () {
-        clients = clients.filter(item => item !== client);
-        client.refresh_cont = false;
-        console.log(timeNow() + config.err_msg_client_error + id);
-        if(client.current_room !== null){
-            try {
-                maps[client.current_room].clients = maps[client.current_room].clients.filter(item => item !== client);
-            } catch(error){
-                console.log(timeNow() + config.err_msg_leaving_room + id);
-                console.log(error.stack);
-            }
-        }
+        db_set_logout(client);
+        process_logout(client);
         sendDestroyPackets(id);
     }
-    //TODO Error when client fails to login but DB registers login, when try to log in again, access is denied
     this.end = function () {
-        clients = clients.filter(item => item !== client);
-        client.refresh_cont = false;
-        console.log(timeNow() + config.err_msg_client_error + id);
-        //maps[client.current_room].clients[client.username];
-        if(client.current_room != null){
-            maps[client.current_room].clients = maps[client.current_room].clients.filter(item => item !== client);
-        }
+        db_set_logout(client);
+        process_logout(client);
         sendDestroyPackets(id);
     }
 }
@@ -70,6 +54,25 @@ function timeNow() {
     var timeStamp = new Date().toISOString();
     return "[" + timeStamp + "] ";
 }
+
+function db_set_logout(client){
+    logout_users.push(client.username);
+}
+
+function process_logout(client){
+    clients = clients.filter(item => item !== client);
+    client.refresh_cont = false;
+    console.log(timeNow() + config.err_msg_client_error + id);
+    if(client.current_room !== null){
+        try {
+            maps[client.current_room].clients = maps[client.current_room].clients.filter(item => item !== client);
+        } catch(error){
+            console.log(timeNow() + config.err_msg_leaving_room + id);
+            console.log(error.stack);
+        }
+    }
+}
+
 
 function sendDestroyPackets(clientId) {
     query = "UPDATE public.users SET online_status = 0 , current_client = null WHERE current_client = ? LIMIT 1";

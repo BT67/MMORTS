@@ -51,7 +51,7 @@ switch(room_name){
 		playAudio(zone1_amb);
 		break;
 	case "rm_random":
-		playAudio(zone2_amb);
+		playAudio(zone1_amb);
 		break;
 	case "rm_connection_lost":
 		audio_stop_all();

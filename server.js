@@ -34,6 +34,7 @@ model_files.forEach(function (modelFile) {
 //Load game map data
 maps = {};
 clients = [];
+logout_users = [];
 const map_files = fs.readdirSync(config.data_paths.maps);
 map_files.forEach(function (mapFile) {
     console.log(timeNow() + "Loading map file: " + mapFile);
@@ -596,6 +597,18 @@ async function updateEntities() {
                 }
             });
         });
+        if (logout_users.length > 0) {
+            var username = logout_users.shift();
+            query = "UPDATE public.users SET online_status = false, current_client = null WHERE username = '" + username + "';";
+            console.log(timeNow() + query);
+            try {
+                await connection.query(query);
+                console.log(timeNow() + config.msg_logout_success);
+            } catch (error) {
+                console.log(timeNow() + config.err_msg_logout_database);
+                console.log(error.stack);
+            }
+        }
         await new Promise(resolve => setTimeout(resolve, config.step));
     }
 }

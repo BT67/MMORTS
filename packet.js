@@ -290,6 +290,10 @@ module.exports = packet = {
             //client.current_room = null;
         }
 
+        function refresh(){
+            client.re
+        }
+
         var data;
         //Interpret commands for client
         switch (header.command.toUpperCase()) {
@@ -321,6 +325,9 @@ module.exports = packet = {
             case "RESETPASSWORD":
                 data = PacketModels.resetpassword.parse(datapacket);
                 password_reset(client, data.email);
+                break;
+            case "REFRESH":
+                refresh();
                 break;
         }
     }
