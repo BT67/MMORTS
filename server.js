@@ -69,6 +69,7 @@ maps["zone1"].grid = initMapGrid(maps["zone1"]);
 //TODO Assign random room identifier;
 new_map = generateDungeon("SMALL", "EASY");
 new_map = createWalls(new_map);
+createMobs(new_map);
 new_map.name = "rm_random";
 new_map.room = "rm_random";
 new_map.grid_size = 32;
@@ -1103,6 +1104,60 @@ function createWalls(map) {
         wall_count++;
     });
     return map;
+}
+
+function createMobs(map){
+    var mob_num = 0
+    map.rooms.forEach(function(room){
+        if(room.name !== "room0") {
+            const entity_inst = new require("./Models/entity.js");
+            this_entity = new entity_inst();
+            this_entity.alive = true;
+            this_entity.max_health = 200;
+            this_entity.health = this_entity.max_health;
+            this_entity.sprite = "";
+            this_entity.type = "goblin";
+            this_entity.name = "mob" + mob_num.toString();
+            mob_num++;
+            this_entity.pos_x = randomInt(room.origin_x + 1, room.origin_x + room.width - 1);
+            this_entity.pos_y = randomInt(room.origin_y + 1, room.origin_y + room.height - 1);
+            this_entity.target_x = this_entity.pos_x;
+            this_entity.target_y = this_entity.pos_y;
+            this_entity.origin_x = this_entity.pos_x;
+            this_entity.origin_y = this_entity.pos_y;
+            this_entity.target_entity = null;
+            this_entity.roam_range = 10;
+            this_entity.view_range = 10;
+            this_entity.attack_range = 1.5;
+            this_entity.in_combat = false;
+            this_entity.aggressive = true;
+            this_entity.move_speed = 1;
+            this_entity.sprite = "sprite";
+            this_entity.respawn_period = 100;
+            this_entity.respawn_timer = this_entity.respawn_period;
+            this_entity.path = [];
+            this_entity.attack_period = 5;
+            this_entity.attack_timer = this_entity.attack_period;
+            var patrol_to_x = this_entity.pos_x;
+            var patrol_to_y = this_entity.pos_y
+            if (this_entity.pos_x - room.origin_x > (room.width / 2)) {
+                patrol_to_x = randomInt(room.origin_x + 1, room.origin_x + (room.width / 2));
+            } else {
+                patrol_to_x = randomInt(room.origin_x + (room.width / 2), room.origin_x + room.width);
+            }
+            if (this_entity.pos_y - room.origin_y > (room.height / 2)) {
+                patrol_to_y = randomInt(room.origin_y + 1, room.origin_y + (room.height / 2));
+            } else {
+                patrol_to_y = randomInt(room.origin_x + (room.height / 2), room.origin_y + room.height);
+            }
+            this_entity.patrol_path = [
+                {x: this_entity.pos_x, y: this_entity.pos_y},
+                {x: patrol_to_x, y: patrol_to_y}
+            ];
+            this_entity.patrol_point = 0;
+            map.entities.push(this_entity);
+        }
+    });
 }
 
 function generateDungeon(dungeon_size, dungeon_difficulty) {
