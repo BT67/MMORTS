@@ -488,8 +488,9 @@ async function updateEntities() {
                                         maps[client.current_room].grid_height.toString()
                                     ], client.id));
                                     drawFloors(client);
-                                    client.socket.write(packet.build(["FLOOREND"], client.id));
+                                    console.log("finished sending floors");
                                     spawnWalls(client);
+                                    console.log("spawned walls");
                                     spawnDoors(client);
                                     spawnEntities(client);
                                     spawnClients(client);
@@ -926,32 +927,41 @@ function randomInt(min, max) {
 }
 
 function drawFloors(client) {
+    console.log("started draw rooms");
+    console.log(maps[client.current_room].rooms.length);
     maps[client.current_room].rooms.forEach(function (room) {
-        for (var h = 0; h < room.width + 1; ++h) {
-            for (var v = 0; v < room.height + 1; ++v) {
-                params = [];
-                params.push("FLOOR");
-                params.push(room.floor_type);
-                params.push((room.origin_x + h).toString());
-                params.push((room.origin_y + v).toString());
-                client.socket.write(packet.build(params, client.id));
-                //await new Promise(resolve => setTimeout(resolve, 80));
-            }
-        }
+        console.log(room.name.toString());
+        console.log(room.origin_x.toString());
+        console.log(room.origin_y.toString());
+        console.log(room.width.toString());
+        console.log(room.height.toString());
+        params = [];
+        params.push("FLOOR");
+        params.push(room.floor_type);
+        params.push(room.origin_x.toString());
+        params.push(room.origin_y.toString());
+        params.push(room.width.toString());
+        params.push(room.height.toString());
+        client.socket.write(packet.build(params, client.id));
     });
+    console.log("started draw connections");
+    console.log(maps[client.current_room].connections.length);
     maps[client.current_room].connections.forEach(function (connection) {
-        for (var h = 0; h < connection.width + 1; ++h) {
-            for (var v = 0; v < connection.height + 1; ++v) {
-                params = [];
-                params.push("FLOOR");
-                params.push(connection.floor_type);
-                params.push((connection.origin_x + h).toString());
-                params.push((connection.origin_y + v).toString());
-                client.socket.write(packet.build(params, client.id));
-                //await new Promise(resolve => setTimeout(resolve, 80));
-            }
-        }
+        console.log(connection.name.toString());
+        console.log(connection.origin_x.toString());
+        console.log(connection.origin_y.toString());
+        console.log(connection.width.toString());
+        console.log(connection.height.toString());
+        params = [];
+        params.push("FLOOR");
+        params.push(connection.floor_type);
+        params.push(connection.origin_x.toString());
+        params.push(connection.origin_y.toString());
+        params.push(connection.width.toString());
+        params.push(connection.height.toString());
+        client.socket.write(packet.build(params, client.id));
     });
+    client.socket.write(packet.build(["FLOOREND"], client.id));
 }
 
 function spawnWalls(client) {
@@ -1313,7 +1323,7 @@ function generateDungeon(dungeon_size, dungeon_difficulty) {
         });
         if (valid_room) {
             new_map.rooms.push(new_room);
-            if (new_map.rooms.length > 0) {
+            if (new_map.rooms.length > 1) {
                 new_map.connections.push(connection_room);
                 num_connections++;
             }

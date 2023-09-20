@@ -64,14 +64,26 @@ function handle_packet(data_buffer){
 		case "FLOOR":
 			floor_type = buffer_read(data_buffer, buffer_string);
 			show_debug_message(string(floor_type));
-			pos_x = buffer_read(data_buffer, buffer_string);
+			origin_x = buffer_read(data_buffer, buffer_string);
 			show_debug_message(string(pos_x));
-			pos_y = buffer_read(data_buffer, buffer_string);
+			origin_y = buffer_read(data_buffer, buffer_string);
 			show_debug_message(string(pos_y));
+			width = buffer_read(data_buffer, buffer_string);
+			show_debug_message(string(width));
+			height = buffer_read(data_buffer, buffer_string);
+			show_debug_message(string(height));
+			origin_x = real(origin_x);
+			origin_y = real(origin_y);
+			width = real(width);
+			height = real(height);
 			var layer_id = layer_get_id("Tiles_1");
 			var tilemap_id = layer_tilemap_get_id(layer_id);
 			var tilemap = tilemap_get(tilemap_id, 0, 1); 
-			tilemap_set(tilemap_id, tilemap, pos_x, pos_y);
+			for(var h = 0; h < width + 1; ++h){
+				for(var v = 0; v < height + 1; ++v){
+					tilemap_set(tilemap_id, tilemap, origin_x + h, origin_y + v);
+				}
+			}
 			break;	
 		case "FLOOREND":
 			variable_instance_set(camera_controller, "floor_end", true);
