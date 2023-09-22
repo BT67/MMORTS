@@ -53,14 +53,13 @@ for (let i = 0; i < 11; ++i) {
     }
     maps["zone1"].walls.push(wall);
 }
-
 //Init doors in map
 door = {
     type: "door_default",
     pos_x: 2,
     pos_y: 7,
     room_to: "rm_random",
-    name: "zone1-door1"
+    name: "door0"
 }
 maps["zone1"].doors.push(door);
 maps["zone1"].grid = initMapGrid(maps["zone1"]);
@@ -69,6 +68,7 @@ maps["zone1"].grid = initMapGrid(maps["zone1"]);
 //TODO Assign random room identifier;
 new_map = generateDungeon("SMALL", "EASY");
 new_map = createWalls(new_map);
+create_doors(new_map)
 createMobs(new_map);
 new_map.name = "rm_random";
 new_map.room = "rm_random";
@@ -242,7 +242,7 @@ net.createServer(function (socket) {
         thisClient.target_y = thisClient.pos_y;
         thisClient.target_entity = null;
         thisClient.move_speed = 1;
-        thisClient.max_health = 100;
+        thisClient.max_health = 1000;
         thisClient.health = thisClient.max_health;
         thisClient.path = [];
         thisClient.alive = true;
@@ -459,7 +459,7 @@ async function updateEntities() {
                             });
                         }
                         //Check if client is in same grid as a door:
-                        maps[map].doors.forEach(function (door) {
+                        maps[map].doors.forEach(async function (door) {
                             if (client.pos_x === door.pos_x && client.pos_y === door.pos_y) {
                                 maps[map].clients = maps[map].clients.filter(item => item !== client);
                                 //Update client current_room in DB:
@@ -485,14 +485,14 @@ async function updateEntities() {
                                     //Send move room packet to target client:
                                     client.socket.write(packet.build([
                                         "ROOM",
-                                        door.room_to,
                                         maps[client.current_room].grid_width.toString(),
-                                        maps[client.current_room].grid_height.toString()
+                                        maps[client.current_room].grid_height.toString(),
+                                        client.pos_x.toString(),
+                                        client.pos_y.toString()
                                     ], client.id));
+                                    await new Promise(resolve => setTimeout(resolve, 100));
                                     drawFloors(client);
-                                    console.log("finished sending floors");
                                     spawnWalls(client);
-                                    console.log("spawned walls");
                                     spawnDoors(client);
                                     spawnEntities(client);
                                     spawnClients(client);
@@ -941,14 +941,7 @@ function randomInt(min, max) {
 }
 
 function drawFloors(client) {
-    console.log("started draw rooms");
-    console.log(maps[client.current_room].rooms.length);
     maps[client.current_room].rooms.forEach(function (room) {
-        console.log(room.name.toString());
-        console.log(room.origin_x.toString());
-        console.log(room.origin_y.toString());
-        console.log(room.width.toString());
-        console.log(room.height.toString());
         params = [];
         params.push("FLOOR");
         params.push(room.floor_type);
@@ -958,14 +951,7 @@ function drawFloors(client) {
         params.push(room.height.toString());
         client.socket.write(packet.build(params, client.id));
     });
-    console.log("started draw connections");
-    console.log(maps[client.current_room].connections.length);
     maps[client.current_room].connections.forEach(function (connection) {
-        console.log(connection.name.toString());
-        console.log(connection.origin_x.toString());
-        console.log(connection.origin_y.toString());
-        console.log(connection.width.toString());
-        console.log(connection.height.toString());
         params = [];
         params.push("FLOOR");
         params.push(connection.floor_type);
@@ -975,7 +961,7 @@ function drawFloors(client) {
         params.push(connection.height.toString());
         client.socket.write(packet.build(params, client.id));
     });
-    client.socket.write(packet.build(["FLOOREND"], client.id));
+    //client.socket.write(packet.build(["FLOOREND"], client.id));
 }
 
 function spawnWalls(client) {
@@ -1160,6 +1146,29 @@ function createMobs(map){
     });
 }
 
+function create_doors(map){
+    //Add entry
+    var room = map.rooms[0]
+    new_door = {
+        type: "door_default",
+        pos_x: randomInt(room.origin_x + 1, room.origin_x + room.width - 1),
+        pos_y: randomInt(room.origin_y + 1, room.origin_y + room.height - 1),
+        room_to: "zone1",
+        name: "door0"
+    }
+    map.doors.push(new_door)
+    room = map.rooms[map.rooms.length -1]
+    //Add exit
+    new_door = {
+        type: "door_default",
+        pos_x: randomInt(room.origin_x + 1, room.origin_x + room.width - 1),
+        pos_y: randomInt(room.origin_y + 1, room.origin_y + room.height - 1),
+        room_to: "zone1",
+        name: "door1"
+    }
+    map.doors.push(new_door)
+}
+
 function generateDungeon(dungeon_size, dungeon_difficulty) {
     var room_min_width = 0;
     var room_max_width = 0;
@@ -1280,7 +1289,6 @@ function generateDungeon(dungeon_size, dungeon_difficulty) {
                 new_map.start_x = new_map_width - 3;
                 new_map.start_y = new_map_height - 3;
             }
-
         } else {
             var connection_origin_x = 0;
             var connection_origin_y = 0;

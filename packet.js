@@ -140,25 +140,25 @@ module.exports = packet = {
                     console.log(config.err_msg_client_enter_room + current_room);
                     return;
                 }
+                client.current_room = current_room;
                 client.socket.write(packet.build([
-                    "LOGIN", "TRUE", config.msg_login_success, username, current_room, pos_x.toString(), pos_y.toString(), health, sprite
+                    "LOGIN",
+                    "TRUE",
+                    config.msg_login_success,
+                    username
                 ], client.id));
+                await new Promise(resolve => setTimeout(resolve, 100));
                 //Send spawn player packet to other clients in the room who are online
-                client.current_room = current_room;
                 console.log(timeNow() + config.msg_enter_room + current_room + ", clientId=" + client.id);
-                clients_str = "";
-                maps[current_room].clients.forEach(function (otherClient) {
-                    clients_str = clients_str + otherClient.id.toString + " ";
-                });
-                console.log(timeNow() + config.msg_clients_in_room + current_room + ": " + clients_str);
-                maps[current_room].clients.forEach(function (otherClient) {
-                    if (otherClient.id !== client.id) {
-                        otherClient.socket.write(packet.build([
-                            "SPAWN", username, "player", pos_x, pos_y, health, sprite
-                        ], otherClient.id));
-                    }
-                });
-                client.current_room = current_room;
+                client.socket.write(packet.build([
+                    "ROOM",
+                    maps[client.current_room].grid_width.toString(),
+                    maps[client.current_room].grid_height.toString(),
+                    client.pos_x.toString(),
+                    client.pos_y.toString()
+                ], client.id));
+                await new Promise(resolve => setTimeout(resolve, 100));
+                drawFloors(client);
                 spawnWalls(client);
                 spawnDoors(client);
                 spawnEntities(client);
@@ -442,7 +442,6 @@ function spawnEntities(client) {
 
 function spawnClients(client) {
     maps[client.current_room].clients.forEach(function (otherClient) {
-        if(otherClient.username !== client.username) {
             params = [];
             params.push("SPAWN");
             params.push(otherClient.username);
@@ -451,6 +450,29 @@ function spawnClients(client) {
             params.push(otherClient.pos_y.toString());
             params.push(otherClient.health);
             client.socket.write(packet.build(params, client.id));
-        }
     });
+}
+
+function drawFloors(client) {
+    maps[client.current_room].rooms.forEach(function (room) {
+        params = [];
+        params.push("FLOOR");
+        params.push(room.floor_type);
+        params.push(room.origin_x.toString());
+        params.push(room.origin_y.toString());
+        params.push(room.width.toString());
+        params.push(room.height.toString());
+        client.socket.write(packet.build(params, client.id));
+    });
+    maps[client.current_room].connections.forEach(function (connection) {
+        params = [];
+        params.push("FLOOR");
+        params.push(connection.floor_type);
+        params.push(connection.origin_x.toString());
+        params.push(connection.origin_y.toString());
+        params.push(connection.width.toString());
+        params.push(connection.height.toString());
+        client.socket.write(packet.build(params, client.id));
+    });
+    //client.socket.write(packet.build(["FLOOREND"], client.id));
 }

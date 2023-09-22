@@ -47,10 +47,7 @@ switch(room_name){
 	case "rm_register_success":
 		playAudio(menu_bgm);
 		break;
-	case "zone1":
-		playAudio(zone1_amb);
-		break;
-	case "rm_random":
+	case "rm_game":
 		playAudio(zone1_amb);
 		break;
 	case "rm_connection_lost":

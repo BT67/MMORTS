@@ -90,7 +90,7 @@
     {"name":"move_right_animation","order":6,"path":"objects/move_right_animation/move_right_animation.yy",},
     {"name":"btn_login","order":2,"path":"objects/btn_login/btn_login.yy",},
     {"name":"dungeon_floor_2_rowsb","order":6,"path":"sprites/dungeon_floor_2_rowsb/dungeon_floor_2_rowsb.yy",},
-    {"name":"rm_random","order":1,"path":"rooms/rm_random/rm_random.yy",},
+    {"name":"rm_game","order":1,"path":"rooms/rm_game/rm_game.yy",},
     {"name":"goblin","order":2,"path":"objects/goblin/goblin.yy",},
     {"name":"rat_move_right","order":7,"path":"objects/rat_move_right/rat_move_right.yy",},
     {"name":"rat_death_right","order":3,"path":"objects/rat_death_right/rat_death_right.yy",},

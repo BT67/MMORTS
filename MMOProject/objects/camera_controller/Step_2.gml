@@ -1,8 +1,5 @@
-if(floor_end){
-
 	view_pos_x = camera_get_view_x(camera);
 	view_pos_y = camera_get_view_y(camera);
-
 	if(keyboard_check(vk_up)){
 		view_pos_y -= scroll_speed;
 	} else if(keyboard_check(vk_down)){
@@ -46,28 +43,16 @@ if(wheel != 0){
 	}
 }
 */
-
-
 	if(view_pos_y < -26){
 		view_pos_y = -26;
 	} else if(view_pos_y + view_height >= network.map_height + 118){
 		view_pos_y = network.map_height - view_height + 118;
 	}
-
 	if(view_pos_x < 0){
 		view_pos_x = 0;
 	} else if(view_pos_x + view_width >= network.map_width){
 		view_pos_x = network.map_width - view_width;
 	}
-	
 	camera_set_view_pos(camera, view_pos_x, view_pos_y);
 	camera_set_view_size(camera, camera_width, camera_height);
-	
-} else {
-	
-	camera_set_view_pos(camera, 0, 0);
-	camera_set_view_size(camera, room_width, room_height);
-	
-}
-
 
