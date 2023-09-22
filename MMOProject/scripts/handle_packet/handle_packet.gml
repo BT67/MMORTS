@@ -101,6 +101,18 @@ function handle_packet(data_buffer){
 			variable_instance_set(instance_find(entity, instance_number(entity) - 1), "target_x", target_x);
 			variable_instance_set(instance_find(entity, instance_number(entity) - 1), "target_y", target_y);
 			show_debug_message(string(entity_name));
+			if(entity_name == network.username){
+				view_pos_x = target_x - (camera_controller.view_width/2)
+				if(view_pos_x < 0){
+					view_pos_x = 0;
+				}
+				view_pos_y = target_y - (camera_controller.view_height/2)
+				if(view_pos_y < 0){
+					view_pos_y = 0;
+				}
+				camera_set_view_pos(camera_controller.camera, view_pos_x, view_pos_y);
+				camera_set_view_size(camera_controller.camera, camera_controller.camera_width, camera_controller.camera_height);	
+			}
 			break;
 		case "HEALTH":
 			entity_name = buffer_read(data_buffer, buffer_string);
