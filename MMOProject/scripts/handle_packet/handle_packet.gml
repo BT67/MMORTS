@@ -112,6 +112,17 @@ function handle_packet(data_buffer){
 			}			
 			break;
 		case "ROOM":
+		//Do not clear the area of the tilemap that holds tile presets, since these are used to draw other tiles
+			var tilemap_id = layer_tilemap_get_id(layer_get_id("Tiles_1"))
+			for (var i = 2; i < tilemap_get_width(tilemap_id); i++;)
+			{
+			    for (var j = 2; j < tilemap_get_height(tilemap_id); j++;)
+			    {
+			        var data = tilemap_get(tilemap_id, i, j);
+			        data = tile_set_empty(data)
+			        tilemap_set(tilemap_id, data, i, j);
+			    }
+			}
 			instance_destroy(entity);
 			instance_destroy(attack);
 			instance_destroy(animation);
@@ -126,10 +137,6 @@ function handle_packet(data_buffer){
 			room_height = new_height;
 			network.map_width = room_width;
 			network.map_height = room_height;
-			var_depth = layer_get_depth(layer_get_id("Tiles_1"));
-			layer_destroy(layer_get_id("Tiles_1"));
-			new_layer = layer_create(var_depth, "Tiles_1");
-			new_tilemap = layer_tilemap_create(new_layer, 0, 0, default_tileset, grid_width, grid_height);
 			break;
 		case "ATTACK":
 			attack_type = buffer_read(data_buffer, buffer_string);
