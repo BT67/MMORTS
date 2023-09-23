@@ -50,9 +50,9 @@ function handle_packet(data_buffer){
 			origin_y = real(origin_y);
 			width = real(width);
 			height = real(height);
-			var layer_id = layer_get_id("Tiles_1");
-			var tilemap_id = layer_tilemap_get_id(layer_id);
+			var tilemap_id = layer_tilemap_get_id(layer_get_id("Tiles_Ref"));
 			var tilemap = tilemap_get(tilemap_id, 0, 1); 
+			tilemap_id = layer_tilemap_get_id(layer_get_id("Tiles_1"));
 			for(var h = 0; h < width + 1; ++h){
 				for(var v = 0; v < height + 1; ++v){
 					camera_set_view_pos(camera_controller.camera, 0, 0);
@@ -126,9 +126,9 @@ function handle_packet(data_buffer){
 		case "ROOM":
 		//Do not clear the area of the tilemap that holds tile presets, since these are used to draw other tiles
 			var tilemap_id = layer_tilemap_get_id(layer_get_id("Tiles_1"))
-			for (var i = 2; i < tilemap_get_width(tilemap_id); i++;)
+			for (var i = 0; i < tilemap_get_width(tilemap_id); i++;)
 			{
-			    for (var j = 2; j < tilemap_get_height(tilemap_id); j++;)
+			    for (var j = 0; j < tilemap_get_height(tilemap_id); j++;)
 			    {
 			        var data = tilemap_get(tilemap_id, i, j);
 			        data = tile_set_empty(data)
