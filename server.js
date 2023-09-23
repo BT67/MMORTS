@@ -165,6 +165,7 @@ this_entity.respawn_timer = this_entity.respawn_period;
 this_entity.path = [];
 this_entity.attack_period = 5;
 this_entity.attack_timer = this_entity.attack_period;
+this_entity.attack_damage = 5;
 //this_entity.patrol_path = [{x: 20, y: 2}, {x: 25, y: 10}];
 this_entity.patrol_path = [];
 this_entity.patrol_point = 0;
@@ -248,8 +249,9 @@ net.createServer(function (socket) {
         thisClient.alive = true;
         thisClient.respawn_period = 10;
         thisClient.respawn_timer = thisClient.respawn_period;
-        thisClient.attack_period = 3;
+        thisClient.attack_period = 2;
         thisClient.attack_timer = thisClient.attack_period;
+        thisClient.attack_damage = 25;
         thisClient.refresh_timer = 0;
         thisClient.refresh_timeout = 300;
         //TODO create clientId allocation system
@@ -342,7 +344,7 @@ async function updateEntities() {
                                                             "ATTACK", "attack", client.username, entity.name
                                                         ], otherClient.id));
                                                     });
-                                                    client.health -= 10;
+                                                    client.health -= entity.attack_damage;
                                                     maps[map].clients.forEach(function (otherClient) {
                                                         otherClient.socket.write(packet.build([
                                                             "HEALTH", client.username, client.health.toString()
@@ -521,7 +523,7 @@ async function updateEntities() {
                                         client.attack_timer = 0;
                                         maps[map].entities.forEach(function (entity) {
                                             if (entity.name === client.target_entity && entity.alive) {
-                                                entity.health -= 10;
+                                                entity.health -= client.attack_damage;
                                                 maps[map].clients.forEach(function (OtherClient) {
                                                     OtherClient.socket.write(packet.build([
                                                         "HEALTH", entity.name, entity.health.toString()
@@ -534,7 +536,7 @@ async function updateEntities() {
                                                     entity.target_x = client.pos_x;
                                                     entity.target_y = client.pos_y;
                                                 }
-                                                if (entity.health < 0) {
+                                                if (entity.health <= 0) {
                                                     send_destroy_packet(target_entity.name, map);
                                                     entity.alive = false;
                                                     alive = entity.alive;
@@ -998,7 +1000,8 @@ function spawnEntities(client) {
             params.push(entity.type);
             params.push(entity.pos_x.toString());
             params.push(entity.pos_y.toString());
-            params.push(entity.health);
+            params.push(entity.health.toString());
+            params.push(entity.max_health.toString())
             client.socket.write(packet.build(params, client.id));
         }
     });
@@ -1012,7 +1015,8 @@ function spawnClients(client) {
         params.push("player");
         params.push(otherClient.pos_x.toString());
         params.push(otherClient.pos_y.toString());
-        params.push(otherClient.health);
+        params.push(otherClient.health.toString());
+        params.push(otherClient.max_health.toString());
         client.socket.write(packet.build(params, client.id));
     });
 }
@@ -1099,7 +1103,7 @@ function createMobs(map){
             const entity_inst = new require("./Models/entity.js");
             this_entity = new entity_inst();
             this_entity.alive = true;
-            this_entity.max_health = 200;
+            this_entity.max_health = 80;
             this_entity.health = this_entity.max_health;
             this_entity.sprite = "";
             this_entity.type = "goblin";
@@ -1124,6 +1128,7 @@ function createMobs(map){
             this_entity.path = [];
             this_entity.attack_period = 5;
             this_entity.attack_timer = this_entity.attack_period;
+            this_entity.attack_damage = 5;
             var patrol_to_x = this_entity.pos_x;
             var patrol_to_y = this_entity.pos_y
             if (this_entity.pos_x - room.origin_x > (room.width / 2)) {

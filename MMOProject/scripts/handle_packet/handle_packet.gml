@@ -94,12 +94,15 @@ function handle_packet(data_buffer){
 			target_y = buffer_read(data_buffer, buffer_string);
 			target_y = (real(target_y) + 1) * 32;
 			entity_health = buffer_read(data_buffer, buffer_string);
+			entity_max_health =  buffer_read(data_buffer, buffer_string);
 			with(instance_create_layer(real(target_x), real(target_y), "Instances", asset_get_index(entity_type))){
 				var_entity = other;
 			}
 			variable_instance_set(instance_find(entity, instance_number(entity) - 1), "entity_name", entity_name);
 			variable_instance_set(instance_find(entity, instance_number(entity) - 1), "target_x", target_x);
 			variable_instance_set(instance_find(entity, instance_number(entity) - 1), "target_y", target_y);
+			variable_instance_set(instance_find(entity, instance_number(entity) - 1), "entity_health", entity_health);
+			variable_instance_set(instance_find(entity, instance_number(entity) - 1), "entity_max_health", entity_max_health);
 			show_debug_message(string(entity_name));
 			if(entity_name == network.username){
 				view_pos_x = target_x - (camera_controller.view_width/2)
@@ -126,8 +129,7 @@ function handle_packet(data_buffer){
 		case "ROOM":
 		//Do not clear the area of the tilemap that holds tile presets, since these are used to draw other tiles
 			var tilemap_id = layer_tilemap_get_id(layer_get_id("Tiles_1"))
-			for (var i = 0; i < tilemap_get_width(tilemap_id); i++;)
-			{
+			for (var i = 0; i < tilemap_get_width(tilemap_id); i++;){
 			    for (var j = 0; j < tilemap_get_height(tilemap_id); j++;)
 			    {
 			        var data = tilemap_get(tilemap_id, i, j);

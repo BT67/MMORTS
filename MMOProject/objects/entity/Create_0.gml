@@ -6,8 +6,8 @@ focused = false;
 //Facing: 1=left. 0=right
 facing_left = false;
 target_entity = "";
-entity_max_health = 100;
-entity_health = 100;
+entity_max_health = 0;
+entity_health = entity_max_health;
 move_speed = 1;
 path = path_add();
 dest_x = x;

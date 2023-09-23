@@ -434,7 +434,8 @@ function spawnEntities(client) {
             params.push(entity.type);
             params.push(entity.pos_x.toString());
             params.push(entity.pos_y.toString());
-            params.push(entity.health);
+            params.push(entity.health.toString());
+            params.push(entity.max_health.toString())
             client.socket.write(packet.build(params, client.id));
         }
     });
@@ -448,7 +449,8 @@ function spawnClients(client) {
             params.push("player");
             params.push(otherClient.pos_x.toString());
             params.push(otherClient.pos_y.toString());
-            params.push(otherClient.health);
+            params.push(otherClient.health.toString());
+            params.push(otherClient.max_health.toString());
             client.socket.write(packet.build(params, client.id));
     });
 }
