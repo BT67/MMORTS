@@ -196,9 +196,13 @@ function handle_packet(data_buffer){
 			entity_name = buffer_read(data_buffer, buffer_string);
 			//Destroy all child animations of the target 
 			for(var i = 0; i < instance_number(animation); ++i){
-				if(instance_find(animation,i).parent_entity == entity_name){
-					instance_destroy(instance_find(animation,i));
-					break;
+				try{
+					if(instance_find(animation,i).parent_entity == entity_name){
+						instance_destroy(instance_find(animation,i));
+						break;
+					}
+				} catch(error) {
+					
 				}
 			}
 			for(var i = 0; i < instance_number(entity); ++i;) {

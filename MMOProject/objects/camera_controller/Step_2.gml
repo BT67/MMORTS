@@ -53,6 +53,20 @@ if(wheel != 0){
 	} else if(view_pos_x + view_width >= network.map_width){
 		view_pos_x = network.map_width - view_width;
 	}
+	
+	try {
+		view_pos_x = player.x - (view_width/2);
+		if(view_pos_x < 0){
+			view_pos_x = 0;
+		}
+		view_pos_y = player.y - (view_height/2);
+		if(view_pos_y < 0){
+			view_pos_y = 0;
+		}
+	} catch(error){
+		
+	}
+	
 	camera_set_view_pos(camera, view_pos_x, view_pos_y);
 	camera_set_view_size(camera, camera_width, camera_height);
 
