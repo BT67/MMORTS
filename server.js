@@ -462,7 +462,11 @@ async function updateEntities() {
                         }
                         //Check if client is in same grid as a door:
                         maps[map].doors.forEach(async function (door) {
-                            if (client.pos_x === door.pos_x && client.pos_y === door.pos_y) {
+                            if (
+                                client.pos_x === door.pos_x &&
+                                client.pos_y === door.pos_y &&
+                                client.target_x === door.pos_x &&
+                                client.target_y === door.pos_y) {
                                 maps[map].clients = maps[map].clients.filter(item => item !== client);
                                 //Update client current_room in DB:
                                 sql_error = false;
