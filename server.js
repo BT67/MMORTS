@@ -356,7 +356,7 @@ async function updateEntities() {
                                                         client.health = client.max_health;
                                                         client.path = [];
                                                         client.target_entity = null;
-                                                        client.pos_x = maps[map].start_x;
+                                                          client.pos_x = maps[map].start_x;
                                                         client.pos_y = maps[map].start_y;
                                                         client.target_x = client.pos_x;
                                                         client.target_y = client.pos_y;

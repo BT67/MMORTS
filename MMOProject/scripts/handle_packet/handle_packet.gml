@@ -70,7 +70,7 @@ function handle_packet(data_buffer){
 			wall_num = buffer_read(data_buffer, buffer_string);
 			wall_num = real(wall_num);
 			var_wall = "";
-			with(instance_create_layer(real(pos_x), real(pos_y), "Instances", asset_get_index(wall_type))){
+			with(instance_create_layer(real(pos_x), real(pos_y), "Walls", asset_get_index(wall_type))){
 				var_wall = other;
 			}
 			break;
@@ -81,7 +81,7 @@ function handle_packet(data_buffer){
 			pos_y = buffer_read(data_buffer, buffer_string);
 			pos_y = (real(pos_y) + 1) * 32;
 			var_door = "";
-			with(instance_create_layer(real(pos_x), real(pos_y), "Instances", asset_get_index(door_type))){
+			with(instance_create_layer(real(pos_x), real(pos_y), "Doors", asset_get_index(door_type))){
 				var_door = other;
 			}
 			break;	
@@ -95,7 +95,7 @@ function handle_packet(data_buffer){
 			target_y = (real(target_y) + 1) * 32;
 			entity_health = buffer_read(data_buffer, buffer_string);
 			entity_max_health =  buffer_read(data_buffer, buffer_string);
-			with(instance_create_layer(real(target_x), real(target_y), "Instances", asset_get_index(entity_type))){
+			with(instance_create_layer(real(target_x), real(target_y), "Entities", asset_get_index(entity_type))){
 				var_entity = other;
 			}
 			variable_instance_set(instance_find(entity, instance_number(entity) - 1), "entity_name", entity_name);
@@ -173,11 +173,11 @@ function handle_packet(data_buffer){
 					var obj = "";
 					audio_play_sound(asset_get_index(instance_find(entity, i).attack_sound), 10, false);
 					if(instance_find(entity, i).facing_left == true){
-						with(instance_create_layer(real(origin_x), real(origin_y), "Instances", asset_get_index(instance_find(entity, i).attack_left))){
+						with(instance_create_layer(real(origin_x), real(origin_y), "Entities", asset_get_index(instance_find(entity, i).attack_left))){
 							obj = other;
 						}
 					} else {
-						with(instance_create_layer(real(origin_x), real(origin_y), "Instances", asset_get_index(instance_find(entity, i).attack_right))){
+						with(instance_create_layer(real(origin_x), real(origin_y), "Entities", asset_get_index(instance_find(entity, i).attack_right))){
 							obj = other;
 						}
 					}
