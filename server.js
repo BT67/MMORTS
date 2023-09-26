@@ -1115,8 +1115,8 @@ function createMobs(map) {
             this_entity.origin_x = this_entity.pos_x;
             this_entity.origin_y = this_entity.pos_y;
             this_entity.target_entity = null;
-            this_entity.roam_range = 10;
-            this_entity.view_range = 10;
+            this_entity.roam_range = Math.max(room.width, room.height) * 1.5;
+            this_entity.view_range = Math.max(room.width, room.height) * 1.5;
             this_entity.attack_range = 1.5;
             this_entity.in_combat = false;
             this_entity.aggressive = true;
