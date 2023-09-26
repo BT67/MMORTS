@@ -1,8 +1,12 @@
 if(focused) {
 	if(entity_name == network.username){
 		draw_circle_colour(x + 16, y + 16, 16, c_green, c_green, true);
-		if(target_entity == "" && distance_to_point(dest_x, dest_y) > 2){
-			draw_circle_colour(dest_x, dest_y, 16, c_yellow, c_yellow, true);
+		try{
+			if(target_entity == "" && distance_to_point(dest_x, dest_y) > 2){
+				draw_circle_colour(dest_x, dest_y, 16, c_yellow, c_yellow, true);
+			} 
+		} catch(error) {
+				
 		}
 		//if(target_entity != ""){
 			//for(var i = 0; i < instance_number(entity); ++i;) {
