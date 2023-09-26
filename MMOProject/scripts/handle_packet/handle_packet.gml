@@ -169,6 +169,7 @@ function handle_packet(data_buffer){
 					origin_entity_index = i;
 					origin_x = instance_find(entity, i).x;
 					origin_y = instance_find(entity, i).y;
+					variable_instance_set(instance_find(entity, i), "target_entity", target_entity);
 					variable_instance_set(instance_find(entity, i), "is_visible", false);
 					var obj = "";
 					audio_play_sound(asset_get_index(instance_find(entity, i).attack_sound), 10, false);
@@ -208,7 +209,13 @@ function handle_packet(data_buffer){
 			for(var i = 0; i < instance_number(entity); ++i;) {
 				if(instance_find(entity, i).entity_name == entity_name){
 					instance_destroy(instance_find(entity, i));
-					break;
+				}
+				try{
+					if(instance_find(entity, i).target_entity == entity_name){
+						variable_instance_set(instance_find(entity, i), "target_entity", "");
+					}
+				} catch(error){
+					
 				}
 			}
 			break;
