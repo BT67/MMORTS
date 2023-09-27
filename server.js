@@ -1152,21 +1152,29 @@ function createMobs(map) {
 
 function create_doors(map) {
     //Add entry
-    var room = map.rooms[0]
     new_door = {
         type: "door_default",
-        pos_x: randomInt(room.origin_x + 1, room.origin_x + room.width - 1),
-        pos_y: randomInt(room.origin_y + 1, room.origin_y + room.height - 1),
+        pos_x: randomInt(map.rooms[0].origin_x + 1, map.rooms[0].origin_x + map.rooms[0].width - 1),
+        pos_y: randomInt(map.rooms[0].origin_y + 1, map.rooms[0].origin_y + map.rooms[0].height - 1),
         room_to: "zone1",
         name: "door0"
     }
+    if(map.rooms[0].origin_x < new_door.pos_x < map.rooms[0].origin_x + (map.rooms[0].width/2)){
+        map.start_x = new_door.pos_x + 1;
+    } else if(map.rooms[0].origin_x + (map.rooms[0].width/2) < new_door.pos_x < map.rooms[0].origin_x + map.rooms[0].width) {
+        map.start_x = new_door.pos_x - 1;
+    }
+    if(map.rooms[0].origin_y < new_door.pos_y < map.rooms[0].origin_y + (map.rooms[0].height/2)){
+        map.start_y = new_door.pos_y + 1;
+    } else if(map.rooms[0].origin_y + (map.rooms[0].height/2) < new_door.pos_y < map.rooms[0].origin_y + map.rooms[0].height) {
+        map.start_y = new_door.pos_y - 1;
+    }
     map.doors.push(new_door)
-    room = map.rooms[map.rooms.length - 1]
     //Add exit
     new_door = {
         type: "door_default",
-        pos_x: randomInt(room.origin_x + 1, room.origin_x + room.width - 1),
-        pos_y: randomInt(room.origin_y + 1, room.origin_y + room.height - 1),
+        pos_x: randomInt(map.rooms[map.rooms.length - 1].origin_x + 1, map.rooms[map.rooms.length - 1].origin_x + map.rooms[map.rooms.length - 1].width - 1),
+        pos_y: randomInt(map.rooms[map.rooms.length - 1].origin_y + 1, map.rooms[map.rooms.length - 1].origin_y + map.rooms[map.rooms.length - 1].height - 1),
         room_to: "zone1",
         name: "door1"
     }
