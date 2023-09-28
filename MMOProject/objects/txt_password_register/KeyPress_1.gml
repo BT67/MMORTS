@@ -6,8 +6,10 @@ if(focused){
 		keyboard_key != vk_up &&
 		keyboard_key != vk_down &&
 		keyboard_key != vk_left &&
-		keyboard_key != vk_right){
-		text += keyboard_lastchar;	
-		hidden_chars += "*";
+		keyboard_key != vk_right &&
+		string_length(text) < max_chars
+		){
+			text += keyboard_lastchar;	
+			hidden_chars += "*";
 	}
 }
