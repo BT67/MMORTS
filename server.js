@@ -2,10 +2,33 @@
 const fs = require("fs");
 const net = require("net");
 require("./packet.js");
-require((__dirname + '/Resources/config.js'));
+require(__dirname + '/Resources/config.js');
 
 const pg = require("pg");
 const {Client} = require("pg");
+
+mobsref = {
+    "goblin": {
+        type: "goblin",
+        move_speed: 1,
+        aggressive: true,
+        max_health: 80,
+        respawn_period: 300,
+        attack_range: 1.5,
+        attack_period: 5,
+        attack_damage: 5
+    },
+    "rat": {
+        type: "rat",
+        move_speed: 1,
+        aggressive: true,
+        max_health: 50,
+        respawn_period: 200,
+        attack_range: 1.5,
+        attack_period: 4,
+        attack_damage: 2
+    }
+}
 
 /*
 1. Load the init files
@@ -377,16 +400,16 @@ async function updateEntities() {
                     }
                     dist = distance(entity.pos_x, entity.pos_y, entity.origin_x, entity.origin_y);
                     if (dist <= entity.roam_range) {
-                            if (entity.target_x !== entity.pos_x || entity.target_y !== entity.pos_y) {
-                                entity.path = createPath(map, entity.pos_x, entity.pos_y, entity.target_x, entity.target_y);
-                                if (entity.target_entity !== null) {
-                                    if (entity.path.length === 1) {
-                                        entity.path = [];
-                                    } else {
-                                        entity.path = entity.path.slice(0, -1);
-                                    }
+                        if (entity.target_x !== entity.pos_x || entity.target_y !== entity.pos_y) {
+                            entity.path = createPath(map, entity.pos_x, entity.pos_y, entity.target_x, entity.target_y);
+                            if (entity.target_entity !== null) {
+                                if (entity.path.length === 1) {
+                                    entity.path = [];
+                                } else {
+                                    entity.path = entity.path.slice(0, -1);
                                 }
                             }
+                        }
                     }
                     dist = distance(entity.target_x, entity.target_y, entity.origin_x, entity.origin_y);
                     if (entity.path.length > 0 && dist <= entity.roam_range) {
@@ -934,7 +957,7 @@ async function send_destroy_packet(entity_name, map) {
     });
 }
 
-//maximum is exclusive, minimum is inclusive
+//minimum is inclusive, maximum is exclusive
 function randomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -1099,53 +1122,55 @@ function createMobs(map) {
     var mob_num = 0
     map.rooms.forEach(function (room) {
         if (room.name !== "room0") {
-            const entity_inst = new require("./Models/entity.js");
-            this_entity = new entity_inst();
-            this_entity.alive = true;
-            this_entity.max_health = 80;
-            this_entity.health = this_entity.max_health;
-            this_entity.sprite = "";
-            this_entity.type = "goblin";
-            this_entity.name = "mob" + mob_num.toString();
-            mob_num++;
-            this_entity.pos_x = randomInt(room.origin_x + 1, room.origin_x + room.width - 1);
-            this_entity.pos_y = randomInt(room.origin_y + 1, room.origin_y + room.height - 1);
-            this_entity.target_x = this_entity.pos_x;
-            this_entity.target_y = this_entity.pos_y;
-            this_entity.origin_x = this_entity.pos_x;
-            this_entity.origin_y = this_entity.pos_y;
-            this_entity.target_entity = null;
-            this_entity.roam_range = Math.max(room.width, room.height) * 1.5;
-            this_entity.view_range = Math.max(room.width, room.height) * 1.5;
-            this_entity.attack_range = 1.5;
-            this_entity.in_combat = false;
-            this_entity.aggressive = true;
-            this_entity.move_speed = 1;
-            this_entity.sprite = "sprite";
-            this_entity.respawn_period = 100;
-            this_entity.respawn_timer = this_entity.respawn_period;
-            this_entity.path = [];
-            this_entity.attack_period = 5;
-            this_entity.attack_timer = this_entity.attack_period;
-            this_entity.attack_damage = 5;
-            var patrol_to_x = this_entity.pos_x;
-            var patrol_to_y = this_entity.pos_y
-            if (this_entity.pos_x - room.origin_x > (room.width / 2)) {
-                patrol_to_x = randomInt(room.origin_x + 1, room.origin_x + (room.width / 2));
-            } else {
-                patrol_to_x = randomInt(room.origin_x + (room.width / 2), room.origin_x + room.width);
-            }
-            if (this_entity.pos_y - room.origin_y > (room.height / 2)) {
-                patrol_to_y = randomInt(room.origin_y + 1, room.origin_y + (room.height / 2));
-            } else {
-                patrol_to_y = randomInt(room.origin_x + (room.height / 2), room.origin_y + room.height);
-            }
-            this_entity.patrol_path = [
-                {x: this_entity.pos_x, y: this_entity.pos_y},
-                {x: patrol_to_x, y: patrol_to_y}
-            ];
-            this_entity.patrol_point = 0;
-            map.entities.push(this_entity);
+            room.mobs.forEach(function (mob) {
+                const entity_inst = new require("./Models/entity.js");
+                this_entity = new entity_inst();
+                //Mob type-dependent properties:
+                this_entity.type = mob;
+                this_entity.max_health = mobsref[mob].max_health;
+                this_entity.health = this_entity.max_health;
+                this_entity.name = "mob" + mob_num.toString();
+                mob_num++;
+                this_entity.attack_range = mobsref[mob].attack_range;
+                this_entity.aggressive = mobsref[mob].aggressive;
+                this_entity.move_speed = mobsref[mob].move_speed;
+                this_entity.respawn_period = mobsref[mob].respawn_period;
+                this_entity.respawn_timer = this_entity.respawn_period;
+                this_entity.attack_period = mobsref[mob].attack_period;
+                this_entity.attack_timer = this_entity.attack_period;
+                this_entity.attack_damage = mobsref[mob].attack_damage;
+                //Mob common properties
+                this_entity.alive = true;
+                this_entity.pos_x = randomInt(room.origin_x + 1, room.origin_x + room.width - 1);
+                this_entity.pos_y = randomInt(room.origin_y + 1, room.origin_y + room.height - 1);
+                this_entity.target_x = this_entity.pos_x;
+                this_entity.target_y = this_entity.pos_y;
+                this_entity.origin_x = this_entity.pos_x;
+                this_entity.origin_y = this_entity.pos_y;
+                this_entity.target_entity = null;
+                this_entity.roam_range = Math.max(room.width, room.height) * 1.5;
+                this_entity.view_range = Math.max(room.width, room.height) * 1.5;
+                this_entity.in_combat = false;
+                this_entity.path = [];
+                var patrol_to_x = this_entity.pos_x;
+                var patrol_to_y = this_entity.pos_y
+                if (this_entity.pos_x - room.origin_x > (room.width / 2)) {
+                    patrol_to_x = randomInt(room.origin_x + 1, room.origin_x + (room.width / 2));
+                } else {
+                    patrol_to_x = randomInt(room.origin_x + (room.width / 2), room.origin_x + room.width);
+                }
+                if (this_entity.pos_y - room.origin_y > (room.height / 2)) {
+                    patrol_to_y = randomInt(room.origin_y + 1, room.origin_y + (room.height / 2));
+                } else {
+                    patrol_to_y = randomInt(room.origin_x + (room.height / 2), room.origin_y + room.height);
+                }
+                this_entity.patrol_path = [
+                    {x: this_entity.pos_x, y: this_entity.pos_y},
+                    {x: patrol_to_x, y: patrol_to_y}
+                ];
+                this_entity.patrol_point = 0;
+                map.entities.push(this_entity);
+            });
         }
     });
 }
@@ -1159,14 +1184,14 @@ function create_doors(map) {
         room_to: "zone1",
         name: "door0"
     }
-    if(map.rooms[0].origin_x < new_door.pos_x < map.rooms[0].origin_x + (map.rooms[0].width/2)){
+    if (map.rooms[0].origin_x < new_door.pos_x < map.rooms[0].origin_x + (map.rooms[0].width / 2)) {
         map.start_x = new_door.pos_x + 1;
-    } else if(map.rooms[0].origin_x + (map.rooms[0].width/2) < new_door.pos_x < map.rooms[0].origin_x + map.rooms[0].width) {
+    } else if (map.rooms[0].origin_x + (map.rooms[0].width / 2) < new_door.pos_x < map.rooms[0].origin_x + map.rooms[0].width) {
         map.start_x = new_door.pos_x - 1;
     }
-    if(map.rooms[0].origin_y < new_door.pos_y < map.rooms[0].origin_y + (map.rooms[0].height/2)){
+    if (map.rooms[0].origin_y < new_door.pos_y < map.rooms[0].origin_y + (map.rooms[0].height / 2)) {
         map.start_y = new_door.pos_y + 1;
-    } else if(map.rooms[0].origin_y + (map.rooms[0].height/2) < new_door.pos_y < map.rooms[0].origin_y + map.rooms[0].height) {
+    } else if (map.rooms[0].origin_y + (map.rooms[0].height / 2) < new_door.pos_y < map.rooms[0].origin_y + map.rooms[0].height) {
         map.start_y = new_door.pos_y - 1;
     }
     map.doors.push(new_door)
@@ -1262,8 +1287,11 @@ function generateDungeon(dungeon_size, dungeon_difficulty) {
         connections: [],
         grid_width: new_map_width,
         grid_height: new_map_height,
-        ascii_grid: []
+        ascii_grid: [],
+        mobs: []
     }
+    new_map.mobs.push("goblin");
+    new_map.mobs.push("rat");
     //Init room grid:
     new_map.grid = initMapGrid(new_map);
     new_map.ascii_grid = initASCIIGrid(new_map);
@@ -1379,8 +1407,14 @@ function generateDungeon(dungeon_size, dungeon_difficulty) {
             origin_y: new_room_origin_y,
             width: new_room_width,
             height: new_room_height,
-            floor_type: new_room_floor_type
+            floor_type: new_room_floor_type,
+            mobs: []
         };
+        num_mobs = randomInt(1, 4);
+        for (var m = 0; m < num_mobs; ++m) {
+            mob_type = new_map.mobs[randomInt(0, new_map.mobs.length)];
+            new_room.mobs.push(mob_type)
+        }
         var valid_room = true;
         if (
             new_room_origin_x < 1 ||
