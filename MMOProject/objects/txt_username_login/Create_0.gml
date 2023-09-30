@@ -1,4 +1,4 @@
 event_inherited();
-max_chars = 30;
+max_chars = network.username_max_chars;
 
 
