@@ -9,4 +9,5 @@ attack_left = "player_attack_left";
 death_left = "player_death_left";
 attack_sound = "attack_sword_1";
 death_sound = "death_player";
+view_range = 200;
 

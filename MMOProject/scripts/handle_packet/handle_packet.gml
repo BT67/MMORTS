@@ -40,6 +40,7 @@ function handle_packet(data_buffer){
 				}
 			}
 			break;
+			/*
 		case "FLOOR":
 			floor_type = buffer_read(data_buffer, buffer_string);
 			origin_x = buffer_read(data_buffer, buffer_string);
@@ -61,6 +62,28 @@ function handle_packet(data_buffer){
 				}
 			}
 			break;	
+			*/
+		case "FLOOR":
+			floor_type = buffer_read(data_buffer, buffer_string);
+			origin_x = buffer_read(data_buffer, buffer_string);
+			origin_x = (real(origin_x) + 1) * 32;
+			origin_y = buffer_read(data_buffer, buffer_string);
+			origin_y = (real(origin_y) + 1) * 32;
+			width = buffer_read(data_buffer, buffer_string);
+			width = real(width);
+			height = buffer_read(data_buffer, buffer_string);
+			height = real(height);
+			for(var h = 0; h < width; ++h){
+				for(var v = 0; v < height; ++v){
+					if(!position_meeting(origin_x + (h * 32), origin_y + (v * 32), obj_floor)){
+						var_floor = "";
+						with(instance_create_layer(origin_x + (h * 32), origin_y + (v * 32), "Walls_Floors", asset_get_index(floor_type))){
+							var_floor = other;
+						}
+					}
+				}
+			}
+			break;		
 		case "WALL":
 			wall_type = buffer_read(data_buffer, buffer_string);
 			pos_x = buffer_read(data_buffer, buffer_string);
@@ -70,7 +93,7 @@ function handle_packet(data_buffer){
 			wall_num = buffer_read(data_buffer, buffer_string);
 			wall_num = real(wall_num);
 			var_wall = "";
-			with(instance_create_layer(real(pos_x), real(pos_y), "Walls", asset_get_index(wall_type))){
+			with(instance_create_layer(real(pos_x), real(pos_y), "Walls_Floors", asset_get_index(wall_type))){
 				var_wall = other;
 			}
 			break;
@@ -81,9 +104,19 @@ function handle_packet(data_buffer){
 			pos_y = buffer_read(data_buffer, buffer_string);
 			pos_y = (real(pos_y) + 1) * 32;
 			var_door = "";
-			with(instance_create_layer(real(pos_x), real(pos_y), "Doors", asset_get_index(door_type))){
+			with(instance_create_layer(real(pos_x), real(pos_y), "Walls_Floors", asset_get_index(door_type))){
 				var_door = other;
 			}
+			view_pos_x = pos_x - (camera_controller.view_width/2)
+			if(view_pos_x < 0){
+				view_pos_x = 0;
+			}
+			view_pos_y = pos_y - (camera_controller.view_height/2)
+			if(view_pos_y < 0){
+				view_pos_y = 0;
+			}
+			camera_set_view_pos(camera_controller.camera, view_pos_x, view_pos_y);
+			camera_set_view_size(camera_controller.camera, camera_controller.camera_width, camera_controller.camera_height);	
 			break;	
 		case "SPAWN":
 			entity_name = buffer_read(data_buffer, buffer_string);
@@ -104,18 +137,6 @@ function handle_packet(data_buffer){
 			variable_instance_set(instance_find(entity, instance_number(entity) - 1), "entity_health", entity_health);
 			variable_instance_set(instance_find(entity, instance_number(entity) - 1), "entity_max_health", entity_max_health);
 			show_debug_message(string(entity_name));
-			if(entity_name == network.username){
-				view_pos_x = target_x - (camera_controller.view_width/2)
-				if(view_pos_x < 0){
-					view_pos_x = 0;
-				}
-				view_pos_y = target_y - (camera_controller.view_height/2)
-				if(view_pos_y < 0){
-					view_pos_y = 0;
-				}
-				camera_set_view_pos(camera_controller.camera, view_pos_x, view_pos_y);
-				camera_set_view_size(camera_controller.camera, camera_controller.camera_width, camera_controller.camera_height);	
-			}
 			break;
 		case "HEALTH":
 			entity_name = buffer_read(data_buffer, buffer_string);

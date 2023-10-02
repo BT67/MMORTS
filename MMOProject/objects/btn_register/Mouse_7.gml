@@ -5,18 +5,31 @@ register_controller.tab_index = 4;
 
 var acceptable = true;
 
-if(
-	string_length(txt_username_register.text < 1) ||
-	string_length(txt_username_register.text > 30)
-	){
-		acceptable = false;
+if(acceptable) {
+	if(
+		string_length(txt_username_register.text) < network.username_min_chars ||
+		string_length(txt_username_register.text) > network.username_max_chars
+		){
+			acceptable = false;
+	}
 }
 
-if(
-	string_length(txt_password_register.text < 8) ||
-	string_length(txt_password_register.text > 30)
-	){
-		acceptable = false;
+if(acceptable) {
+	if(
+		string_length(txt_password_register.text) < network.password_min_chars ||
+		string_length(txt_password_register.text) > network.password_max_chars
+		){
+			acceptable = false;
+	}
+}
+
+if(acceptable) {
+	if(
+		string_length(txt_email_register.text) < network.email_min_chars ||
+		string_length(txt_email_register.text) > network.email_max_chars
+		){
+			acceptable = false;
+	}
 }
 
 if(acceptable){

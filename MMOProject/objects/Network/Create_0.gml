@@ -13,9 +13,11 @@ var_player = "";
 target_entity = "";
 map_width = 0;
 map_height = 0;
+username_min_chars = 4;
 username_max_chars = 30;
 password_min_chars = 8;
 password_max_chars = 30;
+email_min_chars = 4;
 email_max_chars = 40
 
 lang_config = ds_map_create();

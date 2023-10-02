@@ -7,16 +7,16 @@ acceptable = true;
 
 //Check mail address length
 if(
-	string_length(txt_password_register.text < 1) ||
-	string_length(txt_password_register.text > 40)
+	string_length(txt_email_reset.text < network.email_min_chars) ||
+	string_length(txt_email_reset.text > network.email_max_chars)
 	){
 		acceptable = false;
 }
 
 //Check valid characters
 if(acceptable){
-	for(var i = 1; i <= string_length(txt_email_register.text); ++i){
-	    if string_pos(string_char_at(txt_email_register.text, i), "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_@") == 0 {
+	for(var i = 1; i <= string_length(txt_email_reset.text); ++i){
+	    if string_pos(string_char_at(txt_email_reset.text, i), "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_@") == 0 {
 	        acceptable = false;
 	        break;
 	    }

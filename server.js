@@ -1003,14 +1003,15 @@ function spawnWalls(client) {
 }
 
 function spawnDoors(client) {
-    maps[client.current_room].doors.forEach(function (door) {
+    for(var i = maps[client.current_room].doors.length - 1; i >= 0; --i) {
+        door = maps[client.current_room].doors[i];
         params = [];
         params.push("DOOR");
         params.push(door.type);
         params.push(door.pos_x.toString());
         params.push(door.pos_y.toString());
         client.socket.write(packet.build(params, client.id));
-    });
+    }
 }
 
 function spawnEntities(client) {

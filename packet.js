@@ -355,13 +355,13 @@ function password_reset(client, email){
     var transporter = nodemailer.createTransport({
         service: 'outlook',
         auth: {
-            user: 'passwordreset1905@outlook.com',
-            pass: 'kpy333Xseries10'
+            user: 'passwordreset1905@outlook.com', //old
+            pass: 'kpy333Xseries10' //old
         }
     });
 
     var mailOptions = {
-        from: 'passwordreset1905@outlook.com',
+        from: 'passwordreset1905@outlook.com', //old
         to: email,
         subject: 'PASSWORD RESET EMAIL',
         text: password
@@ -476,5 +476,27 @@ function drawFloors(client) {
         params.push(connection.height.toString());
         client.socket.write(packet.build(params, client.id));
     });
-    //client.socket.write(packet.build(["FLOOREND"], client.id));
+}
+
+function drawFloors(client) {
+    maps[client.current_room].rooms.forEach(function (room) {
+        params = [];
+        params.push("FLOOR");
+        params.push(room.floor_type);
+        params.push(room.origin_x.toString());
+        params.push(room.origin_y.toString());
+        params.push(room.width.toString());
+        params.push(room.height.toString());
+        client.socket.write(packet.build(params, client.id));
+    });
+    maps[client.current_room].connections.forEach(function (connection) {
+        params = [];
+        params.push("FLOOR");
+        params.push(connection.floor_type);
+        params.push(connection.origin_x.toString());
+        params.push(connection.origin_y.toString());
+        params.push(connection.width.toString());
+        params.push(connection.height.toString());
+        client.socket.write(packet.build(params, client.id));
+    });
 }
