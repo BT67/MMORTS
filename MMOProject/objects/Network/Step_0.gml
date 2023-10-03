@@ -20,6 +20,7 @@ if(refresh_timer >= refresh_timeout){
 	instance_destroy(attack);
 	instance_destroy(animation);
 	instance_destroy(wall);
+	instance_destroy(obj_floor);
 	instance_destroy(door);
 	audio_stop_all();
 	room_goto(rm_connection_lost);

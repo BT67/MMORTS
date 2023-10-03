@@ -14,6 +14,7 @@
     {"name":"Dialogues","order":16,"path":"folders/Objects/Dialogues.yy",},
     {"name":"Doors","order":17,"path":"folders/Objects/Doors.yy",},
     {"name":"Entities","order":10,"path":"folders/Objects/Entities.yy",},
+    {"name":"Floors","order":20,"path":"folders/Objects/Floors.yy",},
     {"name":"HUD","order":9,"path":"folders/Objects/HUD.yy",},
     {"name":"Init","order":6,"path":"folders/Objects/Init.yy",},
     {"name":"Login","order":2,"path":"folders/Objects/Login.yy",},
@@ -53,7 +54,6 @@
     {"name":"Work","order":7,"path":"folders/Sprites/Work.yy",},
     {"name":"Tile Sets","order":2,"path":"folders/Tile Sets.yy",},
     {"name":"Timelines","order":8,"path":"folders/Timelines.yy",},
-    {"name":"Floors","order":20,"path":"folders/Objects/Floors.yy",},
   ],
   "ResourceOrderSettings": [
     {"name":"camera_controller","order":5,"path":"objects/camera_controller/camera_controller.yy",},

@@ -162,6 +162,7 @@ function handle_packet(data_buffer){
 			instance_destroy(attack);
 			instance_destroy(animation);
 			instance_destroy(wall);
+			instance_destroy(obj_floor);
 			instance_destroy(door);
 			audio_stop_all();
 			grid_width = buffer_read(data_buffer, buffer_string);
