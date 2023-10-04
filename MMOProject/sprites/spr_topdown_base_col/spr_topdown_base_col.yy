@@ -1,11 +1,11 @@
 {
   "resourceType": "GMSprite",
   "resourceVersion": "1.0",
-  "name": "spr_topdown_goblin_sword_attack",
+  "name": "spr_topdown_base_col",
   "bbox_bottom": 39,
   "bbox_left": 24,
   "bbox_right": 46,
-  "bbox_top": 7,
+  "bbox_top": 19,
   "bboxMode": 0,
   "collisionKind": 1,
   "collisionTolerance": 0,
@@ -32,7 +32,7 @@
   "sequence": {
     "resourceType": "GMSequence",
     "resourceVersion": "1.4",
-    "name": "spr_topdown_goblin_sword_attack",
+    "name": "spr_topdown_base_col",
     "autoRecord": true,
     "backdropHeight": 768,
     "backdropImageOpacity": 0.5,
@@ -54,7 +54,7 @@
     "timeUnits": 1,
     "tracks": [
       {"resourceType":"GMSpriteFramesTrack","resourceVersion":"1.0","name":"frames","builtinName":0,"events":[],"inheritsTrackColour":true,"interpolation":1,"isCreationTrack":false,"keyframes":{"resourceType":"KeyframeStore<SpriteFrameKeyframe>","resourceVersion":"1.0","Keyframes":[
-            {"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"1.0","Channels":{"0":{"resourceType":"SpriteFrameKeyframe","resourceVersion":"1.0","Id":{"name":"d34d467c-e371-44d7-98bb-c2787120c274","path":"sprites/spr_topdown_goblin_sword_attack/spr_topdown_goblin_sword_attack.yy",},},},"Disabled":false,"id":"46e5449b-779f-4b07-b7f9-947b3515e65a","IsCreationKey":false,"Key":0.0,"Length":1.0,"Stretch":false,},
+            {"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"1.0","Channels":{"0":{"resourceType":"SpriteFrameKeyframe","resourceVersion":"1.0","Id":{"name":"d34d467c-e371-44d7-98bb-c2787120c274","path":"sprites/spr_topdown_base_col/spr_topdown_base_col.yy",},},},"Disabled":false,"id":"80f59633-7e93-4e2b-ac33-7cab3d57e8b2","IsCreationKey":false,"Key":0.0,"Length":1.0,"Stretch":false,},
           ],},"modifiers":[],"spriteId":null,"trackColour":0,"tracks":[],"traits":0,},
     ],
     "visibleRange": null,
