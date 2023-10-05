@@ -2,10 +2,10 @@
   "resourceType": "GMSprite",
   "resourceVersion": "1.0",
   "name": "spr_goblin_sword",
-  "bbox_bottom": 41,
-  "bbox_left": 21,
+  "bbox_bottom": 44,
+  "bbox_left": 18,
   "bbox_right": 45,
-  "bbox_top": 14,
+  "bbox_top": 20,
   "bboxMode": 0,
   "collisionKind": 1,
   "collisionTolerance": 0,
@@ -13,7 +13,7 @@
   "edgeFiltering": false,
   "For3D": false,
   "frames": [
-    {"resourceType":"GMSpriteFrame","resourceVersion":"1.1","name":"1311e2a2-8d8a-4177-b95c-98ba15a01932",},
+    {"resourceType":"GMSpriteFrame","resourceVersion":"1.1","name":"9747f904-adff-4781-81fd-3fb93ad5030e",},
   ],
   "gridX": 0,
   "gridY": 0,
@@ -54,7 +54,7 @@
     "timeUnits": 1,
     "tracks": [
       {"resourceType":"GMSpriteFramesTrack","resourceVersion":"1.0","name":"frames","builtinName":0,"events":[],"inheritsTrackColour":true,"interpolation":1,"isCreationTrack":false,"keyframes":{"resourceType":"KeyframeStore<SpriteFrameKeyframe>","resourceVersion":"1.0","Keyframes":[
-            {"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"1.0","Channels":{"0":{"resourceType":"SpriteFrameKeyframe","resourceVersion":"1.0","Id":{"name":"1311e2a2-8d8a-4177-b95c-98ba15a01932","path":"sprites/spr_goblin_sword/spr_goblin_sword.yy",},},},"Disabled":false,"id":"f28de966-fcf0-4299-9b45-1f61b4338f87","IsCreationKey":false,"Key":0.0,"Length":1.0,"Stretch":false,},
+            {"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"1.0","Channels":{"0":{"resourceType":"SpriteFrameKeyframe","resourceVersion":"1.0","Id":{"name":"9747f904-adff-4781-81fd-3fb93ad5030e","path":"sprites/spr_goblin_sword/spr_goblin_sword.yy",},},},"Disabled":false,"id":"7f3b9956-b651-46e7-81e5-1e7b423930bc","IsCreationKey":false,"Key":0.0,"Length":1.0,"Stretch":false,},
           ],},"modifiers":[],"spriteId":null,"trackColour":0,"tracks":[],"traits":0,},
     ],
     "visibleRange": null,

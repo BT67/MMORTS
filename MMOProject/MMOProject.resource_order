@@ -6,6 +6,8 @@
     {"name":"Notes","order":13,"path":"folders/Notes.yy",},
     {"name":"Objects","order":9,"path":"folders/Objects.yy",},
     {"name":"Animations","order":18,"path":"folders/Objects/Animations.yy",},
+    {"name":"Base","order":10,"path":"folders/Objects/Animations/Base.yy",},
+    {"name":"Death","order":9,"path":"folders/Objects/Animations/Death.yy",},
     {"name":"Goblin","order":7,"path":"folders/Objects/Animations/Goblin.yy",},
     {"name":"Human","order":8,"path":"folders/Objects/Animations/Human.yy",},
     {"name":"Attacks","order":12,"path":"folders/Objects/Attacks.yy",},
@@ -55,8 +57,6 @@
     {"name":"Work","order":7,"path":"folders/Sprites/Work.yy",},
     {"name":"Tile Sets","order":2,"path":"folders/Tile Sets.yy",},
     {"name":"Timelines","order":8,"path":"folders/Timelines.yy",},
-    {"name":"Death","order":9,"path":"folders/Objects/Animations/Death.yy",},
-    {"name":"Base","order":10,"path":"folders/Objects/Animations/Base.yy",},
   ],
   "ResourceOrderSettings": [
     {"name":"camera_controller","order":5,"path":"objects/camera_controller/camera_controller.yy",},
