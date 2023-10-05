@@ -100,9 +100,9 @@ function handle_packet(data_buffer){
 			entity_type = buffer_read(data_buffer, buffer_string);
 			show_debug_message(string(entity_type));
 			target_x = buffer_read(data_buffer, buffer_string);
-			target_x = (real(target_x) + 1) * 32;
+			target_x = ((real(target_x) + 1) * 32) + network.sprite_offset;
 			target_y = buffer_read(data_buffer, buffer_string);
-			target_y = (real(target_y) + 1) * 32;
+			target_y = ((real(target_y) + 1) * 32) + network.sprite_offset;
 			entity_health = buffer_read(data_buffer, buffer_string);
 			entity_max_health =  buffer_read(data_buffer, buffer_string);
 			with(instance_create_layer(real(target_x), real(target_y), "Entities", asset_get_index(entity_type))){
@@ -211,13 +211,13 @@ function handle_packet(data_buffer){
 		case "POS":
 			entity_name = buffer_read(data_buffer, buffer_string);
 			pos_x = buffer_read(data_buffer, buffer_string);
-			pos_x = (real(pos_x) + 1) * 32;
+			pos_x = ((real(pos_x) + 1) * 32) + network.sprite_offset;
 			pos_y = buffer_read(data_buffer, buffer_string);
-			pos_y = (real(pos_y) + 1) * 32;
+			pos_y = ((real(pos_y) + 1) * 32) + network.sprite_offset;
 			target_x = buffer_read(data_buffer, buffer_string);
-			target_x = (real(target_x) + 1) * 32;
+			target_x = ((real(target_x) + 1) * 32) + network.sprite_offset;
 			target_y = buffer_read(data_buffer, buffer_string);
-			target_y = (real(target_y) + 1) * 32;
+			target_y = ((real(target_y) + 1) * 32) + network.sprite_offset;
 			for(var i = 0; i < instance_number(entity); ++i;) {
 				if(instance_find(entity, i).entity_name == entity_name){
 					if(abs(instance_find(entity, i).x - pos_x) > 50){

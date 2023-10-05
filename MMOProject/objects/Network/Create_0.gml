@@ -18,7 +18,8 @@ username_max_chars = 30;
 password_min_chars = 8;
 password_max_chars = 30;
 email_min_chars = 4;
-email_max_chars = 40
+email_max_chars = 40;
+sprite_offset = 16;
 
 lang_config = ds_map_create();
 english = ds_map_create();

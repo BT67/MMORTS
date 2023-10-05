@@ -122,7 +122,6 @@
     {"name":"dungeon_all_2","order":3,"path":"sprites/dungeon_all_2/dungeon_all_2.yy",},
     {"name":"spr_goblin_idle_left","order":6,"path":"sprites/spr_goblin_idle_left/spr_goblin_idle_left.yy",},
     {"name":"dungeon_wall","order":1,"path":"sprites/dungeon_wall/dungeon_wall.yy",},
-    {"name":"spr_human_sword_test","order":18,"path":"sprites/spr_human_sword_test/spr_human_sword_test.yy",},
     {"name":"spr_rat_idle","order":1,"path":"sprites/spr_rat_idle/spr_rat_idle.yy",},
     {"name":"hud_health","order":6,"path":"objects/hud_health/hud_health.yy",},
     {"name":"spr_ui_base_black","order":1,"path":"sprites/spr_ui_base_black/spr_ui_base_black.yy",},

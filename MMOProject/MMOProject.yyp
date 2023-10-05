@@ -166,7 +166,6 @@
     {"id":{"name":"dungeon_all_2","path":"sprites/dungeon_all_2/dungeon_all_2.yy",},},
     {"id":{"name":"spr_goblin_idle_left","path":"sprites/spr_goblin_idle_left/spr_goblin_idle_left.yy",},},
     {"id":{"name":"dungeon_wall","path":"sprites/dungeon_wall/dungeon_wall.yy",},},
-    {"id":{"name":"spr_human_sword_test","path":"sprites/spr_human_sword_test/spr_human_sword_test.yy",},},
     {"id":{"name":"spr_rat_idle","path":"sprites/spr_rat_idle/spr_rat_idle.yy",},},
     {"id":{"name":"hud_health","path":"objects/hud_health/hud_health.yy",},},
     {"id":{"name":"spr_ui_base_black","path":"sprites/spr_ui_base_black/spr_ui_base_black.yy",},},

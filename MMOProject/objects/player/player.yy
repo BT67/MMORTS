@@ -32,8 +32,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_human_sword_test",
-    "path": "sprites/spr_human_sword_test/spr_human_sword_test.yy",
+    "name": "spr_human_sword",
+    "path": "sprites/spr_human_sword/spr_human_sword.yy",
   },
   "spriteMaskId": null,
   "visible": true,

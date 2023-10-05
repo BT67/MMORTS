@@ -2,10 +2,10 @@
   "resourceType": "GMSprite",
   "resourceVersion": "1.0",
   "name": "spr_human_sword",
-  "bbox_bottom": 41,
-  "bbox_left": 21,
+  "bbox_bottom": 44,
+  "bbox_left": 18,
   "bbox_right": 45,
-  "bbox_top": 14,
+  "bbox_top": 20,
   "bboxMode": 0,
   "collisionKind": 1,
   "collisionTolerance": 0,
@@ -13,7 +13,7 @@
   "edgeFiltering": false,
   "For3D": false,
   "frames": [
-    {"resourceType":"GMSpriteFrame","resourceVersion":"1.1","name":"866bfcc3-a284-43a6-b827-2a7266789989",},
+    {"resourceType":"GMSpriteFrame","resourceVersion":"1.1","name":"b44fd9e2-6200-4289-b2e7-7bcd007c91b8",},
   ],
   "gridX": 0,
   "gridY": 0,
@@ -54,7 +54,7 @@
     "timeUnits": 1,
     "tracks": [
       {"resourceType":"GMSpriteFramesTrack","resourceVersion":"1.0","name":"frames","builtinName":0,"events":[],"inheritsTrackColour":true,"interpolation":1,"isCreationTrack":false,"keyframes":{"resourceType":"KeyframeStore<SpriteFrameKeyframe>","resourceVersion":"1.0","Keyframes":[
-            {"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"1.0","Channels":{"0":{"resourceType":"SpriteFrameKeyframe","resourceVersion":"1.0","Id":{"name":"866bfcc3-a284-43a6-b827-2a7266789989","path":"sprites/spr_human_sword/spr_human_sword.yy",},},},"Disabled":false,"id":"ca23d9ef-cf09-47f5-bb8e-c278ad5be336","IsCreationKey":false,"Key":0.0,"Length":1.0,"Stretch":false,},
+            {"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"1.0","Channels":{"0":{"resourceType":"SpriteFrameKeyframe","resourceVersion":"1.0","Id":{"name":"b44fd9e2-6200-4289-b2e7-7bcd007c91b8","path":"sprites/spr_human_sword/spr_human_sword.yy",},},},"Disabled":false,"id":"669f67b8-412b-46b3-a93f-0ee030f33188","IsCreationKey":false,"Key":0.0,"Length":1.0,"Stretch":false,},
           ],},"modifiers":[],"spriteId":null,"trackColour":0,"tracks":[],"traits":0,},
     ],
     "visibleRange": null,
