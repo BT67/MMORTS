@@ -40,29 +40,6 @@ function handle_packet(data_buffer){
 				}
 			}
 			break;
-			/*
-		case "FLOOR":
-			floor_type = buffer_read(data_buffer, buffer_string);
-			origin_x = buffer_read(data_buffer, buffer_string);
-			origin_y = buffer_read(data_buffer, buffer_string);
-			width = buffer_read(data_buffer, buffer_string);
-			height = buffer_read(data_buffer, buffer_string);
-			origin_x = real(origin_x);
-			origin_y = real(origin_y);
-			width = real(width);
-			height = real(height);
-			var tilemap_id = layer_tilemap_get_id(layer_get_id("Tiles_Ref"));
-			var tilemap = tilemap_get(tilemap_id, 0, 1); 
-			tilemap_id = layer_tilemap_get_id(layer_get_id("Tiles_1"));
-			for(var h = 0; h < width + 1; ++h){
-				for(var v = 0; v < height + 1; ++v){
-					camera_set_view_pos(camera_controller.camera, 0, 0);
-					camera_set_view_size(camera_controller.camera, room_width, room_height);
-					tilemap_set(tilemap_id, tilemap, origin_x + h, origin_y + v);
-				}
-			}
-			break;	
-			*/
 		case "FLOOR":
 			floor_type = buffer_read(data_buffer, buffer_string);
 			origin_x = buffer_read(data_buffer, buffer_string);
@@ -148,16 +125,6 @@ function handle_packet(data_buffer){
 			}			
 			break;
 		case "ROOM":
-		//Do not clear the area of the tilemap that holds tile presets, since these are used to draw other tiles
-			var tilemap_id = layer_tilemap_get_id(layer_get_id("Tiles_1"))
-			for (var i = 0; i < tilemap_get_width(tilemap_id); i++;){
-			    for (var j = 0; j < tilemap_get_height(tilemap_id); j++;)
-			    {
-			        var data = tilemap_get(tilemap_id, i, j);
-			        data = tile_set_empty(data)
-			        tilemap_set(tilemap_id, data, i, j);
-			    }
-			}
 			instance_destroy(entity);
 			instance_destroy(attack);
 			instance_destroy(animation);
@@ -180,11 +147,6 @@ function handle_packet(data_buffer){
 			origin_entity = buffer_read(data_buffer, buffer_string);
 			origin_x = 0;
 			origin_y = 0;
-			for(var i = 0; i < instance_number(move_animation); ++i){
-				if(instance_find(move_animation,i).parent_entity == origin_entity){
-					variable_instance_set(instance_find(move_animation, i), "is_visible", false);
-				}
-			}
 			for(var i = 0; i < instance_number(entity); ++i;) {
 				if(instance_find(entity, i).entity_name == origin_entity){
 					origin_entity = instance_find(entity, i).entity_name;
@@ -192,17 +154,11 @@ function handle_packet(data_buffer){
 					origin_x = instance_find(entity, i).x;
 					origin_y = instance_find(entity, i).y;
 					variable_instance_set(instance_find(entity, i), "target_entity", target_entity);
-					variable_instance_set(instance_find(entity, i), "is_visible", false);
+					variable_instance_set(instance_find(entity, i), "visible", false);
 					var obj = "";
 					audio_play_sound(asset_get_index(instance_find(entity, i).attack_sound), 10, false);
-					if(instance_find(entity, i).facing_left == true){
-						with(instance_create_layer(real(origin_x), real(origin_y), "Entities", asset_get_index(instance_find(entity, i).attack_left))){
-							obj = other;
-						}
-					} else {
-						with(instance_create_layer(real(origin_x), real(origin_y), "Entities", asset_get_index(instance_find(entity, i).attack_right))){
-							obj = other;
-						}
+					with(instance_create_layer(real(origin_x), real(origin_y), "Entities", asset_get_index(instance_find(entity, i).attack_animation_ref))){
+						obj = other;
 					}
 					variable_instance_set(instance_find(attack_animation, instance_number(attack_animation) - 1), "parent_entity", origin_entity);
 					break;
@@ -212,6 +168,13 @@ function handle_packet(data_buffer){
 		case "LOGOUT":
 			msg = buffer_read(data_buffer, buffer_string);
 			network.username = "";
+			instance_destroy(entity);
+			instance_destroy(attack);
+			instance_destroy(animation);
+			instance_destroy(wall);
+			instance_destroy(obj_floor);
+			instance_destroy(door);
+			audio_stop_all();
 			show_debug_message(date_datetime_string(date_current_datetime()) + msg);
 			room_goto(rm_login);
 			break;

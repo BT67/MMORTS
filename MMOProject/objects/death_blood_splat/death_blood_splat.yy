@@ -1,20 +1,17 @@
 {
   "resourceType": "GMObject",
   "resourceVersion": "1.0",
-  "name": "player",
-  "eventList": [
-    {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":57,"eventType":6,"isDnD":false,},
-    {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,},
-  ],
+  "name": "death_blood_splat",
+  "eventList": [],
   "managed": true,
   "overriddenProperties": [],
   "parent": {
-    "name": "Entities",
-    "path": "folders/Objects/Entities.yy",
+    "name": "Death",
+    "path": "folders/Objects/Animations/Death.yy",
   },
   "parentObjectId": {
-    "name": "entity",
-    "path": "objects/entity/entity.yy",
+    "name": "death_animation",
+    "path": "objects/death_animation/death_animation.yy",
   },
   "persistent": true,
   "physicsAngularDamping": 0.1,
@@ -32,8 +29,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_human_sword_test",
-    "path": "sprites/spr_human_sword_test/spr_human_sword_test.yy",
+    "name": "spr_blood_splat_10fps",
+    "path": "sprites/spr_blood_splat_10fps/spr_blood_splat_10fps.yy",
   },
   "spriteMaskId": null,
   "visible": true,

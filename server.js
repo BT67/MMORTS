@@ -887,7 +887,7 @@ function createPath(map, x1, y1, x2, y2) {
             new_point.y >= maps[map].grid_height
         ) {
             new_point.status = "invalid";
-        } else if (new_point.x === x2 && new_point.y === y2) {
+        } else if (new_point.x === x2 && new_point.y === y2) { 
             new_point.status = "end";
         } else if (grid_copy.at(new_point.x).at(new_point.y) !== "empty") {
             new_point.status = "blocked";

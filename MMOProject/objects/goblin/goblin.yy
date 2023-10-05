@@ -31,8 +31,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "default_sprite",
-    "path": "sprites/default_sprite/default_sprite.yy",
+    "name": "spr_goblin_sword",
+    "path": "sprites/spr_goblin_sword/spr_goblin_sword.yy",
   },
   "spriteMaskId": null,
   "visible": true,

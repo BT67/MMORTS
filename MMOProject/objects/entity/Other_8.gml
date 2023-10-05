@@ -1,5 +1,0 @@
-moving = false;
-
-
-
-

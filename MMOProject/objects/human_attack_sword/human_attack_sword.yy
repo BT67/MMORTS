@@ -1,20 +1,17 @@
 {
   "resourceType": "GMObject",
   "resourceVersion": "1.0",
-  "name": "player",
-  "eventList": [
-    {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":57,"eventType":6,"isDnD":false,},
-    {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,},
-  ],
+  "name": "human_attack_sword",
+  "eventList": [],
   "managed": true,
   "overriddenProperties": [],
   "parent": {
-    "name": "Entities",
-    "path": "folders/Objects/Entities.yy",
+    "name": "Human",
+    "path": "folders/Objects/Animations/Human.yy",
   },
   "parentObjectId": {
-    "name": "entity",
-    "path": "objects/entity/entity.yy",
+    "name": "attack_animation",
+    "path": "objects/attack_animation/attack_animation.yy",
   },
   "persistent": true,
   "physicsAngularDamping": 0.1,
@@ -32,8 +29,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_human_sword_test",
-    "path": "sprites/spr_human_sword_test/spr_human_sword_test.yy",
+    "name": "spr_human_sword_attack",
+    "path": "sprites/spr_human_sword_attack/spr_human_sword_attack.yy",
   },
   "spriteMaskId": null,
   "visible": true,
