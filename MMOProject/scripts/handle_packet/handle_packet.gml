@@ -9,7 +9,6 @@ function handle_packet(data_buffer){
 			show_debug_message(date_datetime_string(date_current_datetime()) + " Connection with server established");
 			break;
 		case "REFRESH":
-		show_debug_message(string(network.refresh_timer));
 			network.refresh_timer = 0;
 			break;
 		case "LOGIN":
@@ -167,9 +166,9 @@ function handle_packet(data_buffer){
 						origin_y = instance_find(entity, i).y;
 						variable_instance_set(instance_find(entity, i), "direction", point_direction(origin_x, origin_y, target_x, target_y));
 						variable_instance_set(instance_find(entity, i), "target_entity", target_entity);
-						show_debug_message(origin_entity + " target entity=" + string(instance_find(entity, i).target_entity));
 						variable_instance_set(instance_find(entity, i), "visible", false);
-						show_debug_message(origin_entity + " visible=" + string(instance_find(entity, i).visible));
+						variable_instance_set(instance_find(entity, i), "is_visible", false);
+						show_debug_message(instance_find(entity, i).entity_name + " visible=" + string(instance_find(entity, i).visible));
 						var obj = "";
 						audio_play_sound(asset_get_index(instance_find(entity, i).attack_sound), 10, false);
 						with(instance_create_layer(real(origin_x), real(origin_y), "Entities", asset_get_index(instance_find(entity, i).attack_animation_ref))){

@@ -10,6 +10,7 @@ path = path_add();
 dest_x = x;
 dest_y = y;
 remainder = 0;
+is_visible = true;
 attack_sound = "";
 death_sound = "";
 attack_animation_ref = "base_attack";

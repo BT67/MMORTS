@@ -30,7 +30,6 @@ if(acceptable){
 	    if string_pos(string_char_at(txt_username_login.text, i), "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_@") == 0 {
 	        lbl_msg_login.text = "Invalid username or password";
 			acceptable = false;
-			show_debug_message("Invalid username char");
 	        break;
 	    }
 	}
@@ -41,7 +40,6 @@ if(acceptable){
 	    if string_pos(string_char_at(txt_password_login.text, i), "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_@") == 0 {
 	        lbl_msg_login.text = "Invalid username or password";
 			acceptable = false;
-			show_debug_message("Invalid password char");
 	        break;
 	    }
 	}
