@@ -135,6 +135,7 @@ module.exports = packet = {
                 }
                 try {
                     maps[current_room].clients.push(client);
+                    console.log("added client=" + username + " to room=" + current_room);
                 } catch(error){
                     client.socket.write(packet.build(["LOGIN", "FALSE", config.err_msg_unable_to_login]));
                     console.log(config.err_msg_client_enter_room + current_room);
@@ -165,7 +166,6 @@ module.exports = packet = {
                 spawnClients(client);
                 //TODO send spawn packets for new client to all other clients already in the room
             }
-
             try {
                 processLogin(username, password);
                 setLogin(username, password);

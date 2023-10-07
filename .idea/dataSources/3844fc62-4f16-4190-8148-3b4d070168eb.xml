@@ -3,9 +3,9 @@
   <database-model serializer="dbm" dbms="POSTGRES" family-id="POSTGRES" format-version="4.49">
     <root id="1">
       <DateStyle>mdy</DateStyle>
-      <IntrospectionStateNumber>783</IntrospectionStateNumber>
+      <IntrospectionStateNumber>4171</IntrospectionStateNumber>
       <ServerVersion>15.4</ServerVersion>
-      <StartupTime>1692410966</StartupTime>
+      <StartupTime>1696649480</StartupTime>
       <TimeZones>true ACDT
 true ACSST
 false ACST
@@ -106,7 +106,7 @@ false America/Argentina/San_Luis
 false America/Argentina/Tucuman
 false America/Argentina/Ushuaia
 false America/Aruba
-false America/Asuncion
+true America/Asuncion
 false America/Atikokan
 true America/Atka
 false America/Bahia
@@ -230,7 +230,7 @@ false America/Rio_Branco
 false America/Rosario
 true America/Santa_Isabel
 false America/Santarem
-false America/Santiago
+true America/Santiago
 false America/Santo_Domingo
 false America/Sao_Paulo
 true America/Scoresbysund
@@ -258,12 +258,12 @@ true America/Yellowknife
 false Antarctica/Casey
 false Antarctica/Davis
 false Antarctica/DumontDUrville
-false Antarctica/Macquarie
+true Antarctica/Macquarie
 false Antarctica/Mawson
-false Antarctica/McMurdo
+true Antarctica/McMurdo
 false Antarctica/Palmer
 false Antarctica/Rothera
-false Antarctica/South_Pole
+true Antarctica/South_Pole
 false Antarctica/Syowa
 true Antarctica/Troll
 false Antarctica/Vostok
@@ -379,29 +379,29 @@ false Atlantic/Reykjavik
 false Atlantic/South_Georgia
 false Atlantic/St_Helena
 false Atlantic/Stanley
-false Australia/ACT
-false Australia/Adelaide
+true Australia/ACT
+true Australia/Adelaide
 false Australia/Brisbane
-false Australia/Broken_Hill
-false Australia/Canberra
-false Australia/Currie
+true Australia/Broken_Hill
+true Australia/Canberra
+true Australia/Currie
 false Australia/Darwin
 false Australia/Eucla
-false Australia/Hobart
-false Australia/LHI
+true Australia/Hobart
+true Australia/LHI
 false Australia/Lindeman
-false Australia/Lord_Howe
-false Australia/Melbourne
-false Australia/NSW
+true Australia/Lord_Howe
+true Australia/Melbourne
+true Australia/NSW
 false Australia/North
 false Australia/Perth
 false Australia/Queensland
-false Australia/South
-false Australia/Sydney
-false Australia/Tasmania
-false Australia/Victoria
+true Australia/South
+true Australia/Sydney
+true Australia/Tasmania
+true Australia/Victoria
 false Australia/West
-false Australia/Yancowinna
+true Australia/Yancowinna
 true BDST
 false BDT
 false BNT
@@ -428,7 +428,7 @@ false CHAST
 false CHUT
 false CKT
 true CLST
-false CLT
+true CLT
 false COT
 false CST
 true CST6CDT
@@ -441,13 +441,13 @@ true Canada/Newfoundland
 true Canada/Pacific
 false Canada/Saskatchewan
 false Canada/Yukon
-false Chile/Continental
-false Chile/EasterIsland
+true Chile/Continental
+true Chile/EasterIsland
 true Cuba
 false DAVT
 false DDUT
-false EASST
-false EAST
+true EASST
+true EAST
 false EAT
 true EDT
 true EEST
@@ -616,7 +616,7 @@ false KRAST
 false KRAT
 false KST
 false Kwajalein
-false LHDT
+true LHDT
 false LHST
 false LIGT
 false LINT
@@ -653,8 +653,8 @@ false NOVT
 false NPT
 false NST
 false NUT
-false NZ
-false NZ-CHAT
+true NZ
+true NZ-CHAT
 true NZDT
 false NZST
 false NZT
@@ -678,13 +678,13 @@ false PST
 true PST8PDT
 false PWT
 true PYST
-false PYT
+true PYT
 false Pacific/Apia
-false Pacific/Auckland
+true Pacific/Auckland
 false Pacific/Bougainville
-false Pacific/Chatham
+true Pacific/Chatham
 false Pacific/Chuuk
-false Pacific/Easter
+true Pacific/Easter
 false Pacific/Efate
 false Pacific/Enderbury
 false Pacific/Fakaofo
@@ -705,7 +705,7 @@ false Pacific/Marquesas
 false Pacific/Midway
 false Pacific/Nauru
 false Pacific/Niue
-false Pacific/Norfolk
+true Pacific/Norfolk
 false Pacific/Noumea
 false Pacific/Pago_Pago
 false Pacific/Palau
@@ -802,18 +802,18 @@ false Zulu
 13183||10|C|G
 13183||-9223372036854775808|U|G
 13183||10|U|G</Grants>
-      <IntrospectionStateNumber>783</IntrospectionStateNumber>
+      <IntrospectionStateNumber>4171</IntrospectionStateNumber>
       <ObjectId>5</ObjectId>
       <OwnerName>postgres</OwnerName>
     </database>
-    <role id="3" parent="1" name="pg_database_owner">
+    <role id="3" parent="1" name="pg_checkpoint">
+      <ObjectId>4544</ObjectId>
+    </role>
+    <role id="4" parent="1" name="pg_database_owner">
       <ObjectId>6171</ObjectId>
     </role>
-    <role id="4" parent="1" name="pg_read_all_data">
-      <ObjectId>6181</ObjectId>
-    </role>
-    <role id="5" parent="1" name="pg_write_all_data">
-      <ObjectId>6182</ObjectId>
+    <role id="5" parent="1" name="pg_execute_server_program">
+      <ObjectId>4571</ObjectId>
     </role>
     <role id="6" parent="1" name="pg_monitor">
       <ObjectId>3373</ObjectId>
@@ -821,29 +821,29 @@ false Zulu
 3375
 3377</RoleGrants>
     </role>
-    <role id="7" parent="1" name="pg_read_all_settings">
+    <role id="7" parent="1" name="pg_read_all_data">
+      <ObjectId>6181</ObjectId>
+    </role>
+    <role id="8" parent="1" name="pg_read_all_settings">
       <ObjectId>3374</ObjectId>
     </role>
-    <role id="8" parent="1" name="pg_read_all_stats">
+    <role id="9" parent="1" name="pg_read_all_stats">
       <ObjectId>3375</ObjectId>
-    </role>
-    <role id="9" parent="1" name="pg_stat_scan_tables">
-      <ObjectId>3377</ObjectId>
     </role>
     <role id="10" parent="1" name="pg_read_server_files">
       <ObjectId>4569</ObjectId>
     </role>
-    <role id="11" parent="1" name="pg_write_server_files">
-      <ObjectId>4570</ObjectId>
-    </role>
-    <role id="12" parent="1" name="pg_execute_server_program">
-      <ObjectId>4571</ObjectId>
-    </role>
-    <role id="13" parent="1" name="pg_signal_backend">
+    <role id="11" parent="1" name="pg_signal_backend">
       <ObjectId>4200</ObjectId>
     </role>
-    <role id="14" parent="1" name="pg_checkpoint">
-      <ObjectId>4544</ObjectId>
+    <role id="12" parent="1" name="pg_stat_scan_tables">
+      <ObjectId>3377</ObjectId>
+    </role>
+    <role id="13" parent="1" name="pg_write_all_data">
+      <ObjectId>6182</ObjectId>
+    </role>
+    <role id="14" parent="1" name="pg_write_server_files">
+      <ObjectId>4570</ObjectId>
     </role>
     <role id="15" parent="1" name="postgres">
       <BypassRls>1</BypassRls>
@@ -4229,81 +4229,145 @@ false Zulu
     <schema id="262" parent="2" name="public">
       <Comment>standard public schema</Comment>
       <Current>1</Current>
-      <IntrospectionStateNumber>783</IntrospectionStateNumber>
-      <IntrospectionTimestamp>2023-08-21.09:47:15.436</IntrospectionTimestamp>
-      <LocalIntrospectionTimestamp>2023-08-21.00:47:17</LocalIntrospectionTimestamp>
+      <IntrospectionStateNumber>4171</IntrospectionStateNumber>
+      <IntrospectionTimestamp>2023-10-07.14:22:16.393</IntrospectionTimestamp>
+      <LocalIntrospectionTimestamp>2023-10-07.05:22:18</LocalIntrospectionTimestamp>
       <ObjectId>2200</ObjectId>
       <StateNumber>518</StateNumber>
       <OwnerName>pg_database_owner</OwnerName>
     </schema>
-    <table id="263" parent="262" name="users">
+    <table id="263" parent="262" name="python_users">
+      <ObjectId>24576</ObjectId>
+      <StateNumber>3828</StateNumber>
+      <AccessMethodId>2</AccessMethodId>
+      <OwnerName>postgres</OwnerName>
+    </table>
+    <table id="264" parent="262" name="users">
       <ObjectId>16401</ObjectId>
       <StateNumber>782</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>postgres</OwnerName>
     </table>
-    <column id="264" parent="263" name="username">
+    <column id="265" parent="263" name="username">
+      <DasType>varchar(30)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StateNumber>3682</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="266" parent="263" name="password">
+      <DasType>varchar(30)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StateNumber>3682</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="267" parent="263" name="email">
+      <DasType>varchar(100)|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StateNumber>3682</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="268" parent="263" name="online_status">
+      <DasType>boolean|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StateNumber>3682</StateNumber>
+      <TypeId>16</TypeId>
+    </column>
+    <column id="269" parent="263" name="current_client">
+      <DasType>integer|0s</DasType>
+      <Position>5</Position>
+      <StateNumber>3682</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="270" parent="263" name="in_battle">
+      <DasType>boolean|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>6</Position>
+      <StateNumber>3828</StateNumber>
+      <TypeId>16</TypeId>
+    </column>
+    <index id="271" parent="263" name="python_users_pk">
+      <ColNames>username</ColNames>
+      <ObjectId>24579</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>3682</StateNumber>
+      <Unique>1</Unique>
+      <AccessMethodId>403</AccessMethodId>
+      <CollationNames>default</CollationNames>
+      <CollationIds>100</CollationIds>
+      <CollationParentNames>pg_catalog</CollationParentNames>
+    </index>
+    <key id="272" parent="263" name="python_users_pk">
+      <ObjectId>24580</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>3682</StateNumber>
+      <UnderlyingIndexId>24579</UnderlyingIndexId>
+    </key>
+    <column id="273" parent="264" name="username">
       <DasType>varchar(30)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StateNumber>761</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="265" parent="263" name="password">
+    <column id="274" parent="264" name="password">
       <DasType>varchar(30)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>762</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="266" parent="263" name="email">
+    <column id="275" parent="264" name="email">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StateNumber>763</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="267" parent="263" name="current_room">
+    <column id="276" parent="264" name="current_room">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>4</Position>
       <StateNumber>764</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="268" parent="263" name="pos_x">
+    <column id="277" parent="264" name="pos_x">
       <DasType>integer|0s</DasType>
       <NotNull>1</NotNull>
       <Position>5</Position>
       <StateNumber>765</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <column id="269" parent="263" name="pos_y">
+    <column id="278" parent="264" name="pos_y">
       <DasType>integer|0s</DasType>
       <NotNull>1</NotNull>
       <Position>6</Position>
       <StateNumber>766</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <column id="270" parent="263" name="sprite">
+    <column id="279" parent="264" name="sprite">
       <DasType>varchar(100)|0s</DasType>
       <Position>7</Position>
       <StateNumber>741</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="271" parent="263" name="online_status">
+    <column id="280" parent="264" name="online_status">
       <DasType>boolean|0s</DasType>
       <NotNull>1</NotNull>
       <Position>8</Position>
       <StateNumber>744</StateNumber>
       <TypeId>16</TypeId>
     </column>
-    <column id="272" parent="263" name="current_client">
+    <column id="281" parent="264" name="current_client">
       <DasType>integer|0s</DasType>
       <Position>9</Position>
       <StateNumber>782</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <index id="273" parent="263" name="users_pk">
+    <index id="282" parent="264" name="users_pk">
       <ColNames>username</ColNames>
       <ObjectId>16406</ObjectId>
       <Primary>1</Primary>
@@ -4314,7 +4378,7 @@ false Zulu
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <key id="274" parent="263" name="users_pk">
+    <key id="283" parent="264" name="users_pk">
       <ObjectId>16407</ObjectId>
       <Primary>1</Primary>
       <StateNumber>778</StateNumber>

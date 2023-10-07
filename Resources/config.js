@@ -41,7 +41,7 @@ var common_conf = {
     msg_packet_size: "Packet size=",
     refresh_period: 10,
     chat_max_length: 36,
-    refresh_timeout: 10000,
+    refresh_timeout: 100000,
     err_msg_password_reset_error: "Unable to reset password for clientId=",
     msg_client_disconnect: "Client disconnected, clientId=",
     msg_logout_success: "Successfully logged out",

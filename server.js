@@ -4,7 +4,6 @@ const net = require("net");
 require("./packet.js");
 require(__dirname + '/Resources/config.js');
 
-const pg = require("pg");
 const {Client} = require("pg");
 
 mobsref = {
@@ -13,20 +12,10 @@ mobsref = {
         move_speed: 1,
         aggressive: true,
         max_health: 80,
-        respawn_period: 300,
-        attack_range: 1.5,
-        attack_period: 5,
-        attack_damage: 5
-    },
-    "rat": {
-        type: "rat",
-        move_speed: 1,
-        aggressive: true,
-        max_health: 50,
         respawn_period: 200,
         attack_range: 1.5,
-        attack_period: 4,
-        attack_damage: 2
+        attack_period: 2,
+        attack_damage: 5
     }
 }
 
@@ -102,66 +91,6 @@ maps["rm_random"].grid = initMapGrid(maps["rm_random"]);
 //Load mobs into each map:
 const entity_inst = new require("./Models/entity.js");
 this_entity = new entity_inst();
-// this_entity.alive = true;
-// this_entity.health = 100;
-// this_entity.sprite = "";
-// this_entity.type = "mob";
-// this_entity.name = "mob1";
-// this_entity.pos_x = 15;
-// this_entity.pos_y = 15;
-// this_entity.target_x = this_entity.pos_x;
-// this_entity.target_y = this_entity.pos_y;
-// this_entity.origin_x = this_entity.pos_x;
-// this_entity.origin_y = this_entity.pos_y;
-// this_entity.target_entity = null;
-// this_entity.roam_range = 10;
-// this_entity.view_range = 5;
-// this_entity.attack_range = 3;
-// this_entity.in_combat = false;
-// this_entity.aggressive = true;
-// this_entity.move_speed = 1;
-// this_entity.sprite = "sprite";
-// this_entity.max_health = 100;
-// this_entity.respawn_period = 100;
-// this_entity.respawn_timer = this_entity.respawn_period;
-// this_entity.path = [];
-// this_entity.attack_period = 5;
-// this_entity.attack_timer = this_entity.attack_period;
-// this_entity.patrol_path = [{x: 15, y: 15},{x: 25, y: 15}];
-// this_entity.patrol_point = 0;
-// maps["zone1"].entities.push(this_entity);
-//
-//
-this_entity = new entity_inst();
-this_entity.alive = true;
-this_entity.max_health = 30;
-this_entity.health = this_entity.max_health;
-this_entity.sprite = "";
-this_entity.type = "rat";
-this_entity.name = "rat1";
-this_entity.pos_x = 15;
-this_entity.pos_y = 10;
-this_entity.target_x = this_entity.pos_x;
-this_entity.target_y = this_entity.pos_y;
-this_entity.origin_x = this_entity.pos_x;
-this_entity.origin_y = this_entity.pos_y;
-this_entity.target_entity = null;
-this_entity.roam_range = 15;
-this_entity.view_range = 5;
-this_entity.attack_range = 1.5;
-this_entity.in_combat = false;
-this_entity.aggressive = false;
-this_entity.move_speed = 1;
-this_entity.sprite = "sprite";
-this_entity.respawn_period = 100;
-this_entity.respawn_timer = this_entity.respawn_period;
-this_entity.path = [];
-this_entity.attack_period = 5;
-this_entity.attack_timer = this_entity.attack_period;
-this_entity.patrol_path = [{x: 15, y: 10}, {x: 20, y: 15}];
-this_entity.patrol_point = 0;
-//maps["zone1"].entities.push(this_entity);
-
 this_entity = new entity_inst();
 this_entity.alive = true;
 this_entity.max_health = 200;
@@ -186,10 +115,10 @@ this_entity.sprite = "sprite";
 this_entity.respawn_period = 100;
 this_entity.respawn_timer = this_entity.respawn_period;
 this_entity.path = [];
-this_entity.attack_period = 5;
+this_entity.attack_period = 2;
 this_entity.attack_timer = this_entity.attack_period;
 this_entity.attack_damage = 5;
-//this_entity.patrol_path = [{x: 20, y: 2}, {x: 25, y: 10}];
+this_entity.patrol_path = [{x: 15, y: 5}, {x: 20, y: 10}];
 this_entity.patrol_path = [];
 this_entity.patrol_point = 0;
 maps["zone1"].entities.push(this_entity);
@@ -229,7 +158,7 @@ var clientIdNo = 0;
 //Initialise the server
 net.createServer(function (socket) {
     const c_inst = new require("./client.js");
-    thisClient = new c_inst();
+    let thisClient = new c_inst();
     var server_full = false;
     //Check existing clients and assign unique client id:
     if (clients.length > 0) {
@@ -295,12 +224,18 @@ async function updateEntities() {
     mapList = Object.keys(maps);
     while (true) {
         mapList.forEach(function (map) {
-                maps[map].entities.forEach(function (entity) {
+            if (maps[map].clients.length > 0) {
+                console.log("client detected in room=" + map.toString());
+                maps[map].entities.forEach(async function (entity) {
+                    console.log("updating entity=" + entity.name);
                     if (entity.alive) {
+                        console.log(entity.alive.toString());
                         entity.attack_timer += 1;
                         if (entity.target_entity === null) {
+                            console.log("entity.target_entity is null");
                             //Follow patrol path:
                             if (entity.patrol_path.length > 0) {
+                                console.log("entity.path length is >0");
                                 if (
                                     (entity.patrol_path[entity.patrol_point].x === entity.pos_x &&
                                         entity.patrol_path[entity.patrol_point].y === entity.pos_y) ||
@@ -312,6 +247,7 @@ async function updateEntities() {
                                     }
                                     entity.target_x = entity.patrol_path[entity.patrol_point].x;
                                     entity.target_y = entity.patrol_path[entity.patrol_point].y;
+                                    console.log("updated entity target x, y");
                                 }
                             }
                             if (entity.aggressive) {
@@ -320,16 +256,17 @@ async function updateEntities() {
                                     if (client.alive) {
                                         dist = distance(client.pos_x, client.pos_y, entity.pos_x, entity.pos_y);
                                         if (dist < entity.view_range) {
+                                            console.log("client is within view range");
                                             //If client is within mob view range, check LOS:
-                                            var seen = checklos(map, entity.pos_x, entity.pos_y, client.pos_x, client.pos_y);
-                                            if (seen) {
-                                                console.log(timeNow() + "Mob aggro triggered");
-                                                entity.in_combat = true;
-                                                entity.target_entity = client.username;
-                                                entity.target_x = client.pos_x;
-                                                entity.target_y = client.pos_y;
-                                                entity.path = [];
-                                            }
+                                            //var seen = checklos(map, entity.pos_x, entity.pos_y, client.pos_x, client.pos_y);
+                                            //if (seen) {
+                                            console.log(timeNow() + "Mob aggro triggered, " + entity.name);
+                                            entity.in_combat = true;
+                                            entity.target_entity = client.username;
+                                            entity.target_x = client.pos_x;
+                                            entity.target_y = client.pos_y;
+                                            entity.path = [];
+                                            //}
                                         }
                                     }
                                 });
@@ -398,99 +335,20 @@ async function updateEntities() {
                                 }
                             });
                         }
-                        // // Check if another mob is occupying target pos. If so, change target pos to an empty adjacent square
-                        // maps[map].entities.forEach(function (otherEntity) {
-                        //     if (
-                        //         otherEntity.name !== entity.name &&
-                        //         otherEntity.pos_x === entity.target_x &&
-                        //         otherEntity.pos_y === entity.target_y
-                        //     ) {
-                        //         // Check up
-                        //         if (entity.target_y > 0) {
-                        //             if (maps[map].grid[entity.target_x][entity.target_y - 1] !== "wall") {
-                        //                 entity.target_y = entity.target_y - 1;
-                        //             }
-                        //         }
-                        //         // Check down
-                        //         if (entity.target_y < maps[map].grid_height) {
-                        //             if (maps[map].grid[entity.target_x][entity.target_y + 1] !== "wall") {
-                        //                 entity.target_y = entity.target_y + 1;
-                        //             }
-                        //         }
-                        //         // Check left
-                        //         if (entity.target_x > 0) {
-                        //             if (maps[map].grid[entity.target_x - 1][entity.target_y] !== "wall") {
-                        //                 entity.target_x = entity.target_x - 1;
-                        //             }
-                        //         }
-                        //         // Check right
-                        //         if (entity.target_x < maps[map].grid_width) {
-                        //             if (maps[map].grid[entity.target_x + 1][entity.target_y] !== "wall") {
-                        //                 entity.target_y = entity.target_x + 1;
-                        //             }
-                        //         }
-                        //         // Check up-left
-                        //         if (entity.target_x > 0 && entity.target_y > 0) {
-                        //             if (maps[map].grid[entity.target_x - 1][entity.target_y - 1] !== "wall") {
-                        //                 entity.target_x = entity.target_x - 1;
-                        //                 entity.target_y = entity.target_y - 1;
-                        //             }
-                        //         }
-                        //         // Check up-right
-                        //         if (entity.target_x < maps[map].grid_width && entity.target_y > 0) {
-                        //             if (maps[map].grid[entity.target_x + 1][entity.target_y - 1] !== "wall") {
-                        //                 entity.target_x = entity.target_x + 1;
-                        //                 entity.target_y = entity.target_y - 1;
-                        //             }
-                        //         }
-                        //         // Check down-left
-                        //         if (entity.target_x > 0 && entity.target_y < maps[map].grid_height) {
-                        //             if (maps[map].grid[entity.target_x - 1][entity.target_y + 1] !== "wall") {
-                        //                 entity.target_x = entity.target_x - 1;
-                        //                 entity.target_y = entity.target_y + 1;
-                        //             }
-                        //         }
-                        //         // Check down-right
-                        //         if (entity.target_x < maps[map].grid_width && entity.target_y < maps[map].grid_height) {
-                        //             if (maps[map].grid[entity.target_x + 1][entity.target_y + 1] !== "wall") {
-                        //                 entity.target_x = entity.target_x + 1;
-                        //                 entity.target_y = entity.target_y + 1;
-                        //             }
-                        //         }
-                        //     }
-                        // });
-                        dist = distance(entity.pos_x, entity.pos_y, entity.origin_x, entity.origin_y);
+                        var dist = distance(entity.pos_x, entity.pos_y, entity.origin_x, entity.origin_y);
                         if (dist <= entity.roam_range) {
+                            console.log("entity is within its roam range");
                             if (entity.target_x !== entity.pos_x || entity.target_y !== entity.pos_y) {
-                                entity.path = createPath(map, entity.pos_x, entity.pos_y, entity.target_x, entity.target_y);
-                                if (entity.target_entity !== null) {
-                                    if (entity.path.length === 1) {
-                                        entity.path = [];
-                                    } else {
-                                        entity.path = entity.path.slice(0, -1);
-                                    }
-                                    // if(entity.path.length > 1) {
-                                    //     maps[map].entities.forEach(function (otherEntity) {
-                                    //         if (
-                                    //             (otherEntity.pos_x === entity.path[entity.path.length - 1].x &&
-                                    //                     otherEntity.pos_y === entity.path[entity.path.length - 1].y)
-                                    //                 ||
-                                    //                 (otherEntity.target_x === entity.path[entity.path.length - 1].x &&
-                                    //                     otherEntity.target_y === entity.path[entity.path.length - 1].y)
-                                    //         ) {
-                                    //             console.log(entity.path)
-                                    //             entity.path = entity.path.slice(0, -1);
-                                    //             console.log(entity.path)
-                                    //         }
-                                    //     });
-                                    // }
-                                }
+                                console.log("entity creating path to point...");
+                                entity.path = createPath(map, entity.pos_x, entity.pos_y, entity.target_x, entity.target_y, entity.target_entity);
+                                console.log("entity finished creating path");
                             }
                         }
                         dist = distance(entity.target_x, entity.target_y, entity.origin_x, entity.origin_y);
                         if (entity.path.length > 0 && dist <= entity.roam_range) {
                             prev_pos_x = entity.pos_x;
                             prev_pos_y = entity.pos_y;
+                            console.log("moving towards target point");
                             moveTowardsTarget(map, entity);
                             maps[map].clients.forEach(function (client) {
                                 client.socket.write(packet.build([
@@ -528,8 +386,9 @@ async function updateEntities() {
                         if (client.alive) {
                             client.attack_timer += 1;
                             if (client.target_x !== client.pos_x || client.target_y !== client.pos_y) {
-                                //Client is not creating a path in new room
-                                client.path = createPath(map, client.pos_x, client.pos_y, client.target_x, client.target_y);
+                                console.log("client creating path to point...");
+                                client.path = createPath(map, client.pos_x, client.pos_y, client.target_x, client.target_y, client.target_entity);
+                                console.log("client finished creating path");
                                 if (client.target_entity !== null) {
                                     client.path = client.path.slice(0, -1);
                                     if (client.path.length === 1) {
@@ -590,7 +449,6 @@ async function updateEntities() {
                                             client.pos_x.toString(),
                                             client.pos_y.toString()
                                         ], client.id));
-                                        await new Promise(resolve => setTimeout(resolve, 100));
                                         drawFloors(client);
                                         spawnWalls(client);
                                         spawnDoors(client);
@@ -698,8 +556,7 @@ async function updateEntities() {
                     }
                 });
             }
-        )
-        ;
+        })
         if (logout_users.length > 0) {
             var username = logout_users.shift();
             query = "UPDATE public.users SET online_status = false, current_client = null WHERE username = '" + username + "';";
@@ -887,9 +744,10 @@ function createPath(map, x1, y1, x2, y2) {
             new_point.y >= maps[map].grid_height
         ) {
             new_point.status = "invalid";
-        } else if (new_point.x === x2 && new_point.y === y2) { 
+        } else if (new_point.x === x2 && new_point.y === y2) {
             new_point.status = "end";
-        } else if (grid_copy.at(new_point.x).at(new_point.y) !== "empty") {
+        //} else if (grid_copy[new_point.x][new_point.y] === "wall" || grid_copy[new_point.x][new_point.y] === "checked") {
+        } else if (grid_copy[new_point.x][new_point.y] !== "empty") {
             new_point.status = "blocked";
         } else {
             new_point.status = "valid";
@@ -902,7 +760,7 @@ function createPath(map, x1, y1, x2, y2) {
     var points = [start_point]; //Init array of points, beginning with the start point
     var final_path = [];
     final = false;
-    while (points.length > 0) {
+    while (points.length > 0 && !final && points.length < 1000) {
         var current_point = points.shift(); //remove and return the first point from the array
         var new_point;
         var directions = ["up", "down", "left", "right", "up-left", "up-right", "down-left", "down-right"];
@@ -918,7 +776,26 @@ function createPath(map, x1, y1, x2, y2) {
             }
         });
     }
+    if (!final) {
+        final_path = []
+        return final_path;
+    }
+    while (final_path.length > 0) {
+        if (maps[map].grid[final_path[final_path.length - 1].x][final_path[final_path.length - 1].y] !== "checked" &&
+            maps[map].grid[final_path[final_path.length - 1].x][final_path[final_path.length - 1].y] !== "empty"
+        ) {
+            try {
+                final_path.pop();
+                console.log("removed final_point because it was occupied");
+            } catch {
+                console.log("unable to remove last element from path");
+            }
+        } else {
+            break;
+        }
+    }
     grid_copy = [];
+    //console.log("path length=" + final_path.length.toString());
     return final_path;
 }
 
@@ -983,7 +860,7 @@ function checklos(map, x1, y1, x2, y2) {
             new_point.y >= maps[map].grid_height
         ) {
             new_point.status = "invalid";
-        } else if (grid_copy.at(new_point.x).at(new_point.y) !== "empty") {
+        } else if (grid_copy[new_point.x][new_point.y] === "wall") {
             new_point.status = "blocked";
         } else if (new_point.x === x2 && new_point.y === y2) {
             new_point.status = "end";
@@ -1019,9 +896,9 @@ function checklos(map, x1, y1, x2, y2) {
         return false;
     } else {
         //Check if there are any walls on the path
-        for (var i = 0; i < final_path.length; ++i) {
-            var point = final_path[i];
-            if (maps[map].grid[point.x][point.y] === "wall") {
+        for (var k = 0; k < final_path.length; ++k) {
+            var check_point = final_path[k];
+            if (maps[map].grid[check_point.x][check_point.y] === "wall") {
                 return false;
             }
         }
@@ -1372,7 +1249,6 @@ function generateDungeon(dungeon_size, dungeon_difficulty) {
         mobs: []
     }
     new_map.mobs.push("goblin");
-    new_map.mobs.push("rat");
     //Init room grid:
     new_map.grid = initMapGrid(new_map);
     new_map.ascii_grid = initASCIIGrid(new_map);

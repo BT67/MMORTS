@@ -1,7 +1,7 @@
 //Connect to server
 
 refresh_timer = 0;
-refresh_timeout = 1000;
+refresh_timeout = 100000;
 saved_buffer = buffer_create(1, buffer_grow, 1);
 reading = 0;
 cut_buffer = buffer_create(1, buffer_grow, 1);
