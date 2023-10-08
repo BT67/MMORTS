@@ -303,6 +303,7 @@ async function updateEntities() {
                                                         ], otherClient.id));
                                                     });
                                                     if (client.health <= 0) {
+                                                        maps[map].grid[client.pos_x][client.pos_y] = "empty";
                                                         client.alive = false;
                                                         entity.patrol_point = 0;
                                                         client.health = client.max_health;
@@ -493,6 +494,7 @@ async function updateEntities() {
                                                         entity.target_y = client.pos_y;
                                                     }
                                                     if (entity.health <= 0) {
+                                                        maps[map].grid[entity.pos_x][entity.pos_y] = "empty";
                                                         send_destroy_packet(target_entity.name, map);
                                                         entity.alive = false;
                                                         alive = entity.alive;
@@ -660,7 +662,7 @@ function moveTowardsTarget(map, entity) {
     }
     entity.pos_x = parseInt(entity.pos_x);
     entity.pos_y = parseInt(entity.pos_y);
-    maps[map].grid[entity.pos_x][entity.pos_y] = entity.name
+    maps[map].grid[entity.pos_x][entity.pos_y] = entity.name;
 }
 
 function timeNow() {
