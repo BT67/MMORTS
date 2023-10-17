@@ -127,75 +127,66 @@ async function updateEntities() {
                 maps[map].entities.forEach(async function (entity) {
                     console.log("updating entity=" + entity.name);
                     if (entity.alive) {
-                        console.log(entity.alive.toString());
                         entity.attack_timer += 1;
                         if (entity.target_entity === null) {
-                            maps[map].entities.forEach(function (client) {
-                                if (client.alive) {
-                                    dist = distance(client.pos_x, client.pos_y, entity.pos_x, entity.pos_y);
+                            maps[map].entities.forEach(function (otherEntity) {
+                                if (otherEntity.alive) {
+                                    dist = distance(otherEntity.pos_x, otherEntity.pos_y, entity.pos_x, entity.pos_y);
                                     if (dist < entity.view_range) {
                                         entity.in_combat = true;
-                                        entity.target_entity = client.username;
-                                        entity.target_x = client.pos_x;
-                                        entity.target_y = client.pos_y;
+                                        entity.target_entity = otherEntity.name;
+                                        entity.target_x = otherEntity.pos_x;
+                                        entity.target_y = otherEntity.pos_y;
                                         entity.path = [];
                                     }
                                 }
                             });
                         } else {
                             //If entity has a target
-                            maps[map].entities.forEach(function (client) {
+                            maps[map].entities.forEach(function (otherEntity) {
                                 try {
-                                    if (entity.username === entity.target_entity) {
+                                    if (otherEntity.name === entity.target_entity) {
                                         //If target entity leaves view range, return to origin
-                                        dist = distance(client.pos_x, client.pos_y, entity.pos_x, entity.pos_y);
+                                        dist = distance(otherEntity.pos_x, otherEntity.pos_y, entity.pos_x, entity.pos_y);
                                         if (dist > entity.view_range) {
                                             entity.in_combat = false;
                                             entity.target_entity = null;
-                                            entity.target_x = entity.origin_x;
-                                            entity.target_y = entity.origin_y;
+                                            entity.target_x = entity.pos_x;
+                                            entity.target_y = entity.pos_y;
                                         } else {
                                             //Else, if target is still in view range, continue pursuit
-                                            entity.target_x = client.pos_x;
-                                            entity.target_y = client.pos_y;
+                                            entity.target_x = otherEntity.pos_x;
+                                            entity.target_y = otherEntity.pos_y;
                                             //If target is within attack range, attack the target
                                             if (dist <= entity.attack_range) {
                                                 //attack the target
                                                 if (entity.attack_timer >= entity.attack_period) {
+                                                    maps[map].clients.forEach(function (client) {
+                                                        client.socket.write(packet.build([
+                                                            "ATTACK", "attack", entity.name, entity.target_entity
+                                                        ], client.id));
+                                                    });
+                                                    otherEntity.health -= entity.attack_damage;
                                                     maps[map].clients.forEach(function (otherClient) {
                                                         otherClient.socket.write(packet.build([
-                                                            "ATTACK", "attack", client.username, entity.name
+                                                            "HEALTH", otherEntity.name, otherEntity.health.toString()
                                                         ], otherClient.id));
                                                     });
-                                                    client.health -= entity.attack_damage;
-                                                    maps[map].clients.forEach(function (otherClient) {
-                                                        otherClient.socket.write(packet.build([
-                                                            "HEALTH", client.username, client.health.toString()
-                                                        ], otherClient.id));
-                                                    });
-                                                    if (client.health <= 0) {
-                                                        maps[map].grid[client.pos_x][client.pos_y] = "empty";
-                                                        client.alive = false;
-                                                        entity.patrol_point = 0;
-                                                        client.health = client.max_health;
-                                                        client.path = [];
-                                                        client.target_entity = null;
-                                                        client.pos_x = maps[map].start_x;
-                                                        client.pos_y = maps[map].start_y;
-                                                        client.target_x = client.pos_x;
-                                                        client.target_y = client.pos_y;
-                                                        send_destroy_packet(client.username, map);
+                                                    if (otherEntity.health <= 0) {
+                                                        maps[map].grid[otherEntity.pos_x][otherEntity.pos_y] = "empty";
+                                                        otherEntity.alive = false;
+                                                        send_destroy_packet(otherEntity.username, map);
                                                         entity.in_combat = false;
                                                         entity.target_entity = null;
                                                         entity.target_x = entity.origin_x;
                                                         entity.target_y = entity.origin_y;
-                                                    } else if (client.target_entity === null &&
-                                                        client.target_x === client.pos_x &&
-                                                        client.target_y === client.pos_y) {
-                                                        //If client is not already in combat and is not currently moving,
-                                                        //target the mob that just attacked them:
-                                                        client.in_combat = true;
-                                                        client.target_entity = entity.name;
+                                                    } else if (otherEntity.target_entity === null &&
+                                                        otherEntity.target_x === otherEntity.pos_x &&
+                                                        otherEntity.target_y === otherEntity.pos_y) {
+                                                        //If target entity is not already in combat and is not currently moving,
+                                                        //target the entity that just attacked them:
+                                                        otherEntity.in_combat = true;
+                                                        otherEntity.target_entity = entity.name;
                                                     }
                                                     entity.attack_timer = 0;
                                                 }
@@ -209,11 +200,8 @@ async function updateEntities() {
                         }
                         var dist = distance(entity.pos_x, entity.pos_y, entity.origin_x, entity.origin_y);
                         if (dist <= entity.roam_range) {
-                            console.log("entity is within its roam range");
                             if (entity.target_x !== entity.pos_x || entity.target_y !== entity.pos_y) {
-                                console.log("entity creating path to point...");
                                 entity.path = createPath(map, entity.pos_x, entity.pos_y, entity.target_x, entity.target_y, entity.target_entity);
-                                console.log("entity finished creating path");
                             }
                         }
                         dist = distance(entity.target_x, entity.target_y, entity.origin_x, entity.origin_y);
@@ -252,140 +240,11 @@ async function updateEntities() {
                         }
                     }
                 });
-                //Update client pos
-                maps[map].clients.forEach(async function (client) {
-                    try {
-                        if (client.alive) {
-                            client.attack_timer += 1;
-                            if (client.target_x !== client.pos_x || client.target_y !== client.pos_y) {
-                                console.log("client creating path to point...");
-                                client.path = createPath(map, client.pos_x, client.pos_y, client.target_x, client.target_y, client.target_entity);
-                                console.log("client finished creating path");
-                                if (client.target_entity !== null) {
-                                    client.path = client.path.slice(0, -1);
-                                    if (client.path.length === 1) {
-                                        client.path = [];
-                                    } else {
-                                        client.path = client.path.slice(0, -1);
-                                    }
-                                }
-                            }
-                            if (client.path.length > 0) {
-                                prev_pos_x = client.pos_x;
-                                prev_pos_y = client.pos_y;
-                                moveTowardsTarget(map, client);
-                                maps[map].clients.forEach(function (otherClient) {
-                                    params = [];
-                                    params.push("POS");
-                                    params.push(client.username);
-                                    params.push(prev_pos_x.toString());
-                                    params.push(prev_pos_y.toString());
-                                    params.push(client.pos_x.toString());
-                                    params.push(client.pos_y.toString());
-                                    otherClient.socket.write(packet.build(params, otherClient.id));
-                                });
-                            }
-                            if (client.target_entity !== null) {
-                                var target_entity = null;
-                                maps[map].entities.forEach(function (entity) {
-                                    if (entity.name === client.target_entity) {
-                                        target_entity = entity;
-                                    }
-                                });
-                                if (target_entity.alive) {
-                                    dist = distance(client.pos_x, client.pos_y, target_entity.pos_x, target_entity.pos_y);
-                                    if (dist <= client.attack_range) {
-                                        if (client.attack_timer >= client.attack_period) {
-                                            maps[map].clients.forEach(function (otherClient) {
-                                                otherClient.socket.write(packet.build([
-                                                    "ATTACK", "attack", target_entity.name, client.username
-                                                ], otherClient.id));
-                                            });
-                                            client.attack_timer = 0;
-                                            maps[map].entities.forEach(function (entity) {
-                                                if (entity.name === client.target_entity && entity.alive) {
-                                                    entity.health -= client.attack_damage;
-                                                    maps[map].clients.forEach(function (OtherClient) {
-                                                        OtherClient.socket.write(packet.build([
-                                                            "HEALTH", entity.name, entity.health.toString()
-                                                        ], client.id));
-                                                    });
-                                                    if (entity.target_entity === null) {
-                                                        //If target_entity is not already in combat, target the client that just attacked them:
-                                                        entity.in_combat = true;
-                                                        entity.target_entity = client.username;
-                                                        entity.target_x = client.pos_x;
-                                                        entity.target_y = client.pos_y;
-                                                    }
-                                                    if (entity.health <= 0) {
-                                                        maps[map].grid[entity.pos_x][entity.pos_y] = "empty";
-                                                        send_destroy_packet(target_entity.name, map);
-                                                        entity.alive = false;
-                                                        alive = entity.alive;
-                                                        client.target_entity = null;
-                                                    }
-                                                }
-                                            });
-                                        }
-                                    } else {
-                                        client.target_x = target_entity.pos_x;
-                                        client.target_y = target_entity.pos_y;
-                                    }
-                                }
-                            }
-                        } else {
-                            //If client is not alive, update client spawn timer:
-                            client.respawn_timer -= 1;
-                            if (client.respawn_timer <= 0) {
-                                client.alive = true;
-                                client.respawn_timer = client.respawn_period;
-                                maps[map].clients.forEach(function (otherClient) {
-                                    params = [];
-                                    params.push("SPAWN");
-                                    params.push(client.username);
-                                    params.push("player");
-                                    params.push(client.pos_x.toString());
-                                    params.push(client.pos_y.toString());
-                                    params.push(client.health);
-                                    otherClient.socket.write(packet.build(params, otherClient.id));
-                                });
-                            }
-                        }
-                    } catch (error) {
-
-                    }
-                });
-                //At end of each step, check if any mobs occupy the same square as any players, move mobs out of the square
-                //If no square available to move to, stay in place
-                maps[map].entities.forEach(function (entity) {
-                    if (entity.alive) {
-                        maps[map].clients.forEach(function (client) {
-                            if (client.pos_x === entity.pos_x && client.pos_y === entity.pos_y) {
-                                check_surrounding(maps[map].grid, entity);
-                                if (entity.path.length > 0) {
-                                    prev_pos_x = entity.pos_x;
-                                    prev_pos_y = entity.pos_y;
-                                    moveTowardsTarget(map, entity);
-                                    maps[map].clients.forEach(function (otherClient) {
-                                        params = [];
-                                        params.push("POS");
-                                        params.push(entity.name);
-                                        params.push(prev_pos_x.toString());
-                                        params.push(prev_pos_y.toString());
-                                        params.push(entity.pos_x.toString());
-                                        params.push(entity.pos_y.toString());
-                                        otherClient.socket.write(packet.build(params, otherClient.id));
-                                    });
-                                }
-                            }
-                        });
-                    }
-                });
             }
         })
         if (logout_users.length > 0) {
             var username = logout_users.shift();
-            query = "UPDATE public.users SET online_status = false, current_client = null WHERE username = '" + username + "';";
+            query = "UPDATE public.rts_users SET online_status = false, current_client = null WHERE username = '" + username + "';";
             console.log(timeNow() + query);
             try {
                 await connection.query(query);
@@ -397,82 +256,6 @@ async function updateEntities() {
         }
         await new Promise(resolve => setTimeout(resolve, config.step));
     }
-}
-
-function check_surrounding(grid, entity) {
-    var directions = ["up", "down", "left", "right", "up-left", "up-right", "down-left", "down-right"];
-    var new_point = {
-        x: entity.pos_x,
-        y: entity.pos_y,
-    }
-    directions.forEach(function (direction) {
-        switch (direction) {
-            case "up":
-                if (grid[entity.pos_x][entity.pos_y - 1] === "empty") {
-                    new_point.x = entity.pos_x;
-                    new_point.x = entity.pos_y - 1;
-                    entity.path.push(new_point);
-                    return;
-                }
-                break;
-            case "down":
-                if (grid[entity.pos_x][entity.pos_y + 1] === "empty") {
-                    new_point.x = entity.pos_x;
-                    new_point.x = entity.pos_y + 1;
-                    entity.path.push(new_point);
-                    return;
-                }
-                break;
-            case "left":
-                if (grid[entity.pos_x - 1][entity.pos_y] === "empty") {
-                    new_point.x = entity.pos_x - 1;
-                    new_point.y = entity.pos_y;
-                    entity.path.push(new_point);
-                    return;
-                }
-                break;
-            case "right":
-                if (grid[entity.pos_x + 1][entity.pos_y] === "empty") {
-                    new_point.x = entity.pos_x + 1;
-                    new_point.y = entity.pos_y;
-                    entity.path.push(new_point);
-                    return;
-                }
-                break;
-            case "up-left":
-                if (grid[entity.pos_x - 1][entity.pos_y - 1] === "empty") {
-                    new_point.x = entity.pos_x - 1;
-                    new_point.y = entity.pos_y - 1;
-                    entity.path.push(new_point);
-                    return;
-                }
-                break;
-            case "up-right":
-                if (grid[entity.pos_x + 1][entity.pos_y - 1] === "empty") {
-                    new_point.x = entity.pos_x + 1;
-                    new_point.y = entity.pos_y - 1;
-                    entity.path.push(new_point);
-                    return;
-                }
-                break;
-            case "down-left":
-                if (grid[entity.pos_x - 1][entity.pos_y + 1] === "empty") {
-                    new_point.x = entity.pos_x - 1;
-                    new_point.y = entity.pos_y + 1;
-                    entity.path.push(new_point);
-                    return;
-                }
-                break;
-            case "down-right":
-                if (grid[entity.pos_x + 1][entity.pos_y + 1] === "empty") {
-                    new_point.x = entity.pos_x + 1;
-                    new_point.y = entity.pos_y + 1;
-                    entity.path.push(new_point);
-                    return;
-                }
-                break;
-        }
-    });
 }
 
 function moveTowardsTarget(map, entity) {

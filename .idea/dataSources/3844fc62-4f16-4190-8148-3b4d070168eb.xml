@@ -3,15 +3,7 @@
   <database-model serializer="dbm" dbms="POSTGRES" family-id="POSTGRES" format-version="4.49">
     <root id="1">
       <DateStyle>mdy</DateStyle>
-      <Grants>1||-9223372036854775808|c|G
-1||10|c|G
-1||10|C|G
-1||10|T|G
-4||-9223372036854775808|c|G
-4||10|c|G
-4||10|C|G
-4||10|T|G</Grants>
-      <IntrospectionStateNumber>4273</IntrospectionStateNumber>
+      <IntrospectionStateNumber>4276</IntrospectionStateNumber>
       <ServerVersion>15.4</ServerVersion>
       <StartupTime>1697406870</StartupTime>
       <TimeZones>true ACDT
@@ -810,7 +802,7 @@ false Zulu
 13183||10|C|G
 13183||-9223372036854775808|U|G
 13183||10|U|G</Grants>
-      <IntrospectionStateNumber>4273</IntrospectionStateNumber>
+      <IntrospectionStateNumber>4276</IntrospectionStateNumber>
       <ObjectId>5</ObjectId>
       <OwnerName>postgres</OwnerName>
     </database>
@@ -4237,9 +4229,9 @@ false Zulu
     <schema id="262" parent="2" name="public">
       <Comment>standard public schema</Comment>
       <Current>1</Current>
-      <IntrospectionStateNumber>4273</IntrospectionStateNumber>
-      <IntrospectionTimestamp>2023-10-17.08:31:13.358</IntrospectionTimestamp>
-      <LocalIntrospectionTimestamp>2023-10-16.23:31:15</LocalIntrospectionTimestamp>
+      <IntrospectionStateNumber>4276</IntrospectionStateNumber>
+      <IntrospectionTimestamp>2023-10-17.09:36:24.261</IntrospectionTimestamp>
+      <LocalIntrospectionTimestamp>2023-10-17.00:36:25</LocalIntrospectionTimestamp>
       <ObjectId>2200</ObjectId>
       <StateNumber>518</StateNumber>
       <OwnerName>pg_database_owner</OwnerName>
@@ -4341,10 +4333,10 @@ false Zulu
       <StateNumber>4272</StateNumber>
       <TypeId>16</TypeId>
     </column>
-    <column id="277" parent="264" name="curren_client">
+    <column id="277" parent="264" name="current_client">
       <DasType>integer|0s</DasType>
       <Position>4</Position>
-      <StateNumber>4272</StateNumber>
+      <StateNumber>4275</StateNumber>
       <TypeId>23</TypeId>
     </column>
     <index id="278" parent="264" name="rts_users_pk">

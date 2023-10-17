@@ -1,5 +1,4 @@
 var now = require("performance-now");
-var underscore = require("underscore");
 const {Client} = require("pg");
 const connection = new Client({
     host: '127.0.0.1',
@@ -11,27 +10,14 @@ const connection = new Client({
 var query;
 var values;
 var id;
-var refresh_cont; //do not delete
 module.exports = function () {
 
     var client = this;
 
     this.initiate = async function () {
-        client.refresh_cont = true;
-        //send the connection handshake packet to the client
         client.socket.write(packet.build(["HANDSHAKE", now().toString()]));
         console.log(timeNow() + config.msg_client_connected + client.id);
         id = client.id;
-        //Begin refresh packet loop:
-        var refresh_timer = 0;
-        while(client.refresh_cont) {
-            refresh_timer += 1;
-            if (refresh_timer >= config.refresh_period) {
-                client.socket.write(packet.build(["REFRESH"], client.id));
-                refresh_timer = 0;
-            }
-            await new Promise(resolve => setTimeout(resolve, config.step));
-        }
     };
     this.data = function (data) {
         console.log(timeNow() + config.msg_client_data + client.id + "," + data.toString());
@@ -55,18 +41,18 @@ function timeNow() {
     return "[" + timeStamp + "] ";
 }
 
-function db_set_logout(client){
+function db_set_logout(client) {
     logout_users.push(client.username);
 }
 
-function process_logout(client){
+function process_logout(client) {
     clients = clients.filter(item => item !== client);
     client.refresh_cont = false;
     console.log(timeNow() + config.err_msg_client_error + id);
-    if(client.current_room !== null){
+    if (client.current_room !== null) {
         try {
             maps[client.current_room].clients = maps[client.current_room].clients.filter(item => item !== client);
-        } catch(error){
+        } catch (error) {
             console.log(timeNow() + config.err_msg_leaving_room + id);
             console.log(error.stack);
         }
@@ -75,7 +61,7 @@ function process_logout(client){
 
 
 function sendDestroyPackets(clientId) {
-    query = "UPDATE public.users SET online_status = 0 , current_client = null WHERE current_client = ? LIMIT 1";
+    query = "UPDATE public.rts_users SET online_status = 0 , current_client = null WHERE current_client = ? LIMIT 1";
     values = [clientId];
     connection.query(query, values, function (error) {
         if (error) {
@@ -86,7 +72,7 @@ function sendDestroyPackets(clientId) {
         }
     });
     function getLastRecord(clientId, next) {
-        query = "SELECT * FROM public.users WHERE current_client = ?";
+        query = "SELECT * FROM public.rts_users WHERE current_client = ?";
         values = [clientId];
         connection.query(query, values, function (error, rows) {
             if (error) {

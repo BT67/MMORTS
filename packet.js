@@ -1,9 +1,6 @@
-const {data} = require("./client");
-const q = require('q');
 const {Client} = require("pg");
 const nodemailer = require('nodemailer');
 const generator = require('generate-password');
-const {generate} = require("generate-password");
 const winston = require('winston');
 const connection = new Client({
     host: '127.0.0.1',
@@ -74,7 +71,7 @@ module.exports = packet = {
         var header = PacketModels.header.parse(datapacket);
         function login(username, password) {
             function setLogin(username, password) {
-                query = "UPDATE public.users SET online_status = true, current_client = " + client.id +
+                query = "UPDATE public.rts_users SET online_status = true, current_client = " + client.id +
                     " WHERE username = '" + username + "' AND password = '" + password + "' AND online_status = false" +
                     " AND current_client is null;";
                 console.log(timeNow() + query);
@@ -87,7 +84,7 @@ module.exports = packet = {
             }
             async function loginQuery(username, password) {
                 var data;
-                query = "SELECT * FROM public.users WHERE username = '" +
+                query = "SELECT * FROM public.rts_users WHERE username = '" +
                     username + "' AND password = '" + password + "' AND online_status = false LIMIT 1;";
                 console.log(timeNow() + query);
                 try {
@@ -146,10 +143,9 @@ module.exports = packet = {
             var start_room = config.start_room;
             var start_x = config.start_x;
             var start_y = config.start_y;
-            query = "INSERT INTO public.users" +
-                "(email, username, password, current_room, pos_x, pos_y, online_status, current_client) " +
-                "VALUES ('" + email + "', '" + username + "', '" + password + "', '" + start_room + "', " +
-                start_x + ", " + start_y + ", false, null);";
+            query = "INSERT INTO public.rts_users" +
+                "(email, username, password, current_room, online_status, current_client) " +
+                "VALUES ('" + email + "', '" + username + "', '" + password + "', '" + start_room + "', false, null);";
             console.log(timeNow() + query);
             connection.query(query, function (error) {
                 if (error) {
@@ -209,7 +205,7 @@ module.exports = packet = {
         }
 
         function logout(clientId) {
-            query = "UPDATE public.users SET online_status = false, current_client = null, " +
+            query = "UPDATE public.rts_users SET online_status = false, current_client = null, " +
                 "pos_x = " + client.pos_x + ", pos_y = " + client.pos_y +
                 " WHERE current_client = '" + clientId.toString() + "' AND online_status = true";
             console.log(timeNow() + query);
@@ -233,10 +229,6 @@ module.exports = packet = {
                 console.log(error.stack);
             }
             client.current_room = null;
-        }
-
-        function refresh(){
-            client.refresh
         }
 
         var data;
@@ -271,9 +263,6 @@ module.exports = packet = {
                 data = PacketModels.resetpassword.parse(datapacket);
                 password_reset(client, data.email);
                 break;
-            case "REFRESH":
-                refresh();
-                break;
         }
     }
 }
@@ -287,7 +276,7 @@ function password_reset(client, email){
 
     password = generate_password();
 
-    query = "UPDATE public.users SET password = '" + password + "' WHERE email = '" + email + "';";
+    query = "UPDATE public.rts_users SET password = '" + password + "' WHERE email = '" + email + "';";
     console.log(timeNow() + query);
     try {
         connection.query(query);
