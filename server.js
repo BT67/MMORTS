@@ -6,19 +6,6 @@ require(__dirname + '/Resources/config.js');
 
 const {Client} = require("pg");
 
-mobsref = {
-    "goblin": {
-        type: "goblin",
-        move_speed: 1,
-        aggressive: true,
-        max_health: 80,
-        respawn_period: 200,
-        attack_range: 1.5,
-        attack_period: 2,
-        attack_damage: 5
-    }
-}
-
 /*
 1. Load the init files
 2. Load game models
@@ -27,7 +14,7 @@ mobsref = {
 5. Init server and listen to the internet
  */
 
-console.log(timeNow() + "Startup sequence initiated");
+console.log(timeNow() + "Server startup sequence initiated");
 
 //Load init files
 var init_files = fs.readdirSync(__dirname + "/Initialisers");
@@ -53,75 +40,6 @@ map_files.forEach(function (mapFile) {
     var map = require(config.data_paths.maps + mapFile);
     maps[map.room] = map;
 });
-
-//Init walls in zone1
-//NOTE: when loading walls into the map grid, grid in gamemaker is not zero-indexed
-//In the server, a wall with position 11,1 is loaded in at position 13,3
-for (let i = 0; i < 11; ++i) {
-    var wall = {
-        type: "wall_default",
-        pos_x: 11,
-        pos_y: i
-    }
-    maps["zone1"].walls.push(wall);
-}
-//Init doors in map
-door = {
-    type: "door_default",
-    pos_x: 2,
-    pos_y: 7,
-    room_to: "rm_random",
-    name: "door0"
-}
-maps["zone1"].doors.push(door);
-maps["zone1"].grid = initMapGrid(maps["zone1"]);
-
-//Random rooms must be generated during initialisation:
-//TODO Assign random room identifier;
-new_map = generateDungeon("SMALL", "EASY");
-new_map = createWalls(new_map);
-create_doors(new_map)
-createMobs(new_map);
-new_map.name = "rm_random";
-new_map.room = "rm_random";
-new_map.grid_size = 32;
-maps["rm_random"] = new_map;
-maps["rm_random"].grid = initMapGrid(maps["rm_random"]);
-
-//Load mobs into each map:
-const entity_inst = new require("./Models/entity.js");
-this_entity = new entity_inst();
-this_entity = new entity_inst();
-this_entity.alive = true;
-this_entity.max_health = 200;
-this_entity.health = this_entity.max_health;
-this_entity.sprite = "";
-this_entity.type = "goblin";
-this_entity.name = "goblin1";
-this_entity.pos_x = 15;
-this_entity.pos_y = 5;
-this_entity.target_x = this_entity.pos_x;
-this_entity.target_y = this_entity.pos_y;
-this_entity.origin_x = this_entity.pos_x;
-this_entity.origin_y = this_entity.pos_y;
-this_entity.target_entity = null;
-this_entity.roam_range = 10;
-this_entity.view_range = 10;
-this_entity.attack_range = 1.5;
-this_entity.in_combat = false;
-this_entity.aggressive = true;
-this_entity.move_speed = 1;
-this_entity.sprite = "sprite";
-this_entity.respawn_period = 100;
-this_entity.respawn_timer = this_entity.respawn_period;
-this_entity.path = [];
-this_entity.attack_period = 2;
-this_entity.attack_timer = this_entity.attack_period;
-this_entity.attack_damage = 5;
-this_entity.patrol_path = [{x: 15, y: 5}, {x: 20, y: 10}];
-this_entity.patrol_path = [];
-this_entity.patrol_point = 0;
-maps["zone1"].entities.push(this_entity);
 
 //Initialise the database:
 const connection = new Client({
@@ -187,26 +105,6 @@ net.createServer(function (socket) {
         thisClient.loggedin = 0;
         thisClient.username = "";
         thisClient.current_room = null;
-        thisClient.pos_x = 0;
-        thisClient.pos_y = 0;
-        thisClient.view_range = 5;
-        thisClient.attack_range = 1.5;
-        thisClient.target_x = thisClient.pos_x;
-        thisClient.target_y = thisClient.pos_y;
-        thisClient.target_entity = null;
-        thisClient.move_speed = 1;
-        thisClient.max_health = 1000;
-        thisClient.health = thisClient.max_health;
-        thisClient.path = [];
-        thisClient.alive = true;
-        thisClient.respawn_period = 10;
-        thisClient.respawn_timer = thisClient.respawn_period;
-        thisClient.attack_period = 2;
-        thisClient.attack_timer = thisClient.attack_period;
-        thisClient.attack_damage = 25;
-        thisClient.refresh_timer = 0;
-        thisClient.refresh_timeout = 300;
-        //TODO create clientId allocation system
         thisClient.initiate();
         clients.push(thisClient);
         socket.on("error", thisClient.error);
@@ -232,50 +130,23 @@ async function updateEntities() {
                         console.log(entity.alive.toString());
                         entity.attack_timer += 1;
                         if (entity.target_entity === null) {
-                            console.log("entity.target_entity is null");
-                            //Follow patrol path:
-                            if (entity.patrol_path.length > 0) {
-                                console.log("entity.path length is >0");
-                                if (
-                                    (entity.patrol_path[entity.patrol_point].x === entity.pos_x &&
-                                        entity.patrol_path[entity.patrol_point].y === entity.pos_y) ||
-                                    (entity.pos_x === entity.origin_x && entity.pos_y === entity.origin_y)
-                                ) {
-                                    entity.patrol_point += 1;
-                                    if (entity.patrol_point > entity.patrol_path.length - 1) {
-                                        entity.patrol_point = 0;
+                            maps[map].entities.forEach(function (client) {
+                                if (client.alive) {
+                                    dist = distance(client.pos_x, client.pos_y, entity.pos_x, entity.pos_y);
+                                    if (dist < entity.view_range) {
+                                        entity.in_combat = true;
+                                        entity.target_entity = client.username;
+                                        entity.target_x = client.pos_x;
+                                        entity.target_y = client.pos_y;
+                                        entity.path = [];
                                     }
-                                    entity.target_x = entity.patrol_path[entity.patrol_point].x;
-                                    entity.target_y = entity.patrol_path[entity.patrol_point].y;
-                                    console.log("updated entity target x, y");
                                 }
-                            }
-                            if (entity.aggressive) {
-                                //Check if any clients are within mob's view range
-                                maps[map].clients.forEach(function (client) {
-                                    if (client.alive) {
-                                        dist = distance(client.pos_x, client.pos_y, entity.pos_x, entity.pos_y);
-                                        if (dist < entity.view_range) {
-                                            console.log("client is within view range");
-                                            //If client is within mob view range, check LOS:
-                                            //var seen = checklos(map, entity.pos_x, entity.pos_y, client.pos_x, client.pos_y);
-                                            //if (seen) {
-                                            console.log(timeNow() + "Mob aggro triggered, " + entity.name);
-                                            entity.in_combat = true;
-                                            entity.target_entity = client.username;
-                                            entity.target_x = client.pos_x;
-                                            entity.target_y = client.pos_y;
-                                            entity.path = [];
-                                            //}
-                                        }
-                                    }
-                                });
-                            }
+                            });
                         } else {
                             //If entity has a target
-                            maps[map].clients.forEach(function (client) {
+                            maps[map].entities.forEach(function (client) {
                                 try {
-                                    if (client.username === entity.target_entity) {
+                                    if (entity.username === entity.target_entity) {
                                         //If target entity leaves view range, return to origin
                                         dist = distance(client.pos_x, client.pos_y, entity.pos_x, entity.pos_y);
                                         if (dist > entity.view_range) {
@@ -414,53 +285,6 @@ async function updateEntities() {
                                     otherClient.socket.write(packet.build(params, otherClient.id));
                                 });
                             }
-                            //Check if client is in same grid as a door:
-                            maps[map].doors.forEach(async function (door) {
-                                if (
-                                    client.pos_x === door.pos_x &&
-                                    client.pos_y === door.pos_y &&
-                                    client.target_x === door.pos_x &&
-                                    client.target_y === door.pos_y) {
-                                    maps[map].clients = maps[map].clients.filter(item => item !== client);
-                                    //Update client current_room in DB:
-                                    sql_error = false;
-                                    query = "UPDATE public.users SET current_room = '" + door.room_to +
-                                        "' WHERE current_client = " + client.id + " AND online_status = true;";
-                                    console.log(timeNow() + query);
-                                    try {
-                                        connection.query(query);
-                                    } catch (error) {
-                                        console.log(timeNow() + config.err_msg_login + client.id);
-                                        console.log(error.stack);
-                                        sql_error = true;
-                                    }
-                                    if (!sql_error) {
-                                        client.current_room = door.room_to;
-                                        client.pos_x = maps[client.current_room].start_x;
-                                        client.pos_y = maps[client.current_room].start_y;
-                                        client.target_x = client.pos_x;
-                                        client.target_y = client.pos_y;
-                                        client.target_entity = null;
-                                        maps[client.current_room].clients.push(client);
-                                        //Send move room packet to target client:
-                                        client.socket.write(packet.build([
-                                            "ROOM",
-                                            maps[client.current_room].grid_width.toString(),
-                                            maps[client.current_room].grid_height.toString(),
-                                            client.pos_x.toString(),
-                                            client.pos_y.toString()
-                                        ], client.id));
-                                        drawFloors(client);
-                                        spawnWalls(client);
-                                        spawnDoors(client);
-                                        spawnEntities(client);
-                                        spawnClients(client);
-                                        //Send player destroy packet to all clients in the old room
-                                        send_destroy_packet(client.username, map);
-                                        //TODO send spawn packets for new client to all other clients already in the room
-                                    }
-                                }
-                            })
                             if (client.target_entity !== null) {
                                 var target_entity = null;
                                 maps[map].entities.forEach(function (entity) {
@@ -748,7 +572,7 @@ function createPath(map, x1, y1, x2, y2) {
             new_point.status = "invalid";
         } else if (new_point.x === x2 && new_point.y === y2) {
             new_point.status = "end";
-        //} else if (grid_copy[new_point.x][new_point.y] === "wall" || grid_copy[new_point.x][new_point.y] === "checked") {
+            //} else if (grid_copy[new_point.x][new_point.y] === "wall" || grid_copy[new_point.x][new_point.y] === "checked") {
         } else if (grid_copy[new_point.x][new_point.y] !== "empty") {
             new_point.status = "blocked";
         } else {
@@ -801,113 +625,6 @@ function createPath(map, x1, y1, x2, y2) {
     return final_path;
 }
 
-function checklos(map, x1, y1, x2, y2) {
-    if (x1 === x2 && y1 === y2) {
-        return [];
-    }
-    var grid_copy = [];
-    for (var i = 0; i < maps[map].grid.length; ++i) {
-        new_line = [];
-        for (var k = 0; k < maps[map].grid[i].length; ++k) {
-            new_line.push("empty");
-        }
-        grid_copy.push(new_line);
-    }
-
-    function check_point(current_point, direction, grid_copy) {
-        var new_path = current_point.path.slice();
-        var pos_x = current_point.x;
-        var pos_y = current_point.y;
-        switch (direction) {
-            case "up":
-                pos_y -= 1;
-                break;
-            case "down":
-                pos_y += 1;
-                break;
-            case "left":
-                pos_x -= 1;
-                break;
-            case "right":
-                pos_x += 1;
-                break;
-            case "up-left":
-                pos_x -= 1;
-                pos_y -= 1;
-                break;
-            case "up-right":
-                pos_x += 1;
-                pos_y -= 1;
-                break;
-            case "down-left":
-                pos_x -= 1;
-                pos_y += 1;
-                break;
-            case "down-right":
-                pos_x += 1;
-                pos_y += 1;
-                break;
-        }
-        var new_point = {
-            x: pos_x,
-            y: pos_y,
-            path: new_path,
-            status: "unknown"
-        }
-        new_path.push(new_point);
-        new_point.path = new_path;
-        if (new_point.x < 0 ||
-            new_point.x >= maps[map].grid_width ||
-            new_point.y < 0 ||
-            new_point.y >= maps[map].grid_height
-        ) {
-            new_point.status = "invalid";
-        } else if (grid_copy[new_point.x][new_point.y] === "wall") {
-            new_point.status = "blocked";
-        } else if (new_point.x === x2 && new_point.y === y2) {
-            new_point.status = "end";
-        } else {
-            new_point.status = "valid";
-            grid_copy[new_point.x][new_point.y] = "checked";
-        }
-        return new_point;
-    }
-
-    var start_point = {x: x1, y: y1, path: [], status: "start"};
-    var points = [start_point]; //Init array of points, beginning with the start point
-    var final_path = [];
-    final = false;
-    while (points.length > 0) {
-        var current_point = points.shift(); //remove and return the first point from the array
-        var new_point;
-        var directions = ["up", "down", "left", "right", "up-left", "up-right", "down-left", "down-right"];
-        directions.forEach(function (direction) {
-            new_point = check_point(current_point, direction, grid_copy);
-            if (new_point.status === "end") {
-                if (!final) {
-                    final_path = new_point.path;
-                    final = true;
-                }
-            } else if (new_point.status === "valid") {
-                points.push(new_point);
-            }
-        });
-    }
-    grid_copy = [];
-    if (final_path.length === 0) {
-        return false;
-    } else {
-        //Check if there are any walls on the path
-        for (var k = 0; k < final_path.length; ++k) {
-            var check_point = final_path[k];
-            if (maps[map].grid[check_point.x][check_point.y] === "wall") {
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
 async function send_destroy_packet(entity_name, map) {
     await new Promise(resolve => setTimeout(resolve, config.step));
     maps[map].clients.forEach(function (client) {
@@ -944,7 +661,6 @@ function drawFloors(client) {
         params.push(connection.height.toString());
         client.socket.write(packet.build(params, client.id));
     });
-    //client.socket.write(packet.build(["FLOOREND"], client.id));
 }
 
 function spawnWalls(client) {
@@ -958,18 +674,6 @@ function spawnWalls(client) {
         params.push(i.toString());
         client.socket.write(packet.build(params, client.id));
         packet_count++;
-    }
-}
-
-function spawnDoors(client) {
-    for (var i = maps[client.current_room].doors.length - 1; i >= 0; --i) {
-        door = maps[client.current_room].doors[i];
-        params = [];
-        params.push("DOOR");
-        params.push(door.type);
-        params.push(door.pos_x.toString());
-        params.push(door.pos_y.toString());
-        client.socket.write(packet.build(params, client.id));
     }
 }
 
@@ -1003,480 +707,7 @@ function spawnClients(client) {
     });
 }
 
-function createWalls(map) {
-    //To generate wall objects, iterate over every square in the ASCII grid
-    //Any "|" square adjacent to a "_" room square becomes a wall object
-    for (var i = 0; i < map.grid_width; ++i) {
-        for (var k = 0; k < map.grid_height; ++k) {
-            if (map.ascii_grid[i][k] === "|") {
-                var wall_type = "wall_default";
-                var is_wall = false;
-                //Check up
-                if (k >= 1) {
-                    if (map.ascii_grid[i][k - 1] === "_") {
-                        is_wall = true;
-                    }
-                }
-                //Check down
-                if (k + 1 < map.grid_width) {
-                    if (map.ascii_grid[i][k + 1] === "_") {
-                        is_wall = true;
-                    }
-                }
-                //Check left
-                if (i >= 1) {
-                    if (map.ascii_grid[i - 1][k] === "_") {
-                        is_wall = true;
-                    }
-                }
-                //Check right
-                if (i + 1 < map.grid_height) {
-                    if (map.ascii_grid[i + 1][k] === "_") {
-                        is_wall = true;
-                    }
-                }
-                //Check up-left
-                if (i >= 1 && k >= 1) {
-                    if (map.ascii_grid[i - 1][k - 1] === "_") {
-                        is_wall = true;
-                    }
-                }
-                //Check up-right
-                if (i + 1 < map.grid_width && k >= 1) {
-                    if (map.ascii_grid[i + 1][k - 1] === "_") {
-                        is_wall = true;
-                    }
-                }
-                //Check down-left
-                if (i >= 1 && k + 1 < map.grid_height) {
-                    if (map.ascii_grid[i - 1][k + 1] === "_") {
-                        is_wall = true;
-                    }
-                }
-                //Check down-right
-                if (i + 1 < map.grid_width && k + 1 < map.grid_height) {
-                    if (map.ascii_grid[i + 1][k + 1] === "_") {
-                        is_wall = true;
-                    }
-                }
-                if (is_wall) {
-                    wall = {
-                        pos_x: i,
-                        pos_y: k,
-                        type: wall_type
-                    }
-                    map.walls.push(wall);
-                }
-            }
-        }
-    }
-    var wall_count = 0;
-    map.walls.forEach(function (wall) {
-        map.grid[wall.pos_x][wall.pos_y] = "wall";
-        wall_count++;
-    });
-    return map;
-}
 
-function createMobs(map) {
-    var mob_num = 0
-    map.rooms.forEach(function (room) {
-        if (room.name !== "room0") {
-            room.mobs.forEach(function (mob) {
-                const entity_inst = new require("./Models/entity.js");
-                this_entity = new entity_inst();
-                //Mob type-dependent properties:
-                this_entity.type = mob;
-                this_entity.max_health = mobsref[mob].max_health;
-                this_entity.health = this_entity.max_health;
-                this_entity.name = "mob" + mob_num.toString();
-                mob_num++;
-                this_entity.attack_range = mobsref[mob].attack_range;
-                this_entity.aggressive = mobsref[mob].aggressive;
-                this_entity.move_speed = mobsref[mob].move_speed;
-                this_entity.respawn_period = mobsref[mob].respawn_period;
-                this_entity.respawn_timer = this_entity.respawn_period;
-                this_entity.attack_period = mobsref[mob].attack_period;
-                this_entity.attack_timer = this_entity.attack_period;
-                this_entity.attack_damage = mobsref[mob].attack_damage;
-                //Mob common properties
-                this_entity.alive = true;
-                this_entity.pos_x = randomInt(room.origin_x + 1, room.origin_x + room.width - 1);
-                this_entity.pos_y = randomInt(room.origin_y + 1, room.origin_y + room.height - 1);
-                this_entity.target_x = this_entity.pos_x;
-                this_entity.target_y = this_entity.pos_y;
-                this_entity.origin_x = this_entity.pos_x;
-                this_entity.origin_y = this_entity.pos_y;
-                this_entity.target_entity = null;
-                this_entity.roam_range = Math.max(room.width, room.height) * 1.5;
-                this_entity.view_range = Math.max(room.width, room.height) * 1.5;
-                this_entity.in_combat = false;
-                this_entity.path = [];
-                var patrol_to_x = this_entity.pos_x;
-                var patrol_to_y = this_entity.pos_y
-                if (this_entity.pos_x - room.origin_x > (room.width / 2)) {
-                    patrol_to_x = randomInt(room.origin_x + 1, room.origin_x + (room.width / 2));
-                } else {
-                    patrol_to_x = randomInt(room.origin_x + (room.width / 2), room.origin_x + room.width);
-                }
-                if (this_entity.pos_y - room.origin_y > (room.height / 2)) {
-                    patrol_to_y = randomInt(room.origin_y + 1, room.origin_y + (room.height / 2));
-                } else {
-                    patrol_to_y = randomInt(room.origin_x + (room.height / 2), room.origin_y + room.height);
-                }
-                this_entity.patrol_path = [
-                    {x: this_entity.pos_x, y: this_entity.pos_y},
-                    {x: patrol_to_x, y: patrol_to_y}
-                ];
-                this_entity.patrol_point = 0;
-                map.entities.push(this_entity);
-            });
-        }
-    });
-}
-
-function create_doors(map) {
-    //Add entry
-    new_door = {
-        type: "door_default",
-        pos_x: randomInt(map.rooms[0].origin_x + 1, map.rooms[0].origin_x + map.rooms[0].width - 1),
-        pos_y: randomInt(map.rooms[0].origin_y + 1, map.rooms[0].origin_y + map.rooms[0].height - 1),
-        room_to: "zone1",
-        name: "door0"
-    }
-    if (map.rooms[0].origin_x < new_door.pos_x < map.rooms[0].origin_x + (map.rooms[0].width / 2)) {
-        map.start_x = new_door.pos_x + 1;
-    } else if (map.rooms[0].origin_x + (map.rooms[0].width / 2) < new_door.pos_x < map.rooms[0].origin_x + map.rooms[0].width) {
-        map.start_x = new_door.pos_x - 1;
-    }
-    if (map.rooms[0].origin_y < new_door.pos_y < map.rooms[0].origin_y + (map.rooms[0].height / 2)) {
-        map.start_y = new_door.pos_y + 1;
-    } else if (map.rooms[0].origin_y + (map.rooms[0].height / 2) < new_door.pos_y < map.rooms[0].origin_y + map.rooms[0].height) {
-        map.start_y = new_door.pos_y - 1;
-    }
-    map.doors.push(new_door)
-    //Add exit
-    new_door = {
-        type: "door_default",
-        pos_x: randomInt(map.rooms[map.rooms.length - 1].origin_x + 1, map.rooms[map.rooms.length - 1].origin_x + map.rooms[map.rooms.length - 1].width - 1),
-        pos_y: randomInt(map.rooms[map.rooms.length - 1].origin_y + 1, map.rooms[map.rooms.length - 1].origin_y + map.rooms[map.rooms.length - 1].height - 1),
-        room_to: "zone1",
-        name: "door1"
-    }
-    map.doors.push(new_door)
-}
-
-function generateDungeon(dungeon_size, dungeon_difficulty) {
-    var room_min_width = 0;
-    var room_max_width = 0;
-    var room_min_height = 0;
-    var room_max_height = 0;
-    var connection_min_width = 0;
-    var connection_max_width = 0;
-    var connection_min_height = 0;
-    var connection_max_height = 0;
-    var new_map_width = 0;
-    var new_map_height = 0;
-    var num_rooms = 0;
-    switch (dungeon_size) {
-        case "SMALL":
-            num_rooms = 8;
-            new_map_width = 80;
-            new_map_height = 40;
-            room_min_width = 5;
-            room_max_width = 15;
-            room_min_height = 5;
-            room_max_height = 15;
-            connection_min_width = 3;
-            connection_max_width = 3;
-            connection_min_height = 3;
-            connection_max_height = 3;
-            break;
-        case "MEDIUM":
-            num_rooms = 16;
-            new_map_width = 100;
-            new_map_height = 50;
-            room_min_width = 5;
-            room_max_width = 15;
-            room_min_height = 5;
-            room_max_height = 15;
-            connection_min_width = 3;
-            connection_max_width = 3;
-            connection_min_height = 3;
-            connection_max_height = 3;
-            break;
-        case "LARGE":
-            num_rooms = 30;
-            new_map_width = 120;
-            new_map_height = 60;
-            room_min_width = 5;
-            room_max_width = 15;
-            room_min_height = 5;
-            room_max_height = 15;
-            connection_min_width = 3;
-            connection_max_width = 3;
-            connection_min_height = 3;
-            connection_max_height = 3;
-            break;
-        case "HUGE":
-            num_rooms = 8;
-            new_map_width = 80;
-            new_map_height = 40;
-            room_min_width = 8;
-            room_max_width = 15;
-            room_min_height = 8;
-            room_max_height = 15;
-            connection_min_width = 3;
-            connection_max_width = 3;
-            connection_min_height = 3;
-            connection_max_height = 3;
-            break;
-    }
-    //Init new map object:
-    var new_map = {
-        name: "new_map",
-        room: "new_map",
-        start_x: 0,
-        start_y: 0,
-        clients: [],
-        entities: [],
-        doors: [],
-        walls: [],
-        grid: [],
-        rooms: [],
-        connections: [],
-        grid_width: new_map_width,
-        grid_height: new_map_height,
-        ascii_grid: [],
-        mobs: []
-    }
-    new_map.mobs.push("goblin");
-    //Init room grid:
-    new_map.grid = initMapGrid(new_map);
-    new_map.ascii_grid = initASCIIGrid(new_map);
-    var num_connections = [];
-    //Init origin points for each room
-    //origin_x, origin_y for room refers to the top-left floor tile of the room
-    var i = 0;
-    var tries = 0;
-    while (i < num_rooms) {
-        var new_room_origin_x = 0;
-        var new_room_origin_y = 0;
-        var new_room_width = randomInt(room_min_width, room_max_width + 1);
-        var new_room_height = randomInt(room_min_height, room_max_height + 1);
-        var new_room_floor_type = "floor_default";
-        if (new_map.rooms.length < 1) {
-            var start = Math.random();
-            if (0 < start <= 0.25) {
-                new_room_origin_x = 1;
-                new_room_origin_y = 1;
-                new_map.start_x = 3;
-                new_map.start_y = 3;
-            } else if (0.25 < start <= 0.5) {
-                new_room_origin_x = new_map_width - 1 - new_room_width;
-                new_room_origin_y = 1;
-                new_map.start_x = new_map_width - 3;
-                new_map.start_y = 3;
-            } else if (0.5 < start <= 0.75) {
-                new_room_origin_x = 1;
-                new_room_origin_y = new_map_height - 1 - new_room_height;
-                new_map.start_x = 3;
-                new_map.start_y = new_map_height - 3;
-            } else if (0.75 < start <= 1) {
-                new_room_origin_x = new_map_width - 1 - new_room_width;
-                new_room_origin_y = new_map_height - 1 - new_room_height;
-                new_map.start_x = new_map_width - 3;
-                new_map.start_y = new_map_height - 3;
-            }
-        } else {
-            var connection_origin_x = 0;
-            var connection_origin_y = 0;
-            var connection_width = 0;
-            var connection_height = 0;
-            var prev_room_origin_x = new_map.rooms[new_map.rooms.length - 1].origin_x;
-            var prev_room_origin_y = new_map.rooms[new_map.rooms.length - 1].origin_y;
-            var prev_room_width = new_map.rooms[new_map.rooms.length - 1].width;
-            var prev_room_height = new_map.rooms[new_map.rooms.length - 1].height;
-            if (Math.random() > 0.5) {
-                if (prev_room_origin_y < new_map.grid_height / 2) {
-                    //Create new_room below prev_room
-                    new_room_origin_x = randomInt(prev_room_origin_x + room_min_width - new_room_width,
-                        prev_room_origin_x + prev_room_width - room_min_width);
-                    new_room_origin_y = randomInt(prev_room_origin_y + prev_room_height + 2, new_map.grid_height - 1);
-                    connection_origin_y = prev_room_origin_y;
-                    connection_height = Math.abs(new_room_origin_y + new_room_height - prev_room_origin_y);
-                } else {
-                    //Create new_room above prev_room
-                    new_room_origin_x = randomInt(prev_room_origin_x + room_min_width - new_room_width,
-                        prev_room_origin_x + prev_room_width - room_min_width);
-                    new_room_origin_y = randomInt(2, prev_room_origin_y - 1 - room_min_height);
-                    connection_origin_y = new_room_origin_y;
-                    connection_height = Math.abs(prev_room_origin_y + prev_room_height - new_room_origin_y);
-                    if (new_room_origin_y + new_room_height > prev_room_origin_y) {
-                        new_room_height = prev_room_origin_y - new_room_origin_y - 2;
-                    }
-                }
-                //Connection dimensions:
-                connection_width = connection_min_width;
-                if (new_room_origin_x < prev_room_origin_x) {
-                    connection_origin_x = prev_room_origin_x;
-                } else if (new_room_origin_x >= prev_room_origin_x) {
-                    connection_origin_x = new_room_origin_x;
-                }
-            } else {
-                //Make horizontal connection
-                if (prev_room_origin_x < new_map.grid_width / 2) {
-                    //Create new_room to the right of prev_room
-                    new_room_origin_y = randomInt(prev_room_origin_y + room_min_height - new_room_height,
-                        prev_room_origin_y + prev_room_height - room_min_height);
-                    new_room_origin_x = randomInt(prev_room_origin_x + prev_room_width + 2, new_map.grid_width - 1);
-                    connection_origin_x = prev_room_origin_x;
-                    connection_width = Math.abs(new_room_origin_x + new_room_width - prev_room_origin_x);
-                } else {
-                    //Create new_room to the left of prev_room
-                    new_room_origin_y = randomInt(prev_room_origin_y + room_min_height - new_room_height,
-                        prev_room_origin_y + prev_room_height - room_min_height);
-                    new_room_origin_x = randomInt(2, prev_room_origin_x - 2);
-                    connection_origin_x = new_room_origin_x;
-                    connection_width = Math.abs(prev_room_origin_x + prev_room_width - new_room_origin_x);
-                    if (new_room_origin_x + new_room_width > prev_room_origin_x) {
-                        new_room_width = prev_room_origin_x - new_room_origin_x - 2;
-                    }
-                }
-                //Connection dimensions:
-                connection_height = connection_min_height;
-                if (new_room_origin_y < prev_room_origin_y) {
-                    connection_origin_y = prev_room_origin_y;
-                } else if (new_room_origin_y >= prev_room_origin_y) {
-                    connection_origin_y = new_room_origin_y;
-                }
-            }
-        }
-        connection_room = {
-            name: "hallway" + num_connections.toString(),
-            origin_x: connection_origin_x,
-            origin_y: connection_origin_y,
-            width: connection_width,
-            height: connection_height,
-            floor_type: new_room_floor_type
-        }
-        new_room = {
-            name: "room" + i.toString(),
-            origin_x: new_room_origin_x,
-            origin_y: new_room_origin_y,
-            width: new_room_width,
-            height: new_room_height,
-            floor_type: new_room_floor_type,
-            mobs: []
-        };
-        num_mobs = randomInt(1, 4);
-        for (var m = 0; m < num_mobs; ++m) {
-            mob_type = new_map.mobs[randomInt(0, new_map.mobs.length)];
-            new_room.mobs.push(mob_type)
-        }
-        var valid_room = true;
-        if (
-            new_room_origin_x < 1 ||
-            new_room_origin_x + new_room_width >= new_map.grid_width ||
-            new_room_origin_y < 1 ||
-            new_room_origin_y + new_room_height >= new_map.grid_height ||
-            new_room_width < room_min_width ||
-            new_room_height < room_min_height
-        ) {
-            valid_room = false;
-        }
-        new_map.rooms.forEach(function (room) {
-            if (
-                room.origin_x - 2 < new_room_origin_x &&
-                new_room_origin_x <= room.origin_x + room.width + 2 &&
-                room.origin_y - 2 < new_room_origin_y &&
-                new_room_origin_y <= room.origin_y + room.height + 2
-            ) {
-                valid_room = false;
-            } else if (
-                new_room_origin_x - 2 < room.origin_x &&
-                room.origin_x <= new_room_origin_x + new_room_width + 2 &&
-                new_room_origin_y - 2 < room.origin_y &&
-                room.origin_y <= new_room_origin_y + new_room_height + 2
-            ) {
-                valid_room = false;
-            }
-        });
-        if (valid_room) {
-            new_map.rooms.push(new_room);
-            if (new_map.rooms.length > 1) {
-                new_map.connections.push(connection_room);
-                num_connections++;
-            }
-            i++;
-        } else {
-            tries++;
-        }
-        if (tries > 50) {
-            i++
-            tries = 0;
-        }
-    }
-    outputASCIIgrid(new_map);
-    return new_map;
-}
-
-function outputASCIIgrid(map) {
-    //Write dungeon layout to ASCII
-    map.rooms.forEach(function (room) {
-        for (var h = 0; h < room.width; ++h) {
-            if (room.origin_x + h < map.grid_width) {
-                for (var v = 0; v < room.height; ++v) {
-                    if (room.origin_y + v < map.grid_height) {
-                        if (
-                            room.origin_x + h > 0 &&
-                            room.origin_x + h < map.grid_width - 1 &&
-                            room.origin_y + v > 0 &&
-                            room.origin_y + v < map.grid_height - 1) {
-                            map.ascii_grid[room.origin_x + h][room.origin_y + v] = "_";
-                        }
-                    }
-                }
-            }
-        }
-    });
-    map.connections.forEach(function (connection) {
-        for (var h = 0; h < connection.width; ++h) {
-            if (connection.origin_x + h < map.grid_width) {
-                for (var v = 0; v < connection.height; ++v) {
-                    if (connection.origin_y + v < map.grid_height) {
-                        if (
-                            connection.origin_x + h > 0 &&
-                            connection.origin_x + h < map.grid_width - 1 &&
-                            connection.origin_y + v > 0 &&
-                            connection.origin_y + v < map.grid_height - 1) {
-                            map.ascii_grid[connection.origin_x + h][connection.origin_y + v] = "_";
-                        }
-                    }
-                }
-            }
-        }
-    });
-    //Output dungeon layout to ASCII:
-    for (var i = 0; i < map.grid_height; ++i) {
-        var line = "";
-        for (var k = 0; k < map.grid_width; ++k) {
-            line += map.ascii_grid[k][i];
-        }
-        console.log(line);
-    }
-}
-
-function initASCIIGrid(map) {
-    let grid = [];
-    for (let i = 0; i < map.grid_width; i++) {
-        grid.push([])
-        for (let k = 0; k < map.grid_height; k++) {
-            grid[i][k] = "|";
-        }
-    }
-    return grid;
-}
 
 
 

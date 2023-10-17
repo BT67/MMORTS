@@ -28,8 +28,6 @@ const chat_logger = winston.createLogger({
 });
 
 module.exports = packet = {
-
-    //params is an array of javascript objects to be turned into buffers to send data to gamemaker
     build: function (params, clientId) {
         if (clientId == null) {
             clientId = "unknown";
@@ -101,70 +99,17 @@ module.exports = packet = {
             }
             async function processLogin(username, password) {
                 data = await loginQuery(username, password);
-                var current_room, pos_x, pos_y, health, sprite;
                 if (data.length < 1) {
                     client.socket.write(packet.build(["LOGIN", "FALSE", config.err_msg_login_auth]));
                     console.log(timeNow() + config.err_msg_login_auth);
                     return;
                 }
-                client.username = username;
-                try {
-                    current_room = data.rows[0].current_room;
-                    pos_x = parseInt(data.rows[0].pos_x);
-                    pos_y = parseInt(data.rows[0].pos_y);
-                    client.pos_x = pos_x;
-                    client.pos_y = pos_y;
-                    client.target_x = client.pos_x;
-                    client.target_y = client.pos_y;
-                    health = parseInt(data.rows[0].health);
-                    sprite = data.rows[0].sprite;
-                } catch (error) {
-                    console.log(error.stack);
-                    return;
-                }
-                if (
-                    username == null ||
-                    current_room == null ||
-                    pos_x == null ||
-                    pos_y == null ||
-                    health == null ||
-                    sprite == null
-                ) {
-                    console.log(timeNow() + config.err_msg_db);
-                    return;
-                }
-                try {
-                    maps[current_room].clients.push(client);
-                    console.log("added client=" + username + " to room=" + current_room);
-                } catch(error){
-                    client.socket.write(packet.build(["LOGIN", "FALSE", config.err_msg_unable_to_login]));
-                    console.log(config.err_msg_client_enter_room + current_room);
-                    return;
-                }
-                client.current_room = current_room;
                 client.socket.write(packet.build([
                     "LOGIN",
                     "TRUE",
                     config.msg_login_success,
                     username
                 ], client.id));
-                await new Promise(resolve => setTimeout(resolve, 100));
-                //Send spawn player packet to other clients in the room who are online
-                console.log(timeNow() + config.msg_enter_room + current_room + ", clientId=" + client.id);
-                client.socket.write(packet.build([
-                    "ROOM",
-                    maps[client.current_room].grid_width.toString(),
-                    maps[client.current_room].grid_height.toString(),
-                    client.pos_x.toString(),
-                    client.pos_y.toString()
-                ], client.id));
-                await new Promise(resolve => setTimeout(resolve, 100));
-                drawFloors(client);
-                spawnWalls(client);
-                spawnDoors(client);
-                spawnEntities(client);
-                spawnClients(client);
-                //TODO send spawn packets for new client to all other clients already in the room
             }
             try {
                 processLogin(username, password);
@@ -287,11 +232,11 @@ module.exports = packet = {
                 console.log(timeNow() + config.err_msg_leaving_room + client.current_room);
                 console.log(error.stack);
             }
-            //client.current_room = null;
+            client.current_room = null;
         }
 
         function refresh(){
-            client.re
+            client.refresh
         }
 
         var data;
@@ -355,13 +300,13 @@ function password_reset(client, email){
     var transporter = nodemailer.createTransport({
         service: 'outlook',
         auth: {
-            user: 'passwordreset1905@outlook.com', //old
-            pass: 'kpy333Xseries10' //old
+            user: 'user@example.com',
+            pass: '********'
         }
     });
 
     var mailOptions = {
-        from: 'passwordreset1905@outlook.com', //old
+        from: 'user@example.com',
         to: email,
         subject: 'PASSWORD RESET EMAIL',
         text: password
@@ -380,123 +325,5 @@ function generate_password(){
     return generator.generate({
         length: 16,
         numbers: true
-    });
-}
-
-function randomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min) + min);
-}
-
-function initMapGrid(map) {
-    var grid = [];
-    for (var i = 0; i < map.grid_width; i++) {
-        grid.push([])
-        for (var k = 0; k < map.grid_height; k++) {
-            grid[i][k] = "|";
-        }
-    }
-    return grid;
-}
-
-function spawnWalls(client){
-    var packet_count = 0;
-    for(var i = 0; i < maps[client.current_room].walls.length; ++i){
-        params = [];
-        params.push("WALL");
-        params.push(maps[client.current_room].walls[i].type);
-        params.push(maps[client.current_room].walls[i].pos_x.toString());
-        params.push(maps[client.current_room].walls[i].pos_y.toString());
-        params.push(i.toString());
-        client.socket.write(packet.build(params, client.id));
-        packet_count++;
-    }
-}
-
-function spawnDoors(client){
-    maps[client.current_room].doors.forEach(function(door){
-        params = [];
-        params.push("DOOR");
-        params.push(door.type);
-        params.push(door.pos_x.toString());
-        params.push(door.pos_y.toString());
-        client.socket.write(packet.build(params, client.id));
-    });
-}
-
-function spawnEntities(client) {
-    maps[client.current_room].entities.forEach(function (entity) {
-        if (entity.alive) {
-            params = [];
-            params.push("SPAWN");
-            params.push(entity.name);
-            params.push(entity.type);
-            params.push(entity.pos_x.toString());
-            params.push(entity.pos_y.toString());
-            params.push(entity.health.toString());
-            params.push(entity.max_health.toString())
-            client.socket.write(packet.build(params, client.id));
-        }
-    });
-}
-
-function spawnClients(client) {
-    maps[client.current_room].clients.forEach(function (otherClient) {
-            params = [];
-            params.push("SPAWN");
-            params.push(otherClient.username);
-            params.push("player");
-            params.push(otherClient.pos_x.toString());
-            params.push(otherClient.pos_y.toString());
-            params.push(otherClient.health.toString());
-            params.push(otherClient.max_health.toString());
-            client.socket.write(packet.build(params, client.id));
-    });
-}
-
-function drawFloors(client) {
-    maps[client.current_room].rooms.forEach(function (room) {
-        params = [];
-        params.push("FLOOR");
-        params.push(room.floor_type);
-        params.push(room.origin_x.toString());
-        params.push(room.origin_y.toString());
-        params.push(room.width.toString());
-        params.push(room.height.toString());
-        client.socket.write(packet.build(params, client.id));
-    });
-    maps[client.current_room].connections.forEach(function (connection) {
-        params = [];
-        params.push("FLOOR");
-        params.push(connection.floor_type);
-        params.push(connection.origin_x.toString());
-        params.push(connection.origin_y.toString());
-        params.push(connection.width.toString());
-        params.push(connection.height.toString());
-        client.socket.write(packet.build(params, client.id));
-    });
-}
-
-function drawFloors(client) {
-    maps[client.current_room].rooms.forEach(function (room) {
-        params = [];
-        params.push("FLOOR");
-        params.push(room.floor_type);
-        params.push(room.origin_x.toString());
-        params.push(room.origin_y.toString());
-        params.push(room.width.toString());
-        params.push(room.height.toString());
-        client.socket.write(packet.build(params, client.id));
-    });
-    maps[client.current_room].connections.forEach(function (connection) {
-        params = [];
-        params.push("FLOOR");
-        params.push(connection.floor_type);
-        params.push(connection.origin_x.toString());
-        params.push(connection.origin_y.toString());
-        params.push(connection.width.toString());
-        params.push(connection.height.toString());
-        client.socket.write(packet.build(params, client.id));
     });
 }

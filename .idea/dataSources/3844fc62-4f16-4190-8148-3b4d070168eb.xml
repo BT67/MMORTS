@@ -3,9 +3,17 @@
   <database-model serializer="dbm" dbms="POSTGRES" family-id="POSTGRES" format-version="4.49">
     <root id="1">
       <DateStyle>mdy</DateStyle>
-      <IntrospectionStateNumber>4171</IntrospectionStateNumber>
+      <Grants>1||-9223372036854775808|c|G
+1||10|c|G
+1||10|C|G
+1||10|T|G
+4||-9223372036854775808|c|G
+4||10|c|G
+4||10|C|G
+4||10|T|G</Grants>
+      <IntrospectionStateNumber>4273</IntrospectionStateNumber>
       <ServerVersion>15.4</ServerVersion>
-      <StartupTime>1696649480</StartupTime>
+      <StartupTime>1697406870</StartupTime>
       <TimeZones>true ACDT
 true ACSST
 false ACST
@@ -802,18 +810,18 @@ false Zulu
 13183||10|C|G
 13183||-9223372036854775808|U|G
 13183||10|U|G</Grants>
-      <IntrospectionStateNumber>4171</IntrospectionStateNumber>
+      <IntrospectionStateNumber>4273</IntrospectionStateNumber>
       <ObjectId>5</ObjectId>
       <OwnerName>postgres</OwnerName>
     </database>
-    <role id="3" parent="1" name="pg_database_owner">
+    <role id="3" parent="1" name="pg_checkpoint">
+      <ObjectId>4544</ObjectId>
+    </role>
+    <role id="4" parent="1" name="pg_database_owner">
       <ObjectId>6171</ObjectId>
     </role>
-    <role id="4" parent="1" name="pg_read_all_data">
-      <ObjectId>6181</ObjectId>
-    </role>
-    <role id="5" parent="1" name="pg_write_all_data">
-      <ObjectId>6182</ObjectId>
+    <role id="5" parent="1" name="pg_execute_server_program">
+      <ObjectId>4571</ObjectId>
     </role>
     <role id="6" parent="1" name="pg_monitor">
       <ObjectId>3373</ObjectId>
@@ -821,29 +829,29 @@ false Zulu
 3375
 3377</RoleGrants>
     </role>
-    <role id="7" parent="1" name="pg_read_all_settings">
+    <role id="7" parent="1" name="pg_read_all_data">
+      <ObjectId>6181</ObjectId>
+    </role>
+    <role id="8" parent="1" name="pg_read_all_settings">
       <ObjectId>3374</ObjectId>
     </role>
-    <role id="8" parent="1" name="pg_read_all_stats">
+    <role id="9" parent="1" name="pg_read_all_stats">
       <ObjectId>3375</ObjectId>
-    </role>
-    <role id="9" parent="1" name="pg_stat_scan_tables">
-      <ObjectId>3377</ObjectId>
     </role>
     <role id="10" parent="1" name="pg_read_server_files">
       <ObjectId>4569</ObjectId>
     </role>
-    <role id="11" parent="1" name="pg_write_server_files">
-      <ObjectId>4570</ObjectId>
-    </role>
-    <role id="12" parent="1" name="pg_execute_server_program">
-      <ObjectId>4571</ObjectId>
-    </role>
-    <role id="13" parent="1" name="pg_signal_backend">
+    <role id="11" parent="1" name="pg_signal_backend">
       <ObjectId>4200</ObjectId>
     </role>
-    <role id="14" parent="1" name="pg_checkpoint">
-      <ObjectId>4544</ObjectId>
+    <role id="12" parent="1" name="pg_stat_scan_tables">
+      <ObjectId>3377</ObjectId>
+    </role>
+    <role id="13" parent="1" name="pg_write_all_data">
+      <ObjectId>6182</ObjectId>
+    </role>
+    <role id="14" parent="1" name="pg_write_server_files">
+      <ObjectId>4570</ObjectId>
     </role>
     <role id="15" parent="1" name="postgres">
       <BypassRls>1</BypassRls>
@@ -4229,9 +4237,9 @@ false Zulu
     <schema id="262" parent="2" name="public">
       <Comment>standard public schema</Comment>
       <Current>1</Current>
-      <IntrospectionStateNumber>4171</IntrospectionStateNumber>
-      <IntrospectionTimestamp>2023-10-07.14:22:16.393</IntrospectionTimestamp>
-      <LocalIntrospectionTimestamp>2023-10-07.05:22:18</LocalIntrospectionTimestamp>
+      <IntrospectionStateNumber>4273</IntrospectionStateNumber>
+      <IntrospectionTimestamp>2023-10-17.08:31:13.358</IntrospectionTimestamp>
+      <LocalIntrospectionTimestamp>2023-10-16.23:31:15</LocalIntrospectionTimestamp>
       <ObjectId>2200</ObjectId>
       <StateNumber>518</StateNumber>
       <OwnerName>pg_database_owner</OwnerName>
@@ -4242,54 +4250,60 @@ false Zulu
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>postgres</OwnerName>
     </table>
-    <table id="264" parent="262" name="users">
+    <table id="264" parent="262" name="rts_users">
+      <ObjectId>32768</ObjectId>
+      <StateNumber>4272</StateNumber>
+      <AccessMethodId>2</AccessMethodId>
+      <OwnerName>postgres</OwnerName>
+    </table>
+    <table id="265" parent="262" name="users">
       <ObjectId>16401</ObjectId>
       <StateNumber>782</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>postgres</OwnerName>
     </table>
-    <column id="265" parent="263" name="username">
+    <column id="266" parent="263" name="username">
       <DasType>varchar(30)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StateNumber>3682</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="266" parent="263" name="password">
+    <column id="267" parent="263" name="password">
       <DasType>varchar(30)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>3682</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="267" parent="263" name="email">
+    <column id="268" parent="263" name="email">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StateNumber>3682</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="268" parent="263" name="online_status">
+    <column id="269" parent="263" name="online_status">
       <DasType>boolean|0s</DasType>
       <NotNull>1</NotNull>
       <Position>4</Position>
       <StateNumber>3682</StateNumber>
       <TypeId>16</TypeId>
     </column>
-    <column id="269" parent="263" name="current_client">
+    <column id="270" parent="263" name="current_client">
       <DasType>integer|0s</DasType>
       <Position>5</Position>
       <StateNumber>3682</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <column id="270" parent="263" name="in_battle">
+    <column id="271" parent="263" name="in_battle">
       <DasType>boolean|0s</DasType>
       <NotNull>1</NotNull>
       <Position>6</Position>
       <StateNumber>3828</StateNumber>
       <TypeId>16</TypeId>
     </column>
-    <index id="271" parent="263" name="python_users_pk">
+    <index id="272" parent="263" name="python_users_pk">
       <ColNames>username</ColNames>
       <ObjectId>24579</ObjectId>
       <Primary>1</Primary>
@@ -4300,74 +4314,118 @@ false Zulu
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <key id="272" parent="263" name="python_users_pk">
+    <key id="273" parent="263" name="python_users_pk">
       <ObjectId>24580</ObjectId>
       <Primary>1</Primary>
       <StateNumber>3682</StateNumber>
       <UnderlyingIndexId>24579</UnderlyingIndexId>
     </key>
-    <column id="273" parent="264" name="username">
+    <column id="274" parent="264" name="username">
+      <DasType>varchar|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StateNumber>4272</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="275" parent="264" name="password">
+      <DasType>varchar|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StateNumber>4272</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="276" parent="264" name="online_status">
+      <DasType>boolean|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StateNumber>4272</StateNumber>
+      <TypeId>16</TypeId>
+    </column>
+    <column id="277" parent="264" name="curren_client">
+      <DasType>integer|0s</DasType>
+      <Position>4</Position>
+      <StateNumber>4272</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <index id="278" parent="264" name="rts_users_pk">
+      <ColNames>username</ColNames>
+      <ObjectId>32773</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>4272</StateNumber>
+      <Unique>1</Unique>
+      <AccessMethodId>403</AccessMethodId>
+      <CollationNames>default</CollationNames>
+      <CollationIds>100</CollationIds>
+      <CollationParentNames>pg_catalog</CollationParentNames>
+    </index>
+    <key id="279" parent="264" name="rts_users_pk">
+      <ObjectId>32774</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>4272</StateNumber>
+      <UnderlyingIndexId>32773</UnderlyingIndexId>
+    </key>
+    <column id="280" parent="265" name="username">
       <DasType>varchar(30)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StateNumber>761</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="274" parent="264" name="password">
+    <column id="281" parent="265" name="password">
       <DasType>varchar(30)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>762</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="275" parent="264" name="email">
+    <column id="282" parent="265" name="email">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StateNumber>763</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="276" parent="264" name="current_room">
+    <column id="283" parent="265" name="current_room">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>4</Position>
       <StateNumber>764</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="277" parent="264" name="pos_x">
+    <column id="284" parent="265" name="pos_x">
       <DasType>integer|0s</DasType>
       <NotNull>1</NotNull>
       <Position>5</Position>
       <StateNumber>765</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <column id="278" parent="264" name="pos_y">
+    <column id="285" parent="265" name="pos_y">
       <DasType>integer|0s</DasType>
       <NotNull>1</NotNull>
       <Position>6</Position>
       <StateNumber>766</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <column id="279" parent="264" name="sprite">
+    <column id="286" parent="265" name="sprite">
       <DasType>varchar(100)|0s</DasType>
       <Position>7</Position>
       <StateNumber>741</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="280" parent="264" name="online_status">
+    <column id="287" parent="265" name="online_status">
       <DasType>boolean|0s</DasType>
       <NotNull>1</NotNull>
       <Position>8</Position>
       <StateNumber>744</StateNumber>
       <TypeId>16</TypeId>
     </column>
-    <column id="281" parent="264" name="current_client">
+    <column id="288" parent="265" name="current_client">
       <DasType>integer|0s</DasType>
       <Position>9</Position>
       <StateNumber>782</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <index id="282" parent="264" name="users_pk">
+    <index id="289" parent="265" name="users_pk">
       <ColNames>username</ColNames>
       <ObjectId>16406</ObjectId>
       <Primary>1</Primary>
@@ -4378,7 +4436,7 @@ false Zulu
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <key id="283" parent="264" name="users_pk">
+    <key id="290" parent="265" name="users_pk">
       <ObjectId>16407</ObjectId>
       <Primary>1</Primary>
       <StateNumber>778</StateNumber>
