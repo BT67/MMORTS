@@ -51,10 +51,7 @@
     "name": "Tile Sets",
     "path": "folders/Tile Sets.yy",
   },
-  "spriteId": {
-    "name": "dungeon_all_2",
-    "path": "sprites/dungeon_all_2/dungeon_all_2.yy",
-  },
+  "spriteId": null,
   "spriteNoExport": true,
   "textureGroupId": {
     "name": "Default",
