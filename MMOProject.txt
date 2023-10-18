@@ -1,8 +1,0 @@
-MMO Project
-
-Lets Build a MMORPG vid 11
-
-
-PGadmin:
-postgres
-root

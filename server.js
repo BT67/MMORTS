@@ -116,18 +116,18 @@ net.createServer(function (socket) {
 console.log(timeNow() + config.msg_server_init + config.ip + ":" + config.port + "/" + config.environment)
 console.log(timeNow() + config.msg_server_db + config.database);
 
-updateEntities();
+update_step();
 
-async function updateEntities() {
+async function update_step() {
     mapList = Object.keys(maps);
     while (true) {
         mapList.forEach(function (map) {
             if (maps[map].clients.length > 0) {
-                console.log("client detected in room=" + map.toString());
                 maps[map].entities.forEach(async function (entity) {
-                    console.log("updating entity=" + entity.name);
                     if (entity.alive) {
-                        entity.attack_timer += 1;
+                        if (entity.attack_timer < entity.attack_period) {
+                            entity.attack_timer += 1;
+                        }
                         if (entity.target_entity === null) {
                             maps[map].entities.forEach(function (otherEntity) {
                                 if (otherEntity.alive) {
@@ -167,11 +167,6 @@ async function updateEntities() {
                                                         ], client.id));
                                                     });
                                                     otherEntity.health -= entity.attack_damage;
-                                                    maps[map].clients.forEach(function (otherClient) {
-                                                        otherClient.socket.write(packet.build([
-                                                            "HEALTH", otherEntity.name, otherEntity.health.toString()
-                                                        ], otherClient.id));
-                                                    });
                                                     if (otherEntity.health <= 0) {
                                                         maps[map].grid[otherEntity.pos_x][otherEntity.pos_y] = "empty";
                                                         otherEntity.alive = false;
@@ -198,44 +193,17 @@ async function updateEntities() {
                                 }
                             });
                         }
-                        var dist = distance(entity.pos_x, entity.pos_y, entity.origin_x, entity.origin_y);
-                        if (dist <= entity.roam_range) {
-                            if (entity.target_x !== entity.pos_x || entity.target_y !== entity.pos_y) {
-                                entity.path = createPath(map, entity.pos_x, entity.pos_y, entity.target_x, entity.target_y, entity.target_entity);
-                            }
+                        if (entity.target_x !== entity.pos_x || entity.target_y !== entity.pos_y) {
+                            entity.path = createPath(map, entity.pos_x, entity.pos_y, entity.target_x, entity.target_y, entity.target_entity);
                         }
-                        dist = distance(entity.target_x, entity.target_y, entity.origin_x, entity.origin_y);
-                        if (entity.path.length > 0 && dist <= entity.roam_range) {
+                        if (entity.path.length > 0) {
                             prev_pos_x = entity.pos_x;
                             prev_pos_y = entity.pos_y;
-                            console.log("moving towards target point");
                             moveTowardsTarget(map, entity);
                             maps[map].clients.forEach(function (client) {
                                 client.socket.write(packet.build([
                                     "POS", entity.name, prev_pos_x.toString(), prev_pos_y.toString(), entity.pos_x.toString(), entity.pos_y.toString()
                                 ], client.id));
-                            });
-                        }
-                    } else if (!entity.alive) {
-                        entity.respawn_timer -= 10;
-                        if (entity.respawn_timer <= 0) {
-                            entity.alive = true;
-                            entity.health = entity.max_health;
-                            entity.respawn_timer = entity.respawn_period;
-                            entity.pos_x = entity.origin_x;
-                            entity.pos_y = entity.origin_y;
-                            entity.target_x = entity.origin_x;
-                            entity.target_y = entity.origin_y;
-                            entity.target_entity = null;
-                            maps[map].clients.forEach(function (client) {
-                                params = [];
-                                params.push("SPAWN");
-                                params.push(entity.name);
-                                params.push(entity.type);
-                                params.push(entity.pos_x.toString());
-                                params.push(entity.pos_y.toString());
-                                params.push(entity.health);
-                                client.socket.write(packet.build(params, client.id));
                             });
                         }
                     }
@@ -355,7 +323,6 @@ function createPath(map, x1, y1, x2, y2) {
             new_point.status = "invalid";
         } else if (new_point.x === x2 && new_point.y === y2) {
             new_point.status = "end";
-            //} else if (grid_copy[new_point.x][new_point.y] === "wall" || grid_copy[new_point.x][new_point.y] === "checked") {
         } else if (grid_copy[new_point.x][new_point.y] !== "empty") {
             new_point.status = "blocked";
         } else {
@@ -395,16 +362,13 @@ function createPath(map, x1, y1, x2, y2) {
         ) {
             try {
                 final_path.pop();
-                console.log("removed final_point because it was occupied");
             } catch {
-                console.log("unable to remove last element from path");
             }
         } else {
             break;
         }
     }
     grid_copy = [];
-    //console.log("path length=" + final_path.length.toString());
     return final_path;
 }
 
@@ -424,40 +388,11 @@ function randomInt(min, max) {
 }
 
 function drawFloors(client) {
-    maps[client.current_room].rooms.forEach(function (room) {
-        params = [];
-        params.push("FLOOR");
-        params.push(room.floor_type);
-        params.push(room.origin_x.toString());
-        params.push(room.origin_y.toString());
-        params.push(room.width.toString());
-        params.push(room.height.toString());
-        client.socket.write(packet.build(params, client.id));
-    });
-    maps[client.current_room].connections.forEach(function (connection) {
-        params = [];
-        params.push("FLOOR");
-        params.push(connection.floor_type);
-        params.push(connection.origin_x.toString());
-        params.push(connection.origin_y.toString());
-        params.push(connection.width.toString());
-        params.push(connection.height.toString());
-        client.socket.write(packet.build(params, client.id));
-    });
+    //TODO update drawFloors function to cover whole map
 }
 
 function spawnWalls(client) {
-    var packet_count = 1;
-    for (var i = 0; i < maps[client.current_room].walls.length; ++i) {
-        params = [];
-        params.push("WALL");
-        params.push(maps[client.current_room].walls[i].type);
-        params.push(maps[client.current_room].walls[i].pos_x.toString());
-        params.push(maps[client.current_room].walls[i].pos_y.toString());
-        params.push(i.toString());
-        client.socket.write(packet.build(params, client.id));
-        packet_count++;
-    }
+    //TODO update spawnwalls function
 }
 
 function spawnEntities(client) {
@@ -473,20 +408,6 @@ function spawnEntities(client) {
             params.push(entity.max_health.toString())
             client.socket.write(packet.build(params, client.id));
         }
-    });
-}
-
-function spawnClients(client) {
-    maps[client.current_room].clients.forEach(function (otherClient) {
-        params = [];
-        params.push("SPAWN");
-        params.push(otherClient.username);
-        params.push("player");
-        params.push(otherClient.pos_x.toString());
-        params.push(otherClient.pos_y.toString());
-        params.push(otherClient.health.toString());
-        params.push(otherClient.max_health.toString());
-        client.socket.write(packet.build(params, client.id));
     });
 }
 

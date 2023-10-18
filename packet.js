@@ -20,8 +20,8 @@ var zeroBuffer = Buffer.from("00", "hex");
 const chat_logger = winston.createLogger({
     level: 'info',
     format: winston.format.json(),
-    defaultMeta: { service: 'user-service' },
-    transports: [new winston.transports.File({ filename: 'chat.log' })],
+    defaultMeta: {service: 'user-service'},
+    transports: [new winston.transports.File({filename: 'chat.log'})],
 });
 
 module.exports = packet = {
@@ -69,6 +69,7 @@ module.exports = packet = {
     interpret: function (client, datapacket) {
         var query;
         var header = PacketModels.header.parse(datapacket);
+
         function login(username, password) {
             function setLogin(username, password) {
                 query = "UPDATE public.rts_users SET online_status = true, current_client = " + client.id +
@@ -82,6 +83,7 @@ module.exports = packet = {
                     console.log(error.stack);
                 }
             }
+
             async function loginQuery(username, password) {
                 var data;
                 query = "SELECT * FROM public.rts_users WHERE username = '" +
@@ -94,6 +96,7 @@ module.exports = packet = {
                 }
                 return data;
             }
+
             async function processLogin(username, password) {
                 data = await loginQuery(username, password);
                 if (data.length < 1) {
@@ -108,6 +111,7 @@ module.exports = packet = {
                     username
                 ], client.id));
             }
+
             try {
                 processLogin(username, password);
                 setLogin(username, password);
@@ -140,12 +144,9 @@ module.exports = packet = {
                 return;
             }
             //If username is not taken, register the user:
-            var start_room = config.start_room;
-            var start_x = config.start_x;
-            var start_y = config.start_y;
             query = "INSERT INTO public.rts_users" +
                 "(email, username, password, current_room, online_status, current_client) " +
-                "VALUES ('" + email + "', '" + username + "', '" + password + "', '" + start_room + "', false, null);";
+                "VALUES ('" + email + "', '" + username + "', '" + password + "', null, false, null);";
             console.log(timeNow() + query);
             connection.query(query, function (error) {
                 if (error) {
@@ -165,7 +166,7 @@ module.exports = packet = {
 
         function pos(target_x, target_y) {
             maps[client.current_room].clients.forEach(function (otherClient) {
-                if(otherClient.username === client.username){
+                if (otherClient.username === client.username) {
                     target_x = parseInt((target_x / 32) - 1);
                     target_y = parseInt((target_y / 32) - 1);
                     otherClient.target_entity = null;
@@ -180,15 +181,19 @@ module.exports = packet = {
         }
 
         //Send entity attacks to other clients
-        function attack(target_entity) {
-            client.target_x = client.pos_x;
-            client.target_y = client.pos_y;
-            client.target_entity = target_entity;
+        function attack(attacking_entity, target_entity) {
+            maps[client.current_room].entities.every(function (entity) {
+                if (entity.name === attacking_entity) {
+                    entity.target_entity = target_entity;
+                    return false;
+                }
+                return true;
+            })
         }
 
         function chat(message) {
-            if(message.length > config.chat_max_length){
-                message = message.substring(0,36);
+            if (message.length > config.chat_max_length) {
+                message = message.substring(0, 36);
             }
             var chat_log_json = {
                 "time": timeNow(),
@@ -197,17 +202,15 @@ module.exports = packet = {
             }
             message = client.username + ": " + message;
             chat_logger.info(chat_log_json);
-            maps[client.current_room].clients.forEach(function (otherclient) {
+            maps[client.current_room].clients.forEach(function (otherClient) {
                 client.socket.write(packet.build([
                     "CHAT", message
-                ], otherclient.id));
+                ], otherClient.id));
             });
         }
 
         function logout(clientId) {
-            query = "UPDATE public.rts_users SET online_status = false, current_client = null, " +
-                "pos_x = " + client.pos_x + ", pos_y = " + client.pos_y +
-                " WHERE current_client = '" + clientId.toString() + "' AND online_status = true";
+            query = "UPDATE public.rts_users SET online_status = false, current_client = null, WHERE current_client = '" + clientId.toString() + "' AND online_status = true";
             console.log(timeNow() + query);
             try {
                 connection.query(query);
@@ -224,7 +227,7 @@ module.exports = packet = {
                         OtherClient.socket.write(packet.build(["DESTROY", client.username]));
                     }
                 });
-            } catch(error){
+            } catch (error) {
                 console.log(timeNow() + config.err_msg_leaving_room + client.current_room);
                 console.log(error.stack);
             }
@@ -248,9 +251,7 @@ module.exports = packet = {
                 break;
             case "ATTACK":
                 data = PacketModels.attack.parse(datapacket);
-                if (!checkAttack(data.target_entity)) {
-                    attack(data.target_entity);
-                }
+                attack(data.attacking_entity, data.target_entity);
                 break;
             case "LOGOUT":
                 logout(client.id);
@@ -272,7 +273,7 @@ function timeNow() {
     return "[" + timeStamp + "] ";
 }
 
-function password_reset(client, email){
+function password_reset(client, email) {
 
     password = generate_password();
 
@@ -301,7 +302,7 @@ function password_reset(client, email){
         text: password
     };
 
-    transporter.sendMail(mailOptions, function(error, info){
+    transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
             console.log(error);
         } else {
@@ -310,7 +311,7 @@ function password_reset(client, email){
     });
 }
 
-function generate_password(){
+function generate_password() {
     return generator.generate({
         length: 16,
         numbers: true

@@ -40,6 +40,7 @@ module.exports = PacketModels = {
         .string("target_y", StringOptions),
     attack: new Parser().skip(1)
         .string("command", StringOptions)
+        .string("attacking_entity", StringOptions)
         .string("target_entity", StringOptions),
     destroy: new Parser().skip(1)
         .string("command", StringOptions)
